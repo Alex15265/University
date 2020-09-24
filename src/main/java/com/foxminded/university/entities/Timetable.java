@@ -1,16 +1,14 @@
-package com.foxminded.university;
+package com.foxminded.university.entities;
+
+import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@Data
 public class Timetable {
-
-    private List<Lesson> listOfLessons;
-
-    public Timetable() {
-        listOfLessons = new ArrayList<>();
-    }
+    private List<Lesson> listOfLessons = new ArrayList<>();
 
     public void addLesson(Lesson  lesson) {
         listOfLessons.add(lesson);
@@ -22,9 +20,5 @@ public class Timetable {
 
     public void removeLesson(Lesson lesson) {
         listOfLessons.remove(lesson);
-    }
-
-    public List<Lesson> getListOfLessons() {
-        return listOfLessons;
     }
 }

@@ -1,5 +1,6 @@
-package com.foxminded.university;
+package com.foxminded.university.init;
 
+import com.foxminded.university.entities.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -7,8 +8,8 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDateTime;
 import java.util.List;
 
-class UniversityTest {
-    private static University university;
+class TimetableGeneratorTest {
+    private static TimetableGenerator generator;
     private static Professor professor1;
     private static Professor professor2;
     private static Group group1;
@@ -24,7 +25,7 @@ class UniversityTest {
 
     @BeforeAll
     static void initTimetable() {
-        university = new University();
+        generator = new TimetableGenerator();
         course1 = new Course("History", "HistoryDescription");
         course2 = new Course("English", "EnglishDescription");
         course3 = new Course("Robotics", "RoboticsDescription");
@@ -101,14 +102,14 @@ class UniversityTest {
         lesson19.addGroups(group1, group2);
         Lesson lesson20 = new Lesson(professor2, course4, classRoom2, lessonTime20);
         lesson20.addGroups(group1, group2, group3, group4);
-        university.getTimetable().addLessons(lesson1, lesson2, lesson3, lesson4, lesson5, lesson6, lesson7, lesson8, lesson9, lesson10,
-                 lesson11, lesson12, lesson13, lesson14, lesson15, lesson16, lesson17, lesson18, lesson19, lesson20);
+        generator.getUniversity().getTimetable().addLessons(lesson1, lesson2, lesson3, lesson4, lesson5, lesson6, lesson7, lesson8, lesson9, lesson10,
+                lesson11, lesson12, lesson13, lesson14, lesson15, lesson16, lesson17, lesson18, lesson19, lesson20);
     }
 
     @Test
     void readProfessorTimetableForADay_ShouldReturnAListOf1CorrectLessonsWhenReceiveAProfessor1AndDate() {
         LocalDateTime date = LocalDateTime.of(2020, 10, 2, 0, 0);
-        Timetable professor1TTForADay = university.readProfessorTimetableForADay(professor1, date);
+        Timetable professor1TTForADay = generator.readProfessorTimetableForADay(professor1, date);
         List<Lesson> list = professor1TTForADay.getListOfLessons();
         Assertions.assertEquals(1, list.size());
         Assertions.assertEquals(group1, list.get(0).getGroups().get(0));
@@ -121,7 +122,7 @@ class UniversityTest {
     @Test
     void readProfessorTimetableForADay_ShouldReturnAListOf2CorrectLessonsWhenReceiveAProfessor2AndDate() {
         LocalDateTime date = LocalDateTime.of(2020, 9, 14, 0, 0);
-        Timetable professor2TTForADay = university.readProfessorTimetableForADay(professor2, date);
+        Timetable professor2TTForADay = generator.readProfessorTimetableForADay(professor2, date);
         List<Lesson> list = professor2TTForADay.getListOfLessons();
         Assertions.assertEquals(2, list.size());
         Assertions.assertEquals(group1, list.get(0).getGroups().get(0));
@@ -141,7 +142,7 @@ class UniversityTest {
     @Test
     void readProfessorTimetableForADay_ShouldReturnAListOf0LessonsWhenReceiveAProfessor1AndDate() {
         LocalDateTime date = LocalDateTime.of(2020, 9, 2, 0, 0);
-        Timetable professor1TTForADay = university.readProfessorTimetableForADay(professor1, date);
+        Timetable professor1TTForADay = generator.readProfessorTimetableForADay(professor1, date);
         List<Lesson> list = professor1TTForADay.getListOfLessons();
         Assertions.assertEquals(0, list.size());
     }
@@ -149,7 +150,7 @@ class UniversityTest {
     @Test
     void readProfessorTimetableForAMonth_ShouldReturnAListOf3CorrectLessonsWhenReceiveAProfessor1AndDate() {
         LocalDateTime date = LocalDateTime.of(2020, 10, 2, 0, 0);
-        Timetable professor1TTForAMonth = university.readProfessorTimetableForAMonth(professor1, date);
+        Timetable professor1TTForAMonth = generator.readProfessorTimetableForAMonth(professor1, date);
         List<Lesson> list = professor1TTForAMonth.getListOfLessons();
         Assertions.assertEquals(3, list.size());
         Assertions.assertEquals(group1, list.get(0).getGroups().get(0));
@@ -178,7 +179,7 @@ class UniversityTest {
     @Test
     void readProfessorTimetableForAMonth_ShouldReturnAListOf2CorrectLessonsWhenReceiveAProfessor2AndDate() {
         LocalDateTime date = LocalDateTime.of(2020, 11, 1, 0, 0);
-        Timetable professor1TTForAMonth = university.readProfessorTimetableForAMonth(professor2, date);
+        Timetable professor1TTForAMonth = generator.readProfessorTimetableForAMonth(professor2, date);
         List<Lesson> list = professor1TTForAMonth.getListOfLessons();
         Assertions.assertEquals(2, list.size());
         Assertions.assertEquals(group3, list.get(0).getGroups().get(0));
@@ -201,7 +202,7 @@ class UniversityTest {
     @Test
     void readStudentTimetableForADay_ShouldReturnAListOf2CorrectLessonsWhenReceiveAGroup2AndCourse1AndDate() {
         LocalDateTime date = LocalDateTime.of(2020, 10, 19, 0, 0);
-        Timetable studentTTForADay = university.readStudentTimetableForADay(group2, course1, date);
+        Timetable studentTTForADay = generator.readStudentTimetableForADay(group2, course1, date);
         List<Lesson> list = studentTTForADay.getListOfLessons();
         Assertions.assertEquals(2, list.size());
         Assertions.assertEquals(professor1, list.get(0).getProfessor());
@@ -218,7 +219,7 @@ class UniversityTest {
     @Test
     void readStudentTimetableForADay_ShouldReturnAListOf1CorrectLessonWhenReceiveAGroup1AndCourse1AndDate() {
         LocalDateTime date = LocalDateTime.of(2020, 9, 1, 0, 0);
-        Timetable studentTTForADay = university.readStudentTimetableForADay(group1, course1, date);
+        Timetable studentTTForADay = generator.readStudentTimetableForADay(group1, course1, date);
         List<Lesson> list = studentTTForADay.getListOfLessons();
         Assertions.assertEquals(1, list.size());
         Assertions.assertEquals(professor1, list.get(0).getProfessor());
@@ -230,7 +231,7 @@ class UniversityTest {
     @Test
     void readStudentTimetableForADay_ShouldReturnAListOf0LessonWhenReceiveAGroup1AndCourse1AndDate() {
         LocalDateTime date = LocalDateTime.of(2020, 9, 2, 0, 0);
-        Timetable studentTTForADay = university.readStudentTimetableForADay(group1, course1, date);
+        Timetable studentTTForADay = generator.readStudentTimetableForADay(group1, course1, date);
         List<Lesson> list = studentTTForADay.getListOfLessons();
         Assertions.assertEquals(0, list.size());
     }
@@ -238,7 +239,7 @@ class UniversityTest {
     @Test
     void readStudentTimetableForAMonth_ShouldReturnAListOf2CorrectLessonsWhenReceiveAGroup2AndCourse1AndDate() {
         LocalDateTime date = LocalDateTime.of(2020, 9, 1, 0, 0);
-        Timetable student1TTForAMonth = university.readStudentTimetableForAMonth(group2, course1, date);
+        Timetable student1TTForAMonth = generator.readStudentTimetableForAMonth(group2, course1, date);
         List<Lesson> list = student1TTForAMonth.getListOfLessons();
         Assertions.assertEquals(2, list.size());
         Assertions.assertEquals(professor1, list.get(0).getProfessor());
@@ -255,7 +256,7 @@ class UniversityTest {
     @Test
     void readStudentTimetableForAMonth_ShouldReturnAListOf1CorrectLessonsWhenReceiveAGroup3AndCourse4AndDate() {
         LocalDateTime date = LocalDateTime.of(2020, 9, 29, 0, 0);
-        Timetable student1TTForAMonth = university.readStudentTimetableForAMonth(group3, course4, date);
+        Timetable student1TTForAMonth = generator.readStudentTimetableForAMonth(group3, course4, date);
         List<Lesson> list = student1TTForAMonth.getListOfLessons();
         Assertions.assertEquals(1, list.size());
         Assertions.assertEquals(professor2, list.get(0).getProfessor());
