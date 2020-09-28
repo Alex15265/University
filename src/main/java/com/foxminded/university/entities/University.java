@@ -6,6 +6,7 @@ import java.util.List;
 
 @Data
 public class University {
+    private Integer id;
     private List<Professor> professors;
     private List<Student> students;
     private List<Course> courses;

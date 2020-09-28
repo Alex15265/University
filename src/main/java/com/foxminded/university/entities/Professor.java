@@ -6,7 +6,7 @@ import java.util.List;
 
 @Data
 public class Professor {
-    private Integer professorID;
+    private Integer id;
     private String name;
     private String lastName;
     private List<Course> courses;

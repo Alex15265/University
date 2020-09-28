@@ -6,6 +6,7 @@ import java.util.List;
 
 @Data
 public class Lesson {
+    private Integer id;
     private Professor professor;
     private Course course;
     private ClassRoom classRoom;

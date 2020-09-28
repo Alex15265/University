@@ -6,5 +6,6 @@ import java.util.List;
 
 @Data
 public class Timetable {
+    private Integer id;
     private List<Lesson> listOfLessons;
 }
