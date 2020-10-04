@@ -1,9 +1,9 @@
-package com.foxminded.university.entities;
+package com.foxminded.university.dao.entities;
 
 import lombok.Data;
 
 @Data
 public class ClassRoom {
-    private Integer id;
+    private Integer roomId;
     private Integer roomNumber;
 }

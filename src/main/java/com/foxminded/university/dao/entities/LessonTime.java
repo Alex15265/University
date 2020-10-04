@@ -1,4 +1,4 @@
-package com.foxminded.university.entities;
+package com.foxminded.university.dao.entities;
 
 import lombok.Data;
 
@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 @Data
 public class LessonTime {
-    private Integer id;
+    private Integer timeId;
     private LocalDateTime lessonStart;
     private LocalDateTime lessonEnd;
 }
