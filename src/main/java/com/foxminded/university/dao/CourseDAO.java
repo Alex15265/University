@@ -1,6 +1,7 @@
 package com.foxminded.university.dao;
 
 import com.foxminded.university.dao.entities.Course;
+import com.foxminded.university.dao.entities.Student;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
@@ -12,6 +13,14 @@ public class CourseDAO implements DAO<Course,Integer> {
     private static final String READ_ALL = "SELECT * FROM courses";
     private static final String CREATE = "INSERT INTO courses (course_name, course_description) VALUES (?, ?)";
     private static final String DELETE = "DELETE FROM courses WHERE course_id = ?";
+    private static final String READ_BY_COURSE_NAME =
+                    "SELECT students.student_id, students.first_name, students.last_name " +
+                    "FROM students_courses " +
+                    "INNER  JOIN students " +
+                    "ON students_courses.student_id = students.student_id " +
+                    "WHERE students_courses.course_id = ?";
+    private static final String ADD_TO_COURSE = "INSERT INTO students_courses (student_id, course_id) VALUES (?, ?)";
+    private static final String DELETE_FROM_COURSE = "DELETE FROM students_courses WHERE student_id = ? AND course_id = ?";
     private final JdbcTemplate jdbcTemplate;
 
     public CourseDAO(DriverManagerDataSource dataSource) {
@@ -54,5 +63,23 @@ public class CourseDAO implements DAO<Course,Integer> {
     @Override
     public void delete(Integer id) {
         jdbcTemplate.update(DELETE, id);
+    }
+
+    public List<Student> readStudentsByCourse(Integer courseId) {
+        return jdbcTemplate.query(READ_BY_COURSE_NAME, (resultSet, rowNum) -> {
+            Student student = new Student();
+            student.setStudentId(resultSet.getInt("student_id"));
+            student.setFirstName(resultSet.getString("first_name"));
+            student.setLastName(resultSet.getString("last_name"));
+            return student;
+        }, courseId);
+    }
+
+    public void addStudentToCourse(Integer studentId, Integer courseId) {
+        jdbcTemplate.update(ADD_TO_COURSE, studentId, courseId);
+    }
+
+    public void deleteStudentFromCourse(Integer studentId, Integer courseId) {
+        jdbcTemplate.update(DELETE_FROM_COURSE, studentId, courseId);
     }
 }
