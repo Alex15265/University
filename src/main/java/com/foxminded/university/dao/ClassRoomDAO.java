@@ -4,7 +4,10 @@ import com.foxminded.university.dao.entities.ClassRoom;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 
+import java.sql.PreparedStatement;
 import java.util.List;
 
 public class ClassRoomDAO implements DAO<ClassRoom,Integer> {
@@ -20,8 +23,17 @@ public class ClassRoomDAO implements DAO<ClassRoom,Integer> {
     }
 
     @Override
-    public void create(ClassRoom room) {
-        jdbcTemplate.update(CREATE, room.getRoomNumber());
+    public ClassRoom create(ClassRoom room) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(connection -> {
+                    PreparedStatement resultSet =
+                            connection.prepareStatement(CREATE, new String[] {"room_id"});
+                    resultSet.setInt(1, room.getRoomNumber());
+                    return resultSet;
+                },
+                keyHolder);
+        room.setRoomId((Integer) keyHolder.getKey());
+        return room;
     }
 
     @Override
@@ -37,9 +49,10 @@ public class ClassRoomDAO implements DAO<ClassRoom,Integer> {
     }
 
     @Override
-    public void update(ClassRoom room) {
+    public ClassRoom update(ClassRoom room) {
         jdbcTemplate.update(UPDATE,
                 room.getRoomNumber(), room.getRoomId());
+        return room;
     }
 
     @Override

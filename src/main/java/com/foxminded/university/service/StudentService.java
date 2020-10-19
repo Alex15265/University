@@ -9,35 +9,36 @@ import java.util.List;
 public class StudentService {
     private final ClassPathXmlApplicationContext context;
     private final StudentDAO studentDAO;
+
     public StudentService(String configLocation, StudentDAO studentDAO) {
         context = new ClassPathXmlApplicationContext(configLocation);
         this.studentDAO = studentDAO;
     }
 
-    public void createStudent(String firstName, String lastName) {
+    public Student createStudent(String firstName, String lastName) {
         Student student = context.getBean("student", Student.class);
         student.setFirstName(firstName);
         student.setLastName(lastName);
-        studentDAO.create(student);
+        return studentDAO.create(student);
     }
 
     public List<Student> readAllStudents() {
         return studentDAO.readAll();
     }
 
-    public Student readStudentByID(Integer id) {
-        return studentDAO.readByID(id);
+    public Student readStudentByID(Integer studentId) {
+        return studentDAO.readByID(studentId);
     }
 
-    public void updateStudent(Integer id, String firstName, String lastName) {
+    public Student updateStudent(Integer studentId, String firstName, String lastName) {
         Student student = context.getBean("student", Student.class);
-        student.setStudentId(id);
+        student.setStudentId(studentId);
         student.setFirstName(firstName);
         student.setLastName(lastName);
-        studentDAO.update(student);
+        return studentDAO.update(student);
     }
 
-    public void deleteStudent(Integer id) {
-        studentDAO.delete(id);
+    public void deleteStudent(Integer studentId) {
+        studentDAO.delete(studentId);
     }
 }

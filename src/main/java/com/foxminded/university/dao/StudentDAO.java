@@ -4,7 +4,10 @@ import com.foxminded.university.dao.entities.Student;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 
+import java.sql.PreparedStatement;
 import java.util.List;
 
 public class StudentDAO implements DAO<Student,Integer> {
@@ -20,8 +23,18 @@ public class StudentDAO implements DAO<Student,Integer> {
     }
 
     @Override
-    public void create(Student student) {
-        jdbcTemplate.update(CREATE, student.getFirstName(), student.getLastName());
+    public Student create(Student student) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(connection -> {
+                    PreparedStatement resultSet =
+                    connection.prepareStatement(CREATE, new String[] {"student_id"});
+                    resultSet.setString(1, student.getFirstName());
+                    resultSet.setString(2, student.getLastName());
+                    return resultSet;
+                },
+                keyHolder);
+        student.setStudentId((Integer) keyHolder.getKey());
+        return student;
     }
 
     @Override
@@ -37,9 +50,10 @@ public class StudentDAO implements DAO<Student,Integer> {
     }
 
     @Override
-    public void update(Student student) {
+    public Student update(Student student) {
         jdbcTemplate.update(UPDATE,
                 student.getFirstName(), student.getLastName(), student.getStudentId());
+        return student;
     }
 
     @Override

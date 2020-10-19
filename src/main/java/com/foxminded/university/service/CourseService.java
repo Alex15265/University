@@ -10,16 +10,17 @@ import java.util.List;
 public class CourseService {
     private final ClassPathXmlApplicationContext context;
     private final CourseDAO courseDAO;
+
     public CourseService(String configLocation, CourseDAO courseDAO) {
         context = new ClassPathXmlApplicationContext(configLocation);
         this.courseDAO = courseDAO;
     }
 
-    public void createCourse(String courseName, String description) {
+    public Course createCourse(String courseName, String description) {
         Course course = context.getBean("course", Course.class);
         course.setCourseName(courseName);
         course.setDescription(description);
-        courseDAO.create(course);
+        return courseDAO.create(course);
     }
 
     public List<Course> readAllCourses() {
@@ -30,18 +31,18 @@ public class CourseService {
         return courses;
     }
 
-    public Course readCourseByID (Integer id) {
-        Course course = courseDAO.readByID(id);
-        course.setStudents(courseDAO.readStudentsByCourse(course.getCourseId()));
+    public Course readCourseByID (Integer courseId) {
+        Course course = courseDAO.readByID(courseId);
+        course.setStudents(courseDAO.readStudentsByCourse(courseId));
         return course;
     }
 
-    public void updateCourse(Integer courseId, String courseName, String courseDescription) {
+    public Course updateCourse(Integer courseId, String courseName, String courseDescription) {
         Course course = context.getBean("course", Course.class);
         course.setCourseId(courseId);
         course.setCourseName(courseName);
         course.setDescription(courseDescription);
-        courseDAO.update(course);
+        return courseDAO.update(course);
     }
 
     public void deleteCourse(Integer courseId) {

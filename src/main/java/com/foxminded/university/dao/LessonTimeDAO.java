@@ -3,7 +3,10 @@ package com.foxminded.university.dao;
 import com.foxminded.university.dao.entities.LessonTime;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 
+import java.sql.PreparedStatement;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -22,9 +25,18 @@ public class LessonTimeDAO implements DAO<LessonTime,Integer> {
     }
 
     @Override
-    public void create(LessonTime lessonTime) {
-        jdbcTemplate.update(CREATE, lessonTime.getLessonStart().format(formatter),
-                lessonTime.getLessonEnd().format(formatter));
+    public LessonTime create(LessonTime lessonTime) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(connection -> {
+                    PreparedStatement resultSet =
+                            connection.prepareStatement(CREATE, new String[] {"time_id"});
+                    resultSet.setString(1, lessonTime.getLessonStart().format(formatter));
+                    resultSet.setString(2, lessonTime.getLessonEnd().format(formatter));
+                    return resultSet;
+                },
+                keyHolder);
+        lessonTime.setTimeId((Integer) keyHolder.getKey());
+        return lessonTime;
     }
 
     @Override
@@ -54,10 +66,11 @@ public class LessonTimeDAO implements DAO<LessonTime,Integer> {
     }
 
     @Override
-    public void update(LessonTime lessonTime) {
+    public LessonTime update(LessonTime lessonTime) {
         jdbcTemplate.update(UPDATE, lessonTime.getLessonStart().format(formatter),
             lessonTime.getLessonEnd().format(formatter),
             lessonTime.getTimeId());
+        return lessonTime;
     }
 
     @Override

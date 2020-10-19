@@ -1,9 +1,13 @@
 package com.foxminded.university.dao;
 
 import com.foxminded.university.dao.entities.Group;
+import com.foxminded.university.dao.entities.Student;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 
+import java.sql.PreparedStatement;
 import java.util.List;
 
 public class GroupDAO implements DAO<Group,Integer> {
@@ -12,6 +16,14 @@ public class GroupDAO implements DAO<Group,Integer> {
     private static final String READ_ALL = "SELECT * FROM groups";
     private static final String CREATE = "INSERT INTO groups (group_name) VALUES (?)";
     private static final String DELETE = "DELETE FROM groups WHERE group_id = ?";
+    private static final String READ_STUDENT_BY_GROUP =
+                    "SELECT students.student_id, students.first_name, students.last_name " +
+                    "FROM groups " +
+                    "INNER  JOIN students " +
+                    "ON groups.group_id = students.group_id " +
+                    "WHERE groups.group_id = ?";
+    private static final String ADD_STUDENT_TO_GROUP = "UPDATE students set group_id = ? WHERE student_id = ?";
+    private static final String DELETE_STUDENT_FROM_GROUP = "UPDATE students set group_id = null WHERE student_id = ?";
     private final JdbcTemplate jdbcTemplate;
 
     public GroupDAO(DriverManagerDataSource dataSource) {
@@ -19,8 +31,17 @@ public class GroupDAO implements DAO<Group,Integer> {
     }
 
     @Override
-    public void create(Group group) {
-        jdbcTemplate.update(CREATE, group.getGroupName());
+    public Group create(Group group) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(connection -> {
+                    PreparedStatement resultSet =
+                            connection.prepareStatement(CREATE, new String[] {"group_id"});
+                    resultSet.setString(1, group.getGroupName());
+                    return resultSet;
+                },
+                keyHolder);
+        group.setGroupId((Integer) keyHolder.getKey());
+        return group;
     }
 
     @Override
@@ -44,12 +65,31 @@ public class GroupDAO implements DAO<Group,Integer> {
     }
 
     @Override
-    public void update(Group group) {
+    public Group update(Group group) {
         jdbcTemplate.update(UPDATE, group.getGroupName(), group.getGroupId());
+        return group;
     }
 
     @Override
     public void delete(Integer id) {
         jdbcTemplate.update(DELETE, id);
+    }
+
+    public List<Student> readStudentsByGroup(Integer groupId) {
+        return jdbcTemplate.query(READ_STUDENT_BY_GROUP, (resultSet, rowNum) -> {
+            Student student = new Student();
+            student.setStudentId(resultSet.getInt("student_id"));
+            student.setFirstName(resultSet.getString("first_name"));
+            student.setLastName(resultSet.getString("last_name"));
+            return student;
+        }, groupId);
+    }
+
+    public void addStudentToGroup(Integer studentId, Integer groupId) {
+        jdbcTemplate.update(ADD_STUDENT_TO_GROUP, groupId, studentId);
+    }
+
+    public void deleteStudentFromGroup(Integer studentId) {
+        jdbcTemplate.update(DELETE_STUDENT_FROM_GROUP, studentId);
     }
 }
