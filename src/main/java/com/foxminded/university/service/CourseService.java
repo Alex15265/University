@@ -3,27 +3,24 @@ package com.foxminded.university.service;
 import com.foxminded.university.dao.CourseDAO;
 import com.foxminded.university.dao.entities.Course;
 import com.foxminded.university.dao.entities.Student;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.util.List;
 
 public class CourseService {
-    private final ClassPathXmlApplicationContext context;
     private final CourseDAO courseDAO;
 
-    public CourseService(String configLocation, CourseDAO courseDAO) {
-        context = new ClassPathXmlApplicationContext(configLocation);
+    public CourseService(CourseDAO courseDAO) {
         this.courseDAO = courseDAO;
     }
 
-    public Course createCourse(String courseName, String description) {
-        Course course = context.getBean("course", Course.class);
+    public Course create(String courseName, String description) {
+        Course course = new Course();
         course.setCourseName(courseName);
         course.setDescription(description);
         return courseDAO.create(course);
     }
 
-    public List<Course> readAllCourses() {
+    public List<Course> readAll() {
         List<Course> courses = courseDAO.readAll();
         for (Course course: courses) {
             course.setStudents(courseDAO.readStudentsByCourse(course.getCourseId()));
@@ -31,21 +28,21 @@ public class CourseService {
         return courses;
     }
 
-    public Course readCourseByID (Integer courseId) {
+    public Course readByID (Integer courseId) {
         Course course = courseDAO.readByID(courseId);
         course.setStudents(courseDAO.readStudentsByCourse(courseId));
         return course;
     }
 
-    public Course updateCourse(Integer courseId, String courseName, String courseDescription) {
-        Course course = context.getBean("course", Course.class);
+    public Course update(Integer courseId, String courseName, String courseDescription) {
+        Course course = new Course();
         course.setCourseId(courseId);
         course.setCourseName(courseName);
         course.setDescription(courseDescription);
         return courseDAO.update(course);
     }
 
-    public void deleteCourse(Integer courseId) {
+    public void delete(Integer courseId) {
         courseDAO.delete(courseId);
     }
 

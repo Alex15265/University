@@ -3,27 +3,24 @@ package com.foxminded.university.service;
 import com.foxminded.university.dao.ProfessorDAO;
 import com.foxminded.university.dao.entities.Course;
 import com.foxminded.university.dao.entities.Professor;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.util.List;
 
 public class ProfessorService {
-    private final ClassPathXmlApplicationContext context;
     private final ProfessorDAO professorDAO;
 
-    public ProfessorService(String configLocation, ProfessorDAO professorDAO) {
-        context = new ClassPathXmlApplicationContext(configLocation);
+    public ProfessorService(ProfessorDAO professorDAO) {
         this.professorDAO = professorDAO;
     }
 
-    public Professor createProfessor(String firstName, String lastName) {
-        Professor professor = context.getBean("professor", Professor.class);
+    public Professor create(String firstName, String lastName) {
+        Professor professor = new Professor();
         professor.setFirstName(firstName);
         professor.setLastName(lastName);
         return professorDAO.create(professor);
     }
 
-    public List<Professor> readAllProfessors() {
+    public List<Professor> readAll() {
         List<Professor> professors = professorDAO.readAll();
         for (Professor professor: professors) {
             professor.setCourses(professorDAO.readCoursesByProfessor(professor.getProfessorId()));
@@ -31,21 +28,21 @@ public class ProfessorService {
         return professors;
     }
 
-    public Professor readProfessorById(Integer professorId) {
+    public Professor readById(Integer professorId) {
         Professor professor = professorDAO.readByID(professorId);
         professor.setCourses(professorDAO.readCoursesByProfessor(professorId));
         return professor;
     }
 
-    public Professor updateProfessor(Integer professorId, String firstName, String lastName) {
-        Professor professor = context.getBean("professor", Professor.class);
+    public Professor update(Integer professorId, String firstName, String lastName) {
+        Professor professor = new Professor();
         professor.setProfessorId(professorId);
         professor.setFirstName(firstName);
         professor.setLastName(lastName);
         return professorDAO.update(professor);
     }
 
-    public void deleteProfessor(Integer professorId) {
+    public void delete(Integer professorId) {
         professorDAO.delete(professorId);
     }
 

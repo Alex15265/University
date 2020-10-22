@@ -2,44 +2,41 @@ package com.foxminded.university.service;
 
 import com.foxminded.university.dao.LessonTimeDAO;
 import com.foxminded.university.dao.entities.LessonTime;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 public class LessonTimeService {
-    private final ClassPathXmlApplicationContext context;
     private final LessonTimeDAO lessonTimeDAO;
 
-    public LessonTimeService(String configLocation, LessonTimeDAO lessonTimeDAO) {
-        context = new ClassPathXmlApplicationContext(configLocation);
+    public LessonTimeService(LessonTimeDAO lessonTimeDAO) {
         this.lessonTimeDAO = lessonTimeDAO;
     }
 
-    public void createLessonTime(LocalDateTime lessonStart, LocalDateTime lessonEnd) {
-        LessonTime lessonTime = context.getBean("lessonTime", LessonTime.class);
+    public LessonTime create(LocalDateTime lessonStart, LocalDateTime lessonEnd) {
+        LessonTime lessonTime = new LessonTime();
         lessonTime.setLessonStart(lessonStart);
         lessonTime.setLessonEnd(lessonEnd);
-        lessonTimeDAO.create(lessonTime);
+        return lessonTimeDAO.create(lessonTime);
     }
 
-    public List<LessonTime> readAllLessonTimes() {
+    public List<LessonTime> readAll() {
         return lessonTimeDAO.readAll();
     }
 
-    public LessonTime readLessonTimeByID(Integer id) {
+    public LessonTime readByID(Integer id) {
         return lessonTimeDAO.readByID(id);
     }
 
-    public void updateLessonTime(Integer timeId, LocalDateTime lessonStart, LocalDateTime lessonEnd) {
-        LessonTime lessonTime = context.getBean("lessonTime", LessonTime.class);
+    public LessonTime update(Integer timeId, LocalDateTime lessonStart, LocalDateTime lessonEnd) {
+        LessonTime lessonTime = new LessonTime();
         lessonTime.setTimeId(timeId);
         lessonTime.setLessonStart(lessonStart);
         lessonTime.setLessonEnd(lessonEnd);
-        lessonTimeDAO.update(lessonTime);
+        return lessonTimeDAO.update(lessonTime);
     }
 
-    public void deleteLessonTime(Integer timeId) {
+    public void delete(Integer timeId) {
         lessonTimeDAO.delete(timeId);
     }
 }
