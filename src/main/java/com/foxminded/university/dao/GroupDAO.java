@@ -88,7 +88,7 @@ public class GroupDAO implements DAO<Group,Integer> {
         jdbcTemplate.update(DELETE, id);
     }
 
-    public List<Student> readStudentsByGroup(Integer groupId) {
+    public List<Student> findByGroup(Integer groupId) {
         return jdbcTemplate.query(READ_STUDENT_BY_GROUP, (resultSet, rowNum) -> {
             Student student = new Student();
             student.setStudentId(resultSet.getInt("student_id"));

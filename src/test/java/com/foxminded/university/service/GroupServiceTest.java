@@ -88,9 +88,9 @@ class GroupServiceTest {
         groups.add(group3);
 
         when(mockedGroupDAO.readAll()).thenReturn(groups);
-        when(mockedGroupDAO.readStudentsByGroup(3)).thenReturn(students1);
-        when(mockedGroupDAO.readStudentsByGroup(6)).thenReturn(students2);
-        when(mockedGroupDAO.readStudentsByGroup(7)).thenReturn(students3);
+        when(mockedGroupDAO.findByGroup(3)).thenReturn(students1);
+        when(mockedGroupDAO.findByGroup(6)).thenReturn(students2);
+        when(mockedGroupDAO.findByGroup(7)).thenReturn(students3);
 
         assertEquals(groups, groupService.readAll());
         assertEquals(group1, groupService.readAll().get(0));
@@ -101,9 +101,9 @@ class GroupServiceTest {
         assertEquals(students3, groupService.readAll().get(2).getStudents());
 
         verify(mockedGroupDAO, times(7)).readAll();
-        verify(mockedGroupDAO, times(7)).readStudentsByGroup(3);
-        verify(mockedGroupDAO, times(7)).readStudentsByGroup(6);
-        verify(mockedGroupDAO, times(7)).readStudentsByGroup(7);
+        verify(mockedGroupDAO, times(7)).findByGroup(3);
+        verify(mockedGroupDAO, times(7)).findByGroup(6);
+        verify(mockedGroupDAO, times(7)).findByGroup(7);
     }
 
     @Test
@@ -123,14 +123,14 @@ class GroupServiceTest {
         group.setStudents(students);
 
         when(mockedGroupDAO.readByID(1)).thenReturn(group);
-        when(mockedGroupDAO.readStudentsByGroup(1)).thenReturn(students);
+        when(mockedGroupDAO.findByGroup(1)).thenReturn(students);
 
         assertEquals(group, groupService.readById(1));
         assertEquals("aa-20", groupService.readById(1).getGroupName());
         assertEquals(students, groupService.readById(1).getStudents());
 
         verify(mockedGroupDAO, times(3)).readByID(1);
-        verify(mockedGroupDAO, times(3)).readStudentsByGroup(1);
+        verify(mockedGroupDAO, times(3)).findByGroup(1);
     }
 
     @Test
@@ -187,14 +187,14 @@ class GroupServiceTest {
         students.add(student2);
         students.add(student3);
 
-        when(mockedGroupDAO.readStudentsByGroup(1)).thenReturn(students);
+        when(mockedGroupDAO.findByGroup(1)).thenReturn(students);
 
-        assertEquals(students, groupService.readStudentsByGroup(1));
-        assertEquals(student1, groupService.readStudentsByGroup(1).get(0));
-        assertEquals(student2, groupService.readStudentsByGroup(1).get(1));
-        assertEquals(student3, groupService.readStudentsByGroup(1).get(2));
+        assertEquals(students, groupService.findByGroup(1));
+        assertEquals(student1, groupService.findByGroup(1).get(0));
+        assertEquals(student2, groupService.findByGroup(1).get(1));
+        assertEquals(student3, groupService.findByGroup(1).get(2));
 
-        verify(mockedGroupDAO, times(4)).readStudentsByGroup(1);
+        verify(mockedGroupDAO, times(4)).findByGroup(1);
 
     }
 

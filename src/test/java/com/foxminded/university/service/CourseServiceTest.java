@@ -79,8 +79,8 @@ class CourseServiceTest {
         courses.add(course2);
 
         when(mockedCourseDAO.readAll()).thenReturn(courses);
-        when(mockedCourseDAO.readStudentsByCourse(1)).thenReturn(students1);
-        when(mockedCourseDAO.readStudentsByCourse(2)).thenReturn(students2);
+        when(mockedCourseDAO.findByCourse(1)).thenReturn(students1);
+        when(mockedCourseDAO.findByCourse(2)).thenReturn(students2);
 
         assertEquals(courses, courseService.readAll());
         assertEquals(course1, courseService.readAll().get(0));
@@ -89,8 +89,8 @@ class CourseServiceTest {
         assertEquals(students2, courseService.readAll().get(1).getStudents());
 
         verify(mockedCourseDAO, times(5)).readAll();
-        verify(mockedCourseDAO, times(5)).readStudentsByCourse(1);
-        verify(mockedCourseDAO, times(5)).readStudentsByCourse(2);
+        verify(mockedCourseDAO, times(5)).findByCourse(1);
+        verify(mockedCourseDAO, times(5)).findByCourse(2);
     }
 
     @Test
@@ -110,7 +110,7 @@ class CourseServiceTest {
         course.setDescription("History Description");
 
         when(mockedCourseDAO.readByID(1)).thenReturn(course);
-        when(mockedCourseDAO.readStudentsByCourse(1)).thenReturn(students);
+        when(mockedCourseDAO.findByCourse(1)).thenReturn(students);
 
         assertEquals(course, courseService.readByID(1));
         assertEquals("History", courseService.readByID(1).getCourseName());
@@ -118,7 +118,7 @@ class CourseServiceTest {
         assertEquals(students, courseService.readByID(1).getStudents());
 
         verify(mockedCourseDAO, times(4)).readByID(1);
-        verify(mockedCourseDAO, times(4)).readStudentsByCourse(1);
+        verify(mockedCourseDAO, times(4)).findByCourse(1);
     }
 
     @Test
@@ -171,13 +171,13 @@ class CourseServiceTest {
         students.add(student1);
         students.add(student2);
 
-        when(mockedCourseDAO.readStudentsByCourse(1)).thenReturn(students);
+        when(mockedCourseDAO.findByCourse(1)).thenReturn(students);
 
-        assertEquals(students, courseService.readStudentsByCourse(1));
-        assertEquals(student1, courseService.readStudentsByCourse(1).get(0));
-        assertEquals(student2, courseService.readStudentsByCourse(1).get(1));
+        assertEquals(students, courseService.findByCourse(1));
+        assertEquals(student1, courseService.findByCourse(1).get(0));
+        assertEquals(student2, courseService.findByCourse(1).get(1));
 
-        verify(mockedCourseDAO, times(3)).readStudentsByCourse(1);
+        verify(mockedCourseDAO, times(3)).findByCourse(1);
     }
 
     @Test

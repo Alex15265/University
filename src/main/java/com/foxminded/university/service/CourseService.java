@@ -29,7 +29,7 @@ public class CourseService {
     public List<Course> readAll() {
         List<Course> courses = courseDAO.readAll();
         for (Course course: courses) {
-            course.setStudents(courseDAO.readStudentsByCourse(course.getCourseId()));
+            course.setStudents(courseDAO.findByCourse(course.getCourseId()));
         }
         return courses;
     }
@@ -37,7 +37,7 @@ public class CourseService {
     public Course readByID (Integer courseId) throws FileNotFoundException {
         try {
             Course course = courseDAO.readByID(courseId);
-            course.setStudents(courseDAO.readStudentsByCourse(courseId));
+            course.setStudents(courseDAO.findByCourse(courseId));
             return course;
         } catch (EmptyResultDataAccessException e) {
             throw new FileNotFoundException();
@@ -64,7 +64,7 @@ public class CourseService {
         courseDAO.deleteStudentFromCourse(studentId, courseId);
     }
 
-    public List<Student> readStudentsByCourse(Integer courseId) {
-        return courseDAO.readStudentsByCourse(courseId);
+    public List<Student> findByCourse(Integer courseId) {
+        return courseDAO.findByCourse(courseId);
     }
 }

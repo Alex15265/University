@@ -29,7 +29,7 @@ public class ProfessorService {
     public List<Professor> readAll() {
         List<Professor> professors = professorDAO.readAll();
         for (Professor professor: professors) {
-            professor.setCourses(professorDAO.readCoursesByProfessor(professor.getProfessorId()));
+            professor.setCourses(professorDAO.findCoursesByProfessor(professor.getProfessorId()));
         }
         return professors;
     }
@@ -37,7 +37,7 @@ public class ProfessorService {
     public Professor readById(Integer professorId) throws FileNotFoundException {
         try {
         Professor professor = professorDAO.readByID(professorId);
-        professor.setCourses(professorDAO.readCoursesByProfessor(professorId));
+        professor.setCourses(professorDAO.findCoursesByProfessor(professorId));
         return professor;
         } catch (EmptyResultDataAccessException e) {
             throw new FileNotFoundException();
@@ -64,7 +64,7 @@ public class ProfessorService {
         professorDAO.deleteCourseFromProfessor(professorId);
     }
 
-    public List<Course> readCoursesByProfessor(Integer professorId) {
-        return professorDAO.readCoursesByProfessor(professorId);
+    public List<Course> findCoursesByProfessor(Integer professorId) {
+        return professorDAO.findCoursesByProfessor(professorId);
     }
 }

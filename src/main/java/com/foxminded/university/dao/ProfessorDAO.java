@@ -92,7 +92,7 @@ public class ProfessorDAO implements DAO<Professor,Integer> {
         jdbcTemplate.update(DELETE, id);
     }
 
-    public List<Course> readCoursesByProfessor(Integer professorId) {
+    public List<Course> findCoursesByProfessor(Integer professorId) {
         return jdbcTemplate.query(READ_COURSES_BY_PROFESSOR, (resultSet, rowNum) -> {
             Course course = new Course();
             course.setCourseId(resultSet.getInt("course_id"));

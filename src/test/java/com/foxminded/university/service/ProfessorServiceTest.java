@@ -72,8 +72,8 @@ class ProfessorServiceTest {
         professors.add(professor2);
 
         when(mockedProfessorDAO.readAll()).thenReturn(professors);
-        when(mockedProfessorDAO.readCoursesByProfessor(1)).thenReturn(courses1);
-        when(mockedProfessorDAO.readCoursesByProfessor(3)).thenReturn(courses2);
+        when(mockedProfessorDAO.findCoursesByProfessor(1)).thenReturn(courses1);
+        when(mockedProfessorDAO.findCoursesByProfessor(3)).thenReturn(courses2);
 
         assertEquals(professors, professorService.readAll());
         assertEquals(professor1, professorService.readAll().get(0));
@@ -82,8 +82,8 @@ class ProfessorServiceTest {
         assertEquals(courses2, professorService.readAll().get(1).getCourses());
 
         verify(mockedProfessorDAO, times(5)).readAll();
-        verify(mockedProfessorDAO, times(5)).readCoursesByProfessor(1);
-        verify(mockedProfessorDAO, times(5)).readCoursesByProfessor(3);
+        verify(mockedProfessorDAO, times(5)).findCoursesByProfessor(1);
+        verify(mockedProfessorDAO, times(5)).findCoursesByProfessor(3);
     }
 
     @Test
@@ -108,7 +108,7 @@ class ProfessorServiceTest {
         professor.setCourses(courses);
 
         when(mockedProfessorDAO.readByID(3)).thenReturn(professor);
-        when(mockedProfessorDAO.readCoursesByProfessor(3)).thenReturn(courses);
+        when(mockedProfessorDAO.findCoursesByProfessor(3)).thenReturn(courses);
 
         assertEquals(professor, professorService.readById(3));
         assertEquals("Jade", professorService.readById(3).getFirstName());
@@ -116,7 +116,7 @@ class ProfessorServiceTest {
         assertEquals(courses, professorService.readById(3).getCourses());
 
         verify(mockedProfessorDAO, times(4)).readByID(3);
-        verify(mockedProfessorDAO, times(4)).readCoursesByProfessor(3);
+        verify(mockedProfessorDAO, times(4)).findCoursesByProfessor(3);
     }
 
     @Test
@@ -169,13 +169,13 @@ class ProfessorServiceTest {
         courses.add(course1);
         courses.add(course2);
 
-        when(mockedProfessorDAO.readCoursesByProfessor(1)).thenReturn(courses);
+        when(mockedProfessorDAO.findCoursesByProfessor(1)).thenReturn(courses);
 
-        assertEquals(courses, professorService.readCoursesByProfessor(1));
-        assertEquals(course1, professorService.readCoursesByProfessor(1).get(0));
-        assertEquals(course2, professorService.readCoursesByProfessor(1).get(1));
+        assertEquals(courses, professorService.findCoursesByProfessor(1));
+        assertEquals(course1, professorService.findCoursesByProfessor(1).get(0));
+        assertEquals(course2, professorService.findCoursesByProfessor(1).get(1));
 
-        verify(mockedProfessorDAO, times(3)).readCoursesByProfessor(1);
+        verify(mockedProfessorDAO, times(3)).findCoursesByProfessor(1);
     }
 
     @Test

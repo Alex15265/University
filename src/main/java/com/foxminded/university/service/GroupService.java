@@ -28,7 +28,7 @@ public class GroupService {
     public List<Group> readAll() {
         List<Group> groups = groupDAO.readAll();
         for (Group group: groups) {
-            group.setStudents(groupDAO.readStudentsByGroup(group.getGroupId()));
+            group.setStudents(groupDAO.findByGroup(group.getGroupId()));
         }
         return groups;
     }
@@ -36,7 +36,7 @@ public class GroupService {
     public Group readById(Integer groupId) throws FileNotFoundException {
         try {
         Group group = groupDAO.readByID(groupId);
-        group.setStudents(groupDAO.readStudentsByGroup(groupId));
+        group.setStudents(groupDAO.findByGroup(groupId));
         return group;
         } catch (EmptyResultDataAccessException e) {
             throw new FileNotFoundException();
@@ -62,7 +62,7 @@ public class GroupService {
         groupDAO.deleteStudentFromGroup(studentId);
     }
 
-    public List<Student> readStudentsByGroup(Integer groupId) {
-        return groupDAO.readStudentsByGroup(groupId);
+    public List<Student> findByGroup(Integer groupId) {
+        return groupDAO.findByGroup(groupId);
     }
 }
