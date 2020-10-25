@@ -3,12 +3,18 @@ package com.foxminded.university.service;
 import com.foxminded.university.dao.CourseDAO;
 import com.foxminded.university.dao.entities.Course;
 import com.foxminded.university.dao.entities.Student;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.stereotype.Component;
 
+import java.io.FileNotFoundException;
 import java.util.List;
 
+@Component
 public class CourseService {
     private final CourseDAO courseDAO;
 
+    @Autowired
     public CourseService(CourseDAO courseDAO) {
         this.courseDAO = courseDAO;
     }
@@ -28,18 +34,22 @@ public class CourseService {
         return courses;
     }
 
-    public Course readByID (Integer courseId) {
-        Course course = courseDAO.readByID(courseId);
-        course.setStudents(courseDAO.readStudentsByCourse(courseId));
-        return course;
+    public Course readByID (Integer courseId) throws FileNotFoundException {
+        try {
+            Course course = courseDAO.readByID(courseId);
+            course.setStudents(courseDAO.readStudentsByCourse(courseId));
+            return course;
+        } catch (EmptyResultDataAccessException e) {
+            throw new FileNotFoundException();
+        }
     }
 
-    public Course update(Integer courseId, String courseName, String courseDescription) {
-        Course course = new Course();
-        course.setCourseId(courseId);
-        course.setCourseName(courseName);
-        course.setDescription(courseDescription);
-        return courseDAO.update(course);
+    public Course update(Integer courseId, String courseName, String courseDescription) throws FileNotFoundException {
+            Course course = new Course();
+            course.setCourseId(courseId);
+            course.setCourseName(courseName);
+            course.setDescription(courseDescription);
+            return courseDAO.update(course);
     }
 
     public void delete(Integer courseId) {

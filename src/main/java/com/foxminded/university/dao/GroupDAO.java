@@ -1,15 +1,20 @@
 package com.foxminded.university.dao;
 
+import com.foxminded.university.config.DriverManagerDataSourceInitializer;
 import com.foxminded.university.dao.entities.Group;
 import com.foxminded.university.dao.entities.Student;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.stereotype.Component;
 
+import java.io.FileNotFoundException;
 import java.sql.PreparedStatement;
 import java.util.List;
 
+@Component
 public class GroupDAO implements DAO<Group,Integer> {
     private static final String UPDATE = "UPDATE groups set group_name = ? WHERE group_id = ?";
     private static final String READ_BY_ID = "SELECT * FROM groups WHERE group_id = ?";
@@ -26,8 +31,9 @@ public class GroupDAO implements DAO<Group,Integer> {
     private static final String DELETE_STUDENT_FROM_GROUP = "UPDATE students set group_id = null WHERE student_id = ?";
     private final JdbcTemplate jdbcTemplate;
 
-    public GroupDAO(DriverManagerDataSource dataSource) {
-        jdbcTemplate = new JdbcTemplate(dataSource);
+    @Autowired
+    public GroupDAO(DriverManagerDataSourceInitializer initializer) {
+        jdbcTemplate = new JdbcTemplate(initializer.initialize());
     }
 
     @Override
@@ -55,7 +61,7 @@ public class GroupDAO implements DAO<Group,Integer> {
     }
 
     @Override
-    public Group readByID(Integer id) {
+    public Group readByID(Integer id) throws EmptyResultDataAccessException {
         return jdbcTemplate.queryForObject(READ_BY_ID, (resultSet, rowNum) -> {
             Group group = new Group();
             group.setGroupId(resultSet.getInt("group_id"));
@@ -65,8 +71,15 @@ public class GroupDAO implements DAO<Group,Integer> {
     }
 
     @Override
-    public Group update(Group group) {
-        jdbcTemplate.update(UPDATE, group.getGroupName(), group.getGroupId());
+    public Group update(Group group) throws FileNotFoundException {
+        int count = jdbcTemplate.update(connection -> {
+            PreparedStatement resultSet =
+                    connection.prepareStatement(UPDATE, new String[] {"group_id"});
+            resultSet.setString(1, group.getGroupName());
+            resultSet.setInt(2, group.getGroupId());
+            return resultSet;
+        });
+        if (count == 0) throw new FileNotFoundException();
         return group;
     }
 

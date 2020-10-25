@@ -3,9 +3,12 @@ package com.foxminded.university.service;
 import com.foxminded.university.dao.CourseDAO;
 import com.foxminded.university.dao.entities.Course;
 import com.foxminded.university.dao.entities.Student;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.dao.EmptyResultDataAccessException;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -91,7 +94,7 @@ class CourseServiceTest {
     }
 
     @Test
-    void readByID() {
+    void readByID() throws FileNotFoundException {
         Student student1 = new Student();
         student1.setFirstName("Alex");
         student1.setLastName("Belyaev");
@@ -119,7 +122,7 @@ class CourseServiceTest {
     }
 
     @Test
-    void update() {
+    void update() throws FileNotFoundException {
         Course course = new Course();
         course.setCourseId(1);
         course.setCourseName("History");
@@ -175,5 +178,23 @@ class CourseServiceTest {
         assertEquals(student2, courseService.readStudentsByCourse(1).get(1));
 
         verify(mockedCourseDAO, times(3)).readStudentsByCourse(1);
+    }
+
+    @Test
+    void readByID_ShouldThrowExceptionWhenInputIsNonExistentID() {
+        when(mockedCourseDAO.readByID(1234)).thenThrow(EmptyResultDataAccessException.class);
+        Assertions.assertThrows(FileNotFoundException.class, () ->
+                courseService.readByID(1234));
+    }
+
+    @Test
+    void update_ShouldThrowExceptionWhenInputIsNonExistentID() throws FileNotFoundException {
+        Course course = new Course();
+        course.setCourseId(1);
+        course.setCourseName("History");
+        course.setDescription("History Description");
+        when(mockedCourseDAO.update(anyObject())).thenThrow(FileNotFoundException.class);
+        Assertions.assertThrows(FileNotFoundException.class, () ->
+                courseService.update(1, "History", "History Description"));
     }
 }

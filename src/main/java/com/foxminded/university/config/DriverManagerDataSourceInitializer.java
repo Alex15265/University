@@ -1,20 +1,17 @@
 package com.foxminded.university.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.stereotype.Component;
 
-import java.util.ResourceBundle;
-
+@Component
 public class DriverManagerDataSourceInitializer {
-    private final String url;
-    private final String user;
-    private final String password;
-
-    public DriverManagerDataSourceInitializer(String propertyFile) {
-        ResourceBundle rb = ResourceBundle.getBundle(propertyFile);
-        url = rb.getString("url");
-        user = rb.getString("user");
-        password = rb.getString("password");
-    }
+    @Value("${url}")
+    private String url;
+    @Value("${user}")
+    private String user;
+    @Value("${password}")
+    private String password;
 
     public DriverManagerDataSource initialize() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();

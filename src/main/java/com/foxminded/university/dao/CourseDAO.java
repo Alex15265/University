@@ -1,15 +1,20 @@
 package com.foxminded.university.dao;
 
+import com.foxminded.university.config.DriverManagerDataSourceInitializer;
 import com.foxminded.university.dao.entities.Course;
 import com.foxminded.university.dao.entities.Student;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.stereotype.Component;
 
+import java.io.FileNotFoundException;
 import java.sql.PreparedStatement;
 import java.util.List;
 
+@Component
 public class CourseDAO implements DAO<Course,Integer> {
     private static final String UPDATE = "UPDATE courses set course_name = ?, course_description = ? WHERE course_id = ?";
     private static final String READ_BY_ID = "SELECT * FROM courses WHERE course_id = ?";
@@ -26,8 +31,9 @@ public class CourseDAO implements DAO<Course,Integer> {
     private static final String DELETE_STUDENT_FROM_COURSE = "DELETE FROM students_courses WHERE student_id = ? AND course_id = ?";
     private final JdbcTemplate jdbcTemplate;
 
-    public CourseDAO(DriverManagerDataSource dataSource) {
-        jdbcTemplate = new JdbcTemplate(dataSource);
+    @Autowired
+    public CourseDAO(DriverManagerDataSourceInitializer initializer) {
+        jdbcTemplate = new JdbcTemplate(initializer.initialize());
     }
 
     @Override
@@ -57,7 +63,7 @@ public class CourseDAO implements DAO<Course,Integer> {
     }
 
     @Override
-    public Course readByID(Integer id) {
+    public Course readByID(Integer id) throws EmptyResultDataAccessException {
         return jdbcTemplate.queryForObject(READ_BY_ID, (resultSet, rowNum) -> {
             Course course = new Course();
             course.setCourseId(resultSet.getInt("course_id"));
@@ -68,9 +74,16 @@ public class CourseDAO implements DAO<Course,Integer> {
     }
 
     @Override
-    public Course update(Course course) {
-        jdbcTemplate.update(UPDATE,
-                course.getCourseName(), course.getDescription(), course.getCourseId());
+    public Course update(Course course) throws FileNotFoundException {
+        int count = jdbcTemplate.update(connection -> {
+            PreparedStatement resultSet =
+                    connection.prepareStatement(UPDATE, new String[] {"course_id"});
+            resultSet.setString(1, course.getCourseName());
+            resultSet.setString(2, course.getDescription());
+            resultSet.setInt(3, course.getCourseId());
+            return resultSet;
+        });
+        if (count == 0) throw new FileNotFoundException();
         return course;
     }
 

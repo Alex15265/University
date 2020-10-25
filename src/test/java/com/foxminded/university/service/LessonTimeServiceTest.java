@@ -1,10 +1,14 @@
 package com.foxminded.university.service;
 
 import com.foxminded.university.dao.LessonTimeDAO;
+import com.foxminded.university.dao.entities.ClassRoom;
 import com.foxminded.university.dao.entities.LessonTime;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.dao.EmptyResultDataAccessException;
 
+import java.io.FileNotFoundException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -63,7 +67,7 @@ class LessonTimeServiceTest {
     }
 
     @Test
-    void readByID() {
+    void readByID() throws FileNotFoundException {
         LessonTime lessonTime = new LessonTime();
         lessonTime.setLessonStart(LocalDateTime.of(2020, 10, 4, 11, 0));
         lessonTime.setLessonEnd(LocalDateTime.of(2020, 10, 4, 12, 30));
@@ -80,7 +84,7 @@ class LessonTimeServiceTest {
     }
 
     @Test
-    void update() {
+    void update() throws FileNotFoundException {
         LessonTime lessonTime = new LessonTime();
         lessonTime.setTimeId(9);
         lessonTime.setLessonStart(LocalDateTime.of(2020, 9, 1, 8, 0));
@@ -100,5 +104,23 @@ class LessonTimeServiceTest {
         lessonTimeService.delete(1);
 
         verify(mockedLessonTimeDAO, times(1)).delete(1);
+    }
+
+    @Test
+    void readByID_ShouldThrowExceptionWhenInputIsNonExistentID() {
+        when(mockedLessonTimeDAO.readByID(1234)).thenThrow(EmptyResultDataAccessException.class);
+        Assertions.assertThrows(FileNotFoundException.class, () ->
+                lessonTimeService.readByID(1234));
+    }
+
+    @Test
+    void update_ShouldThrowExceptionWhenInputIsNonExistentID() throws FileNotFoundException {
+        ClassRoom classRoom = new ClassRoom();
+        classRoom.setRoomId(234);
+        classRoom.setRoomId(13);
+        when(mockedLessonTimeDAO.update(anyObject())).thenThrow(FileNotFoundException.class);
+        Assertions.assertThrows(FileNotFoundException.class, () ->
+                lessonTimeService.update(234, LocalDateTime.of(2020, 9, 1, 8, 0),
+                        LocalDateTime.of(2020, 9, 1, 9, 30)));
     }
 }

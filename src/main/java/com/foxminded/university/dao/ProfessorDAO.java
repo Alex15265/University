@@ -1,15 +1,20 @@
 package com.foxminded.university.dao;
 
+import com.foxminded.university.config.DriverManagerDataSourceInitializer;
 import com.foxminded.university.dao.entities.Course;
 import com.foxminded.university.dao.entities.Professor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.stereotype.Component;
 
+import java.io.FileNotFoundException;
 import java.sql.PreparedStatement;
 import java.util.List;
 
+@Component
 public class ProfessorDAO implements DAO<Professor,Integer> {
     private static final String UPDATE = "UPDATE professors set first_name = ?, last_name = ? WHERE professor_id = ?";
     private static final String READ_BY_ID = "SELECT * FROM professors WHERE professor_id = ?";
@@ -26,8 +31,9 @@ public class ProfessorDAO implements DAO<Professor,Integer> {
     private static final String DELETE_COURSE_FROM_PROFESSOR = "UPDATE courses set professor_id = null WHERE course_id = ?";
     private final JdbcTemplate jdbcTemplate;
 
-    public ProfessorDAO(DriverManagerDataSource dataSource) {
-        jdbcTemplate = new JdbcTemplate(dataSource);
+    @Autowired
+    public ProfessorDAO(DriverManagerDataSourceInitializer initializer) {
+        jdbcTemplate = new JdbcTemplate(initializer.initialize());
     }
 
     @Override
@@ -57,7 +63,7 @@ public class ProfessorDAO implements DAO<Professor,Integer> {
     }
 
     @Override
-    public Professor readByID(Integer id) {
+    public Professor readByID(Integer id) throws EmptyResultDataAccessException {
         return jdbcTemplate.queryForObject(READ_BY_ID, (resultSet, rowNum) -> {
             Professor professor = new Professor();
             professor.setProfessorId(resultSet.getInt("professor_id"));
@@ -68,9 +74,16 @@ public class ProfessorDAO implements DAO<Professor,Integer> {
     }
 
     @Override
-    public Professor update(Professor professor) {
-        jdbcTemplate.update(UPDATE,
-                professor.getFirstName(), professor.getLastName(), professor.getProfessorId());
+    public Professor update(Professor professor) throws FileNotFoundException {
+        int count = jdbcTemplate.update(connection -> {
+            PreparedStatement resultSet =
+                    connection.prepareStatement(UPDATE, new String[] {"professor_id"});
+            resultSet.setString(1, professor.getFirstName());
+            resultSet.setString(2, professor.getLastName());
+            resultSet.setInt(3, professor.getProfessorId());
+            return resultSet;
+        });
+        if (count == 0) throw new FileNotFoundException();
         return professor;
     }
 

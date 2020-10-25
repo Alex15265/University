@@ -2,9 +2,12 @@ package com.foxminded.university.service;
 
 import com.foxminded.university.dao.LessonDAO;
 import com.foxminded.university.dao.entities.*;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.dao.EmptyResultDataAccessException;
 
+import java.io.FileNotFoundException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +35,7 @@ class LessonServiceTest {
     }
 
     @Test
-    void create() {
+    void create() throws FileNotFoundException {
         Professor professor = new Professor();
         professor.setFirstName("John");
         professor.setLastName("Smith");
@@ -154,7 +157,7 @@ class LessonServiceTest {
     }
 
     @Test
-    void readById() {
+    void readById() throws FileNotFoundException {
         Professor professor = new Professor();
         professor.setFirstName("John");
         professor.setLastName("Smith");
@@ -193,7 +196,7 @@ class LessonServiceTest {
     }
 
     @Test
-    void update() {
+    void update() throws FileNotFoundException {
         Professor professor = new Professor();
         professor.setProfessorId(2);
         professor.setFirstName("John");
@@ -255,5 +258,22 @@ class LessonServiceTest {
         lessonService.deleteGroupFromLesson(1,1);
 
         verify(mockedLessonDAO, times(1)).deleteGroupFromLesson(1,1);
+    }
+
+    @Test
+    void readByID_ShouldThrowExceptionWhenInputIsNonExistentID() {
+        when(mockedLessonDAO.readByID(1234)).thenThrow(EmptyResultDataAccessException.class);
+        Assertions.assertThrows(FileNotFoundException.class, () ->
+                lessonService.readById(1234));
+    }
+
+    @Test
+    void update_ShouldThrowExceptionWhenInputIsNonExistentID() throws FileNotFoundException {
+        ClassRoom classRoom = new ClassRoom();
+        classRoom.setRoomId(234);
+        classRoom.setRoomId(13);
+        when(mockedLessonDAO.update(anyObject())).thenThrow(FileNotFoundException.class);
+        Assertions.assertThrows(FileNotFoundException.class, () ->
+                lessonService.update(1, 1, 1, 1, 1));
     }
 }

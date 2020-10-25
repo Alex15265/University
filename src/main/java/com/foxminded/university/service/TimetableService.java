@@ -3,14 +3,18 @@ package com.foxminded.university.service;
 import com.foxminded.university.dao.entities.Group;
 import com.foxminded.university.dao.entities.Lesson;
 import com.foxminded.university.dao.entities.Timetable;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class TimetableService {
     private final LessonService lessonService;
 
+    @Autowired
     public TimetableService(LessonService lessonService) {
         this.lessonService =lessonService;
     }

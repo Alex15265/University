@@ -1,11 +1,15 @@
 package com.foxminded.university.service;
 
 import com.foxminded.university.dao.GroupDAO;
+import com.foxminded.university.dao.entities.ClassRoom;
 import com.foxminded.university.dao.entities.Group;
 import com.foxminded.university.dao.entities.Student;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.dao.EmptyResultDataAccessException;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -103,7 +107,7 @@ class GroupServiceTest {
     }
 
     @Test
-    void readById() {
+    void readById() throws FileNotFoundException {
         Student student1 = new Student();
         student1.setFirstName("Alex");
         student1.setLastName("Belyaev");
@@ -130,7 +134,7 @@ class GroupServiceTest {
     }
 
     @Test
-    void update() {
+    void update() throws FileNotFoundException {
         Group group = new Group();
         group.setGroupId(7);
         group.setGroupName("bd-17");
@@ -192,5 +196,22 @@ class GroupServiceTest {
 
         verify(mockedGroupDAO, times(4)).readStudentsByGroup(1);
 
+    }
+
+    @Test
+    void readByID_ShouldThrowExceptionWhenInputIsNonExistentID() {
+        when(mockedGroupDAO.readByID(1234)).thenThrow(EmptyResultDataAccessException.class);
+        Assertions.assertThrows(FileNotFoundException.class, () ->
+                groupService.readById(1234));
+    }
+
+    @Test
+    void update_ShouldThrowExceptionWhenInputIsNonExistentID() throws FileNotFoundException {
+        ClassRoom classRoom = new ClassRoom();
+        classRoom.setRoomId(234);
+        classRoom.setRoomId(13);
+        when(mockedGroupDAO.update(anyObject())).thenThrow(FileNotFoundException.class);
+        Assertions.assertThrows(FileNotFoundException.class, () ->
+                groupService.update(234, "aa-99"));
     }
 }

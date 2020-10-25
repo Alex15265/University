@@ -3,12 +3,18 @@ package com.foxminded.university.service;
 import com.foxminded.university.dao.ProfessorDAO;
 import com.foxminded.university.dao.entities.Course;
 import com.foxminded.university.dao.entities.Professor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.stereotype.Component;
 
+import java.io.FileNotFoundException;
 import java.util.List;
 
+@Component
 public class ProfessorService {
     private final ProfessorDAO professorDAO;
 
+    @Autowired
     public ProfessorService(ProfessorDAO professorDAO) {
         this.professorDAO = professorDAO;
     }
@@ -28,13 +34,17 @@ public class ProfessorService {
         return professors;
     }
 
-    public Professor readById(Integer professorId) {
+    public Professor readById(Integer professorId) throws FileNotFoundException {
+        try {
         Professor professor = professorDAO.readByID(professorId);
         professor.setCourses(professorDAO.readCoursesByProfessor(professorId));
         return professor;
+        } catch (EmptyResultDataAccessException e) {
+            throw new FileNotFoundException();
+        }
     }
 
-    public Professor update(Integer professorId, String firstName, String lastName) {
+    public Professor update(Integer professorId, String firstName, String lastName) throws FileNotFoundException {
         Professor professor = new Professor();
         professor.setProfessorId(professorId);
         professor.setFirstName(firstName);

@@ -1,15 +1,20 @@
 package com.foxminded.university.dao;
 
+import com.foxminded.university.config.DriverManagerDataSourceInitializer;
 import com.foxminded.university.dao.entities.ClassRoom;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.stereotype.Component;
 
+import java.io.FileNotFoundException;
 import java.sql.PreparedStatement;
 import java.util.List;
 
+@Component
 public class ClassRoomDAO implements DAO<ClassRoom,Integer> {
     private static final String UPDATE = "UPDATE classrooms set room_number = ? WHERE room_id = ?";
     private static final String READ_BY_ID = "SELECT * FROM classrooms WHERE room_id = ?";
@@ -18,8 +23,9 @@ public class ClassRoomDAO implements DAO<ClassRoom,Integer> {
     private static final String DELETE = "DELETE FROM classrooms WHERE room_id = ?";
     private final JdbcTemplate jdbcTemplate;
 
-    public ClassRoomDAO(DriverManagerDataSource dataSource) {
-        jdbcTemplate = new JdbcTemplate(dataSource);
+    @Autowired
+    public ClassRoomDAO(DriverManagerDataSourceInitializer initializer) {
+        jdbcTemplate = new JdbcTemplate(initializer.initialize());
     }
 
     @Override
@@ -43,15 +49,21 @@ public class ClassRoomDAO implements DAO<ClassRoom,Integer> {
     }
 
     @Override
-    public ClassRoom readByID(Integer id) {
+    public ClassRoom readByID(Integer id) throws EmptyResultDataAccessException {
         return jdbcTemplate.queryForObject(READ_BY_ID,
                 new Object[] {id}, new BeanPropertyRowMapper<>(ClassRoom.class));
     }
 
     @Override
-    public ClassRoom update(ClassRoom room) {
-        jdbcTemplate.update(UPDATE,
-                room.getRoomNumber(), room.getRoomId());
+    public ClassRoom update(ClassRoom room) throws FileNotFoundException{
+        int count = jdbcTemplate.update(connection -> {
+                    PreparedStatement resultSet =
+                            connection.prepareStatement(UPDATE, new String[] {"room_id"});
+                    resultSet.setInt(1, room.getRoomNumber());
+                    resultSet.setInt(2, room.getRoomId());
+                    return resultSet;
+                });
+        if (count == 0) throw new FileNotFoundException();
         return room;
     }
 

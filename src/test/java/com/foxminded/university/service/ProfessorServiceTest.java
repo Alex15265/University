@@ -1,11 +1,15 @@
 package com.foxminded.university.service;
 
 import com.foxminded.university.dao.ProfessorDAO;
+import com.foxminded.university.dao.entities.ClassRoom;
 import com.foxminded.university.dao.entities.Course;
 import com.foxminded.university.dao.entities.Professor;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.dao.EmptyResultDataAccessException;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -83,7 +87,7 @@ class ProfessorServiceTest {
     }
 
     @Test
-    void readById() {
+    void readById() throws FileNotFoundException {
         List<Course> courses = new ArrayList<>();
         Course course1 = new Course();
         course1.setCourseId(1);
@@ -116,7 +120,7 @@ class ProfessorServiceTest {
     }
 
     @Test
-    void update() {
+    void update() throws FileNotFoundException {
         Professor professor = new Professor();
         professor.setProfessorId(1);
         professor.setFirstName("Alex");
@@ -172,5 +176,22 @@ class ProfessorServiceTest {
         assertEquals(course2, professorService.readCoursesByProfessor(1).get(1));
 
         verify(mockedProfessorDAO, times(3)).readCoursesByProfessor(1);
+    }
+
+    @Test
+    void readByID_ShouldThrowExceptionWhenInputIsNonExistentID() {
+        when(mockedProfessorDAO.readByID(1234)).thenThrow(EmptyResultDataAccessException.class);
+        Assertions.assertThrows(FileNotFoundException.class, () ->
+                professorService.readById(1234));
+    }
+
+    @Test
+    void update_ShouldThrowExceptionWhenInputIsNonExistentID() throws FileNotFoundException {
+        ClassRoom classRoom = new ClassRoom();
+        classRoom.setRoomId(234);
+        classRoom.setRoomId(13);
+        when(mockedProfessorDAO.update(anyObject())).thenThrow(FileNotFoundException.class);
+        Assertions.assertThrows(FileNotFoundException.class, () ->
+                professorService.update(234, "Alex", "Belyaev"));
     }
 }
