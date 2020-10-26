@@ -9,7 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.dao.EmptyResultDataAccessException;
 
-import java.io.FileNotFoundException;
+import java.rmi.NoSuchObjectException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -107,7 +107,7 @@ class GroupServiceTest {
     }
 
     @Test
-    void readById() throws FileNotFoundException {
+    void readById() throws NoSuchObjectException {
         Student student1 = new Student();
         student1.setFirstName("Alex");
         student1.setLastName("Belyaev");
@@ -134,7 +134,7 @@ class GroupServiceTest {
     }
 
     @Test
-    void update() throws FileNotFoundException {
+    void update() throws NoSuchObjectException {
         Group group = new Group();
         group.setGroupId(7);
         group.setGroupName("bd-17");
@@ -201,17 +201,17 @@ class GroupServiceTest {
     @Test
     void readByID_ShouldThrowExceptionWhenInputIsNonExistentID() {
         when(mockedGroupDAO.readByID(1234)).thenThrow(EmptyResultDataAccessException.class);
-        Assertions.assertThrows(FileNotFoundException.class, () ->
+        Assertions.assertThrows(NoSuchObjectException.class, () ->
                 groupService.readById(1234));
     }
 
     @Test
-    void update_ShouldThrowExceptionWhenInputIsNonExistentID() throws FileNotFoundException {
+    void update_ShouldThrowExceptionWhenInputIsNonExistentID() throws NoSuchObjectException {
         ClassRoom classRoom = new ClassRoom();
         classRoom.setRoomId(234);
         classRoom.setRoomId(13);
-        when(mockedGroupDAO.update(anyObject())).thenThrow(FileNotFoundException.class);
-        Assertions.assertThrows(FileNotFoundException.class, () ->
+        when(mockedGroupDAO.update(anyObject())).thenThrow(NoSuchObjectException.class);
+        Assertions.assertThrows(NoSuchObjectException.class, () ->
                 groupService.update(234, "aa-99"));
     }
 }

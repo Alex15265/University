@@ -10,7 +10,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
-import java.io.FileNotFoundException;
+import java.rmi.NoSuchObjectException;
 import java.sql.PreparedStatement;
 import java.util.List;
 
@@ -25,7 +25,7 @@ public class StudentDAO implements DAO<Student,Integer> {
 
     @Autowired
     public StudentDAO(DriverManagerDataSourceInitializer initializer) {
-        jdbcTemplate = new JdbcTemplate(initializer.initialize());
+        jdbcTemplate = initializer.initialize();
     }
 
     @Override
@@ -56,7 +56,7 @@ public class StudentDAO implements DAO<Student,Integer> {
     }
 
     @Override
-    public Student update(Student student) throws FileNotFoundException {
+    public Student update(Student student) throws NoSuchObjectException {
         int count = jdbcTemplate.update(connection -> {
             PreparedStatement resultSet =
                     connection.prepareStatement(UPDATE, new String[] {"group_id"});
@@ -65,7 +65,7 @@ public class StudentDAO implements DAO<Student,Integer> {
             resultSet.setInt(3, student.getStudentId());
             return resultSet;
         });
-        if (count == 0) throw new FileNotFoundException();
+        if (count == 0) throw new NoSuchObjectException("Object not found");
         return student;
     }
 

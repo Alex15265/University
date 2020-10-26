@@ -9,7 +9,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
-import java.io.FileNotFoundException;
+import java.rmi.NoSuchObjectException;
 import java.sql.PreparedStatement;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -41,7 +41,7 @@ public class LessonDAO implements DAO<Lesson,Integer> {
 
     @Autowired
     public LessonDAO(DriverManagerDataSourceInitializer initializer) {
-        jdbcTemplate = new JdbcTemplate(initializer.initialize());
+        jdbcTemplate = initializer.initialize();
     }
 
     @Override
@@ -122,7 +122,7 @@ public class LessonDAO implements DAO<Lesson,Integer> {
     }
 
     @Override
-    public Lesson update(Lesson lesson) throws FileNotFoundException {
+    public Lesson update(Lesson lesson) throws NoSuchObjectException {
         int count = jdbcTemplate.update(connection -> {
             PreparedStatement resultSet =
                     connection.prepareStatement(UPDATE, new String[] {"lesson_id"});
@@ -133,7 +133,7 @@ public class LessonDAO implements DAO<Lesson,Integer> {
             resultSet.setInt(5, lesson.getLessonId());
             return resultSet;
         });
-        if (count == 0) throw new FileNotFoundException();
+        if (count == 0) throw new NoSuchObjectException("Object not found");
         return lesson;
     }
 

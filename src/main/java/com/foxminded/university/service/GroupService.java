@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
 
-import java.io.FileNotFoundException;
+import java.rmi.NoSuchObjectException;
 import java.util.List;
 
 @Component
@@ -33,17 +33,17 @@ public class GroupService {
         return groups;
     }
 
-    public Group readById(Integer groupId) throws FileNotFoundException {
+    public Group readById(Integer groupId) throws NoSuchObjectException {
         try {
         Group group = groupDAO.readByID(groupId);
         group.setStudents(groupDAO.findByGroup(groupId));
         return group;
         } catch (EmptyResultDataAccessException e) {
-            throw new FileNotFoundException();
+            throw new NoSuchObjectException("Object not found");
         }
     }
 
-    public Group update(Integer groupId, String groupName) throws FileNotFoundException {
+    public Group update(Integer groupId, String groupName) throws NoSuchObjectException {
         Group group = new Group();
         group.setGroupId(groupId);
         group.setGroupName(groupName);

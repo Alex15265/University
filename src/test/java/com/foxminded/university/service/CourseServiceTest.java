@@ -8,7 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.dao.EmptyResultDataAccessException;
 
-import java.io.FileNotFoundException;
+import java.rmi.NoSuchObjectException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -94,7 +94,7 @@ class CourseServiceTest {
     }
 
     @Test
-    void readByID() throws FileNotFoundException {
+    void readByID() throws NoSuchObjectException {
         Student student1 = new Student();
         student1.setFirstName("Alex");
         student1.setLastName("Belyaev");
@@ -122,7 +122,7 @@ class CourseServiceTest {
     }
 
     @Test
-    void update() throws FileNotFoundException {
+    void update() throws NoSuchObjectException {
         Course course = new Course();
         course.setCourseId(1);
         course.setCourseName("History");
@@ -183,18 +183,18 @@ class CourseServiceTest {
     @Test
     void readByID_ShouldThrowExceptionWhenInputIsNonExistentID() {
         when(mockedCourseDAO.readByID(1234)).thenThrow(EmptyResultDataAccessException.class);
-        Assertions.assertThrows(FileNotFoundException.class, () ->
+        Assertions.assertThrows(NoSuchObjectException.class, () ->
                 courseService.readByID(1234));
     }
 
     @Test
-    void update_ShouldThrowExceptionWhenInputIsNonExistentID() throws FileNotFoundException {
+    void update_ShouldThrowExceptionWhenInputIsNonExistentID() throws NoSuchObjectException {
         Course course = new Course();
         course.setCourseId(1);
         course.setCourseName("History");
         course.setDescription("History Description");
-        when(mockedCourseDAO.update(anyObject())).thenThrow(FileNotFoundException.class);
-        Assertions.assertThrows(FileNotFoundException.class, () ->
+        when(mockedCourseDAO.update(anyObject())).thenThrow(NoSuchObjectException.class);
+        Assertions.assertThrows(NoSuchObjectException.class, () ->
                 courseService.update(1, "History", "History Description"));
     }
 }

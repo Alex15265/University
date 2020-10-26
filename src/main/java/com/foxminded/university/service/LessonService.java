@@ -7,6 +7,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
 
 import java.io.FileNotFoundException;
+import java.rmi.NoSuchObjectException;
 import java.util.List;
 
 @Component
@@ -27,7 +28,7 @@ public class LessonService {
         this.courseService = courseService;
     }
 
-    public Lesson create(Integer professorId, Integer courseId, Integer roomId, Integer timeId) throws FileNotFoundException {
+    public Lesson create(Integer professorId, Integer courseId, Integer roomId, Integer timeId) throws NoSuchObjectException {
         Lesson lesson = new Lesson();
         lesson.setProfessor(professorService.readById(professorId));
         lesson.setCourse(courseService.readByID(courseId));
@@ -44,17 +45,17 @@ public class LessonService {
         return lessons;
     }
 
-    public Lesson readById(Integer lessonId) throws FileNotFoundException {
+    public Lesson readById(Integer lessonId) throws NoSuchObjectException {
         try {
         Lesson lesson = lessonDAO.readByID(lessonId);
         lesson.setGroups(lessonDAO.readGroupsByLesson(lessonId));
         return lesson;
         } catch (EmptyResultDataAccessException e) {
-            throw new FileNotFoundException();
+            throw new NoSuchObjectException("Object not found");
         }
     }
 
-    public Lesson update(Integer lessonId, Integer professorId, Integer courseId, Integer roomId, Integer timeId) throws FileNotFoundException {
+    public Lesson update(Integer lessonId, Integer professorId, Integer courseId, Integer roomId, Integer timeId) throws NoSuchObjectException, NoSuchObjectException {
             Lesson lesson = new Lesson();
             lesson.setLessonId(lessonId);
             lesson.setProfessor(professorService.readById(professorId));

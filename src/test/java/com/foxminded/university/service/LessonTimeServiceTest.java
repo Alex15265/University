@@ -8,7 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.dao.EmptyResultDataAccessException;
 
-import java.io.FileNotFoundException;
+import java.rmi.NoSuchObjectException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -67,7 +67,7 @@ class LessonTimeServiceTest {
     }
 
     @Test
-    void readByID() throws FileNotFoundException {
+    void readByID() throws NoSuchObjectException {
         LessonTime lessonTime = new LessonTime();
         lessonTime.setLessonStart(LocalDateTime.of(2020, 10, 4, 11, 0));
         lessonTime.setLessonEnd(LocalDateTime.of(2020, 10, 4, 12, 30));
@@ -84,7 +84,7 @@ class LessonTimeServiceTest {
     }
 
     @Test
-    void update() throws FileNotFoundException {
+    void update() throws NoSuchObjectException {
         LessonTime lessonTime = new LessonTime();
         lessonTime.setTimeId(9);
         lessonTime.setLessonStart(LocalDateTime.of(2020, 9, 1, 8, 0));
@@ -109,17 +109,17 @@ class LessonTimeServiceTest {
     @Test
     void readByID_ShouldThrowExceptionWhenInputIsNonExistentID() {
         when(mockedLessonTimeDAO.readByID(1234)).thenThrow(EmptyResultDataAccessException.class);
-        Assertions.assertThrows(FileNotFoundException.class, () ->
+        Assertions.assertThrows(NoSuchObjectException.class, () ->
                 lessonTimeService.readByID(1234));
     }
 
     @Test
-    void update_ShouldThrowExceptionWhenInputIsNonExistentID() throws FileNotFoundException {
+    void update_ShouldThrowExceptionWhenInputIsNonExistentID() throws NoSuchObjectException {
         ClassRoom classRoom = new ClassRoom();
         classRoom.setRoomId(234);
         classRoom.setRoomId(13);
-        when(mockedLessonTimeDAO.update(anyObject())).thenThrow(FileNotFoundException.class);
-        Assertions.assertThrows(FileNotFoundException.class, () ->
+        when(mockedLessonTimeDAO.update(anyObject())).thenThrow(NoSuchObjectException.class);
+        Assertions.assertThrows(NoSuchObjectException.class, () ->
                 lessonTimeService.update(234, LocalDateTime.of(2020, 9, 1, 8, 0),
                         LocalDateTime.of(2020, 9, 1, 9, 30)));
     }

@@ -1,6 +1,7 @@
 package com.foxminded.university.config;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.stereotype.Component;
 
@@ -13,11 +14,11 @@ public class DriverManagerDataSourceInitializer {
     @Value("${password}")
     private String password;
 
-    public DriverManagerDataSource initialize() {
+    public JdbcTemplate initialize() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setUrl(url);
         dataSource.setUsername(user);
         dataSource.setPassword(password);
-        return dataSource;
+        return new JdbcTemplate(dataSource);
     }
 }

@@ -11,6 +11,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
 import java.io.FileNotFoundException;
+import java.rmi.NoSuchObjectException;
 import java.sql.PreparedStatement;
 import java.util.List;
 
@@ -25,7 +26,7 @@ public class ClassRoomDAO implements DAO<ClassRoom,Integer> {
 
     @Autowired
     public ClassRoomDAO(DriverManagerDataSourceInitializer initializer) {
-        jdbcTemplate = new JdbcTemplate(initializer.initialize());
+        jdbcTemplate = initializer.initialize();
     }
 
     @Override
@@ -55,7 +56,7 @@ public class ClassRoomDAO implements DAO<ClassRoom,Integer> {
     }
 
     @Override
-    public ClassRoom update(ClassRoom room) throws FileNotFoundException{
+    public ClassRoom update(ClassRoom room) throws NoSuchObjectException{
         int count = jdbcTemplate.update(connection -> {
                     PreparedStatement resultSet =
                             connection.prepareStatement(UPDATE, new String[] {"room_id"});
@@ -63,7 +64,7 @@ public class ClassRoomDAO implements DAO<ClassRoom,Integer> {
                     resultSet.setInt(2, room.getRoomId());
                     return resultSet;
                 });
-        if (count == 0) throw new FileNotFoundException();
+        if (count == 0) throw new NoSuchObjectException("Object not found");
         return room;
     }
 

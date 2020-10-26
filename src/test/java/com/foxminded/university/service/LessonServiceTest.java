@@ -7,7 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.dao.EmptyResultDataAccessException;
 
-import java.io.FileNotFoundException;
+import java.rmi.NoSuchObjectException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +35,7 @@ class LessonServiceTest {
     }
 
     @Test
-    void create() throws FileNotFoundException {
+    void create() throws NoSuchObjectException {
         Professor professor = new Professor();
         professor.setFirstName("John");
         professor.setLastName("Smith");
@@ -157,7 +157,7 @@ class LessonServiceTest {
     }
 
     @Test
-    void readById() throws FileNotFoundException {
+    void readById() throws NoSuchObjectException {
         Professor professor = new Professor();
         professor.setFirstName("John");
         professor.setLastName("Smith");
@@ -196,7 +196,7 @@ class LessonServiceTest {
     }
 
     @Test
-    void update() throws FileNotFoundException {
+    void update() throws NoSuchObjectException {
         Professor professor = new Professor();
         professor.setProfessorId(2);
         professor.setFirstName("John");
@@ -263,17 +263,17 @@ class LessonServiceTest {
     @Test
     void readByID_ShouldThrowExceptionWhenInputIsNonExistentID() {
         when(mockedLessonDAO.readByID(1234)).thenThrow(EmptyResultDataAccessException.class);
-        Assertions.assertThrows(FileNotFoundException.class, () ->
+        Assertions.assertThrows(NoSuchObjectException.class, () ->
                 lessonService.readById(1234));
     }
 
     @Test
-    void update_ShouldThrowExceptionWhenInputIsNonExistentID() throws FileNotFoundException {
+    void update_ShouldThrowExceptionWhenInputIsNonExistentID() throws NoSuchObjectException {
         ClassRoom classRoom = new ClassRoom();
         classRoom.setRoomId(234);
         classRoom.setRoomId(13);
-        when(mockedLessonDAO.update(anyObject())).thenThrow(FileNotFoundException.class);
-        Assertions.assertThrows(FileNotFoundException.class, () ->
+        when(mockedLessonDAO.update(anyObject())).thenThrow(NoSuchObjectException.class);
+        Assertions.assertThrows(NoSuchObjectException.class, () ->
                 lessonService.update(1, 1, 1, 1, 1));
     }
 }

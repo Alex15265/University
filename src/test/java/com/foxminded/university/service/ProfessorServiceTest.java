@@ -9,7 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.dao.EmptyResultDataAccessException;
 
-import java.io.FileNotFoundException;
+import java.rmi.NoSuchObjectException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -87,7 +87,7 @@ class ProfessorServiceTest {
     }
 
     @Test
-    void readById() throws FileNotFoundException {
+    void readById() throws NoSuchObjectException {
         List<Course> courses = new ArrayList<>();
         Course course1 = new Course();
         course1.setCourseId(1);
@@ -120,7 +120,7 @@ class ProfessorServiceTest {
     }
 
     @Test
-    void update() throws FileNotFoundException {
+    void update() throws NoSuchObjectException {
         Professor professor = new Professor();
         professor.setProfessorId(1);
         professor.setFirstName("Alex");
@@ -181,17 +181,17 @@ class ProfessorServiceTest {
     @Test
     void readByID_ShouldThrowExceptionWhenInputIsNonExistentID() {
         when(mockedProfessorDAO.readByID(1234)).thenThrow(EmptyResultDataAccessException.class);
-        Assertions.assertThrows(FileNotFoundException.class, () ->
+        Assertions.assertThrows(NoSuchObjectException.class, () ->
                 professorService.readById(1234));
     }
 
     @Test
-    void update_ShouldThrowExceptionWhenInputIsNonExistentID() throws FileNotFoundException {
+    void update_ShouldThrowExceptionWhenInputIsNonExistentID() throws NoSuchObjectException {
         ClassRoom classRoom = new ClassRoom();
         classRoom.setRoomId(234);
         classRoom.setRoomId(13);
-        when(mockedProfessorDAO.update(anyObject())).thenThrow(FileNotFoundException.class);
-        Assertions.assertThrows(FileNotFoundException.class, () ->
+        when(mockedProfessorDAO.update(anyObject())).thenThrow(NoSuchObjectException.class);
+        Assertions.assertThrows(NoSuchObjectException.class, () ->
                 professorService.update(234, "Alex", "Belyaev"));
     }
 }

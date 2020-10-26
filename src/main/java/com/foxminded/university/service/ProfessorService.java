@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
 
-import java.io.FileNotFoundException;
+import java.rmi.NoSuchObjectException;
 import java.util.List;
 
 @Component
@@ -34,17 +34,17 @@ public class ProfessorService {
         return professors;
     }
 
-    public Professor readById(Integer professorId) throws FileNotFoundException {
+    public Professor readById(Integer professorId) throws NoSuchObjectException {
         try {
         Professor professor = professorDAO.readByID(professorId);
         professor.setCourses(professorDAO.findCoursesByProfessor(professorId));
         return professor;
         } catch (EmptyResultDataAccessException e) {
-            throw new FileNotFoundException();
+            throw new NoSuchObjectException("Object not found");
         }
     }
 
-    public Professor update(Integer professorId, String firstName, String lastName) throws FileNotFoundException {
+    public Professor update(Integer professorId, String firstName, String lastName) throws NoSuchObjectException {
         Professor professor = new Professor();
         professor.setProfessorId(professorId);
         professor.setFirstName(firstName);

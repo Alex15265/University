@@ -1,6 +1,6 @@
 package com.foxminded.university.dao;
 
-import java.io.FileNotFoundException;
+import java.rmi.NoSuchObjectException;
 import java.util.List;
 
 public interface DAO<T, ID> {
@@ -10,7 +10,7 @@ public interface DAO<T, ID> {
 
     T readByID(ID id);
 
-    T update(T t) throws FileNotFoundException;
+    T update(T t) throws NoSuchObjectException;
 
     void delete(ID id);
 }

@@ -10,7 +10,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
-import java.io.FileNotFoundException;
+import java.rmi.NoSuchObjectException;
 import java.sql.PreparedStatement;
 import java.util.List;
 
@@ -33,7 +33,7 @@ public class GroupDAO implements DAO<Group,Integer> {
 
     @Autowired
     public GroupDAO(DriverManagerDataSourceInitializer initializer) {
-        jdbcTemplate = new JdbcTemplate(initializer.initialize());
+        jdbcTemplate = initializer.initialize();
     }
 
     @Override
@@ -71,7 +71,7 @@ public class GroupDAO implements DAO<Group,Integer> {
     }
 
     @Override
-    public Group update(Group group) throws FileNotFoundException {
+    public Group update(Group group) throws NoSuchObjectException {
         int count = jdbcTemplate.update(connection -> {
             PreparedStatement resultSet =
                     connection.prepareStatement(UPDATE, new String[] {"group_id"});
@@ -79,7 +79,7 @@ public class GroupDAO implements DAO<Group,Integer> {
             resultSet.setInt(2, group.getGroupId());
             return resultSet;
         });
-        if (count == 0) throw new FileNotFoundException();
+        if (count == 0) throw new NoSuchObjectException("Object not found");
         return group;
     }
 

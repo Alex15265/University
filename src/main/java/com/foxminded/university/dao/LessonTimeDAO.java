@@ -9,7 +9,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
-import java.io.FileNotFoundException;
+import java.rmi.NoSuchObjectException;
 import java.sql.PreparedStatement;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -27,7 +27,7 @@ public class LessonTimeDAO implements DAO<LessonTime,Integer> {
 
     @Autowired
     public LessonTimeDAO(DriverManagerDataSourceInitializer initializer) {
-        jdbcTemplate = new JdbcTemplate(initializer.initialize());
+        jdbcTemplate = initializer.initialize();
     }
 
     @Override
@@ -72,7 +72,7 @@ public class LessonTimeDAO implements DAO<LessonTime,Integer> {
     }
 
     @Override
-    public LessonTime update(LessonTime lessonTime) throws FileNotFoundException {
+    public LessonTime update(LessonTime lessonTime) throws NoSuchObjectException {
         int count = jdbcTemplate.update(connection -> {
             PreparedStatement resultSet =
                     connection.prepareStatement(UPDATE, new String[] {"time_id"});
@@ -81,7 +81,7 @@ public class LessonTimeDAO implements DAO<LessonTime,Integer> {
             resultSet.setInt(3, lessonTime.getTimeId());
             return resultSet;
         });
-        if (count == 0) throw new FileNotFoundException();
+        if (count == 0) throw new NoSuchObjectException("Object not found");
         return lessonTime;
     }
 

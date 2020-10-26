@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
 
-import java.io.FileNotFoundException;
+import java.rmi.NoSuchObjectException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -30,15 +30,15 @@ public class LessonTimeService {
         return lessonTimeDAO.readAll();
     }
 
-    public LessonTime readByID(Integer id) throws FileNotFoundException {
+    public LessonTime readByID(Integer id) throws NoSuchObjectException {
         try {
         return lessonTimeDAO.readByID(id);
         } catch (EmptyResultDataAccessException e) {
-            throw new FileNotFoundException();
+            throw new NoSuchObjectException("Object not found");
         }
     }
 
-    public LessonTime update(Integer timeId, LocalDateTime lessonStart, LocalDateTime lessonEnd) throws FileNotFoundException {
+    public LessonTime update(Integer timeId, LocalDateTime lessonStart, LocalDateTime lessonEnd) throws NoSuchObjectException {
         LessonTime lessonTime = new LessonTime();
         lessonTime.setTimeId(timeId);
         lessonTime.setLessonStart(lessonStart);

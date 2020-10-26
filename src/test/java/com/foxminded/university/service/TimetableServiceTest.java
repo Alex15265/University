@@ -146,11 +146,12 @@ class TimetableServiceTest {
     }
 
     @Test
-    void readProfessorTimetableForADay_ShouldReturnAListOf1CorrectLessonsWhenReceiveAProfessor2AndDate() {
+    void findByProfessor_ShouldReturnAListOf1CorrectLessonsWhenReceiveAProfessor2AndDates() {
         when(mockedLessonService.readAll()).thenReturn(lessons);
 
-        LocalDateTime date = LocalDateTime.of(2020, 9, 5, 8, 0);
-        Timetable professor2TTForADay = timetableService.readProfessorTimetableForADay(2, date);
+        LocalDateTime start = LocalDateTime.of(2020, 9, 5, 8, 0);
+        LocalDateTime end = LocalDateTime.of(2020, 9, 6, 8, 0);
+        Timetable professor2TTForADay = timetableService.findByProfessor(2, start, end);
         List<Lesson> list = professor2TTForADay.getListOfLessons();
 
         assertEquals(1, list.size());
@@ -162,11 +163,12 @@ class TimetableServiceTest {
     }
 
     @Test
-    void readProfessorTimetableForADay_ShouldReturnAListOf2CorrectLessonsWhenReceiveAProfessor1AndDate() {
+    void findByProfessor_ShouldReturnAListOf2CorrectLessonsWhenReceiveAProfessor1AndDates() {
         when(mockedLessonService.readAll()).thenReturn(lessons);
 
-        LocalDateTime date = LocalDateTime.of(2020, 9, 14, 8, 0);
-        Timetable professor1TTForADay = timetableService.readProfessorTimetableForADay(1, date);
+        LocalDateTime start = LocalDateTime.of(2020, 9, 14, 8, 0);
+        LocalDateTime end = LocalDateTime.of(2020, 9, 15, 8, 0);
+        Timetable professor1TTForADay = timetableService.findByProfessor(1, start, end);
         List<Lesson> list = professor1TTForADay.getListOfLessons();
 
         assertEquals(2, list.size());
@@ -184,22 +186,24 @@ class TimetableServiceTest {
     }
 
     @Test
-    void readProfessorTimetableForADay_ShouldReturnAListOf0LessonsWhenReceiveAProfessor1AndDate() {
+    void findByProfessor_ShouldReturnAListOf0LessonsWhenReceiveAProfessor1AndDates() {
         when(mockedLessonService.readAll()).thenReturn(lessons);
 
-        LocalDateTime date = LocalDateTime.of(2020, 9, 2, 0, 0);
-        Timetable professor1TTForADay = timetableService.readProfessorTimetableForADay(1, date);
+        LocalDateTime start = LocalDateTime.of(2020, 9, 2, 0, 0);
+        LocalDateTime end = LocalDateTime.of(2020, 9, 3, 0, 0);
+        Timetable professor1TTForADay = timetableService.findByProfessor(1, start, end);
         List<Lesson> list = professor1TTForADay.getListOfLessons();
 
         assertEquals(0, list.size());
     }
 
     @Test
-    void readProfessorTimetableForAMonth_ShouldReturnAListOf3CorrectLessonsWhenReceiveAProfessor1AndDate() {
+    void findByProfessor_ShouldReturnAListOf0LessonsWhenReceiveAProfessor1AndDate_ShouldReturnAListOf3CorrectLessonsWhenReceiveAProfessor1AndDates() {
         when(mockedLessonService.readAll()).thenReturn(lessons);
 
-        LocalDateTime date = LocalDateTime.of(2020, 9, 5, 7, 0);
-        Timetable professor1TTForAMonth = timetableService.readProfessorTimetableForAMonth(1, date);
+        LocalDateTime start = LocalDateTime.of(2020, 9, 5, 7, 0);
+        LocalDateTime end = LocalDateTime.of(2020, 10, 5, 7, 0);
+        Timetable professor1TTForAMonth = timetableService.findByProfessor(1, start, end);
         List<Lesson> list = professor1TTForAMonth.getListOfLessons();
 
         assertEquals(3, list.size());
@@ -223,11 +227,12 @@ class TimetableServiceTest {
     }
 
     @Test
-    void readProfessorTimetableForAMonth_ShouldReturnAListOf2CorrectLessonsWhenReceiveAProfessor1AndDate() {
+    void findByProfessor_ShouldReturnAListOf0LessonsWhenReceiveAProfessor1AndDate_ShouldReturnAListOf3CorrectLessonsWhenReceiveAProfessor1AndDates_ShouldReturnAListOf2CorrectLessonsWhenReceiveAProfessor1AndDates() {
         when(mockedLessonService.readAll()).thenReturn(lessons);
 
-        LocalDateTime date = LocalDateTime.of(2020, 10, 17, 8, 0);
-        Timetable professor1TTForAMonth = timetableService.readProfessorTimetableForAMonth(1, date);
+        LocalDateTime start = LocalDateTime.of(2020, 10, 17, 8, 0);
+        LocalDateTime end = LocalDateTime.of(2020, 11, 17, 8, 0);
+        Timetable professor1TTForAMonth = timetableService.findByProfessor(1, start, end);
         List<Lesson> list = professor1TTForAMonth.getListOfLessons();
 
         assertEquals(2, list.size());
@@ -245,11 +250,12 @@ class TimetableServiceTest {
     }
 
     @Test
-    void readStudentTimetableForADay_ShouldReturnAListOf1CorrectLessonsWhenReceiveAGroup1AndCourse2AndDate() {
+    void findByStudent_ShouldReturnAListOf1CorrectLessonsWhenReceiveAGroup1AndCourse2AndDates() {
         when(mockedLessonService.readAll()).thenReturn(lessons);
 
-        LocalDateTime date = LocalDateTime.of(2020, 10, 19, 8, 0);
-        Timetable studentTTForADay = timetableService.readStudentTimetableForADay(1, 2, date);
+        LocalDateTime start = LocalDateTime.of(2020, 10, 19, 8, 0);
+        LocalDateTime end = LocalDateTime.of(2020, 10, 20, 8, 0);
+        Timetable studentTTForADay = timetableService.findByGroup(1, start, end);
         List<Lesson> list = studentTTForADay.getListOfLessons();
 
         assertEquals(1, list.size());
@@ -259,22 +265,24 @@ class TimetableServiceTest {
     }
 
     @Test
-    void readStudentTimetableForADay_ShouldReturnAListOf0LessonWhenReceiveAGroup1AndCourse1AndDate() {
+    void findByStudent_ShouldReturnAListOf0LessonWhenReceiveAGroup1AndCourse1AndDates() {
         when(mockedLessonService.readAll()).thenReturn(lessons);
 
-        LocalDateTime date = LocalDateTime.of(2020, 9, 2, 0, 0);
-        Timetable studentTTForADay = timetableService.readStudentTimetableForADay(1, 2, date);
+        LocalDateTime start = LocalDateTime.of(2020, 9, 2, 8, 0);
+        LocalDateTime end = LocalDateTime.of(2020, 9, 3, 8, 0);
+        Timetable studentTTForADay = timetableService.findByGroup(1, start, end);
         List<Lesson> list = studentTTForADay.getListOfLessons();
 
         assertEquals(0, list.size());
     }
 
     @Test
-    void readStudentTimetableForAMonth_ShouldReturnAListOf2CorrectLessonsWhenReceiveAGroup2AndCourse1AndDate() {
+    void findByStudent_ShouldReturnAListOf2CorrectLessonsWhenReceiveAGroup2AndCourse1AndDates() {
         when(mockedLessonService.readAll()).thenReturn(lessons);
 
-        LocalDateTime date = LocalDateTime.of(2020, 9, 5, 7, 0);
-        Timetable student1TTForAMonth = timetableService.readStudentTimetableForAMonth(2, 1, date);
+        LocalDateTime start = LocalDateTime.of(2020, 9, 5, 7, 0);
+        LocalDateTime end = LocalDateTime.of(2020, 10, 5, 7, 0);
+        Timetable student1TTForAMonth = timetableService.findByGroup(2, start, end);
         List<Lesson> list = student1TTForAMonth.getListOfLessons();
 
         assertEquals(2, list.size());
