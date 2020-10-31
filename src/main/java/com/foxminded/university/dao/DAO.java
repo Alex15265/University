@@ -1,15 +1,16 @@
 package com.foxminded.university.dao;
 
+import java.rmi.NoSuchObjectException;
 import java.util.List;
 
 public interface DAO<T, ID> {
-    void create(T t);
+    T create(T t);
 
     List<T> readAll();
 
     T readByID(ID id);
 
-    void update(T t);
+    T update(T t) throws NoSuchObjectException;
 
     void delete(ID id);
 }
