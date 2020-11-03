@@ -2,31 +2,21 @@ package com.foxminded.university.service;
 
 import com.foxminded.university.dao.LessonDAO;
 import com.foxminded.university.dao.entities.Lesson;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
 
-import java.io.FileNotFoundException;
 import java.rmi.NoSuchObjectException;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class LessonService {
     private final LessonDAO lessonDAO;
     private final ProfessorService professorService;
     private final CourseService courseService;
     private final ClassRoomService classRoomService;
     private final LessonTimeService lessonTimeService;
-
-    @Autowired
-    public LessonService(LessonDAO lessonDAO, ProfessorService professorService, CourseService courseService,
-                         ClassRoomService classRoomService, LessonTimeService lessonTimeService) {
-        this.lessonDAO = lessonDAO;
-        this.professorService = professorService;
-        this.classRoomService = classRoomService;
-        this.lessonTimeService = lessonTimeService;
-        this.courseService = courseService;
-    }
 
     public Lesson create(Integer professorId, Integer courseId, Integer roomId, Integer timeId) throws NoSuchObjectException {
         Lesson lesson = new Lesson();
@@ -38,18 +28,12 @@ public class LessonService {
     }
 
     public List<Lesson> readAll() {
-        List<Lesson> lessons = lessonDAO.readAll();
-        for (Lesson lesson: lessons) {
-            lesson.setGroups(lessonDAO.readGroupsByLesson(lesson.getLessonId()));
-        }
-        return lessons;
+        return lessonDAO.readAll();
     }
 
     public Lesson readById(Integer lessonId) throws NoSuchObjectException {
         try {
-        Lesson lesson = lessonDAO.readByID(lessonId);
-        lesson.setGroups(lessonDAO.readGroupsByLesson(lessonId));
-        return lesson;
+        return lessonDAO.readByID(lessonId);
         } catch (EmptyResultDataAccessException e) {
             throw new NoSuchObjectException("Object not found");
         }

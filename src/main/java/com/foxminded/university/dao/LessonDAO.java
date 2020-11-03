@@ -13,30 +13,71 @@ import java.rmi.NoSuchObjectException;
 import java.sql.PreparedStatement;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
 public class LessonDAO implements DAO<Lesson,Integer> {
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    private static final String UPDATE = "UPDATE lessons set professor_id = ?, course_id = ?, room_id = ?, time_id = ?  WHERE lesson_id = ?";
-    private static final String READ_BY_ID = "SELECT * FROM lessons INNER JOIN professors \n" +
-            "ON professors.professor_id = lessons.professor_id INNER JOIN courses ON courses.course_id = lessons.course_id \n" +
-            "INNER JOIN classrooms ON classrooms.room_id = lessons.room_id INNER JOIN times \n" +
-            "ON times.time_id = lessons.time_id WHERE lesson_id = ?";
-    private static final String READ_ALL = "SELECT * FROM lessons INNER JOIN professors \n" +
-            "ON professors.professor_id = lessons.professor_id INNER JOIN courses ON courses.course_id = lessons.course_id \n" +
-            "INNER JOIN classrooms ON classrooms.room_id = lessons.room_id INNER JOIN times \n" +
-            "ON times.time_id = lessons.time_id";
-    private static final String CREATE = "INSERT INTO lessons (professor_id, course_id, room_id, time_id) VALUES (?, ?, ?, ?)";
+    private static final String CREATE =
+            "INSERT INTO lessons (professor_id, course_id, room_id, time_id) VALUES (?, ?, ?, ?)";
+    private static final String READ_ALL =
+            "SELECT lessons.lesson_id, professors.professor_id, professors.first_name, " +
+            "professors.last_name, courses.course_id, courses.course_name, courses.course_description, " +
+            "classrooms.room_id, classrooms.room_number, times.time_id, times.lesson_start, times.lesson_end, " +
+            "string_agg(groups.group_id::text, ','), " +
+            "string_agg(groups.group_name, ',') " +
+            "FROM groups_lessons " +
+            "INNER JOIN groups " +
+            "ON groups.group_id = groups_lessons.group_id " +
+            "INNER JOIN lessons " +
+            "ON lessons.lesson_id = groups_lessons.lesson_id " +
+            "INNER JOIN professors " +
+            "ON professors.professor_id = lessons.professor_id " +
+            "INNER JOIN courses " +
+            "ON courses.course_id = lessons.course_id " +
+            "INNER JOIN classrooms " +
+            "ON classrooms.room_id = lessons.room_id " +
+            "INNER JOIN times " +
+            "ON times.time_id = lessons.time_id " +
+            "GROUP BY lessons.lesson_id, professors.professor_id, " +
+            "courses.course_id, classrooms.room_id, times.time_id " +
+            "ORDER BY lessons.lesson_id ASC";
+    private static final String READ_BY_ID =
+            "SELECT lessons.lesson_id, professors.professor_id, professors.first_name, " +
+            "professors.last_name, courses.course_id, courses.course_name, courses.course_description, " +
+            "classrooms.room_id, classrooms.room_number, times.time_id, times.lesson_start, times.lesson_end, " +
+            "string_agg(groups.group_id::text, ','), " +
+            "string_agg(groups.group_name, ',') " +
+            "FROM groups_lessons " +
+            "INNER JOIN groups " +
+            "ON groups.group_id = groups_lessons.group_id " +
+            "INNER JOIN lessons " +
+            "ON lessons.lesson_id = groups_lessons.lesson_id " +
+            "INNER JOIN professors " +
+            "ON professors.professor_id = lessons.professor_id " +
+            "INNER JOIN courses " +
+            "ON courses.course_id = lessons.course_id " +
+            "INNER JOIN classrooms " +
+            "ON classrooms.room_id = lessons.room_id " +
+            "INNER JOIN times " +
+            "ON times.time_id = lessons.time_id " +
+            "WHERE lessons.lesson_id = ? " +
+            "GROUP BY lessons.lesson_id, professors.professor_id, " +
+            "courses.course_id, classrooms.room_id, times.time_id";
+    private static final String UPDATE = "UPDATE lessons set professor_id = ?, " +
+            "course_id = ?, room_id = ?, time_id = ?  WHERE lesson_id = ?";
     private static final String DELETE = "DELETE FROM lessons WHERE lesson_id = ?";
-    private static final String READ_GROUPS_BY_LESSON =
-                    "SELECT groups.group_id, groups.group_name " +
-                    "FROM groups_lessons " +
-                    "INNER JOIN groups " +
-                    "ON groups_lessons.group_id = groups.group_id " +
-                    "WHERE groups_lessons.lesson_id = ?";
-    private static final String ADD_GROUP_TO_LESSON = "INSERT INTO groups_lessons (group_id, lesson_id) VALUES (?, ?)";
-    private static final String DELETE_GROUP_FROM_LESSON = "DELETE FROM groups_lessons WHERE group_id = ? AND lesson_id = ?";
+    private static final String FIND_BY_LESSON =
+            "SELECT groups.group_id, groups.group_name " +
+            "FROM groups_lessons " +
+            "INNER JOIN groups " +
+            "ON groups_lessons.group_id = groups.group_id " +
+            "WHERE groups_lessons.lesson_id = ?";
+    private static final String ADD_GROUP_TO_LESSON =
+            "INSERT INTO groups_lessons (group_id, lesson_id) VALUES (?, ?)";
+    private static final String DELETE_GROUP_FROM_LESSON =
+            "DELETE FROM groups_lessons WHERE group_id = ? AND lesson_id = ?";
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
@@ -81,12 +122,24 @@ public class LessonDAO implements DAO<Lesson,Integer> {
                     formatter));
             lessonTime.setLessonEnd(LocalDateTime.parse(resultSet.getString("lesson_end"),
                     formatter));
+            List<Group> groups = new ArrayList<>();
+            String groupIds = resultSet.getString(13);
+            String[] splitGroupIds = groupIds.split(",");
+            String groupNames = resultSet.getString(14);
+            String[] splitGroupNames = groupNames.split(",");
+            for (int i = 0; i < splitGroupIds.length; i++) {
+                Group group = new Group();
+                group.setGroupId(Integer.parseInt(splitGroupIds[i]));
+                group.setGroupName(splitGroupNames[i]);
+                groups.add(group);
+            }
             Lesson lesson = new Lesson();
             lesson.setLessonId(resultSet.getInt("lesson_id"));
             lesson.setProfessor(professor);
             lesson.setCourse(course);
             lesson.setClassRoom(classRoom);
             lesson.setTime(lessonTime);
+            lesson.setGroups(groups);
             return lesson;
         });
     }
@@ -111,12 +164,24 @@ public class LessonDAO implements DAO<Lesson,Integer> {
                     formatter));
             lessonTime.setLessonEnd(LocalDateTime.parse(resultSet.getString("lesson_end"),
                     formatter));
+            List<Group> groups = new ArrayList<>();
+            String groupIds = resultSet.getString(13);
+            String[] splitGroupIds = groupIds.split(",");
+            String groupNames = resultSet.getString(14);
+            String[] splitGroupNames = groupNames.split(",");
+            for (int i = 0; i < splitGroupIds.length; i++) {
+                Group group = new Group();
+                group.setGroupId(Integer.parseInt(splitGroupIds[i]));
+                group.setGroupName(splitGroupNames[i]);
+                groups.add(group);
+            }
             Lesson lesson = new Lesson();
             lesson.setLessonId(resultSet.getInt("lesson_id"));
             lesson.setProfessor(professor);
             lesson.setCourse(course);
             lesson.setClassRoom(classRoom);
             lesson.setTime(lessonTime);
+            lesson.setGroups(groups);
             return lesson;
         }, id);
     }
@@ -143,7 +208,7 @@ public class LessonDAO implements DAO<Lesson,Integer> {
     }
 
     public List<Group> readGroupsByLesson(Integer lessonId) {
-        return jdbcTemplate.query(READ_GROUPS_BY_LESSON, (resultSet, rowNum) -> {
+        return jdbcTemplate.query(FIND_BY_LESSON, (resultSet, rowNum) -> {
             Group group = new Group();
             group.setGroupId(resultSet.getInt("group_id"));
             group.setGroupName(resultSet.getString("group_name"));

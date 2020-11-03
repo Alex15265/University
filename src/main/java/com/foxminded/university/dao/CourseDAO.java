@@ -10,26 +10,51 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
-import java.io.FileNotFoundException;
 import java.rmi.NoSuchObjectException;
 import java.sql.PreparedStatement;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
 public class CourseDAO implements DAO<Course,Integer> {
-    private static final String UPDATE = "UPDATE courses set course_name = ?, course_description = ? WHERE course_id = ?";
-    private static final String READ_BY_ID = "SELECT * FROM courses WHERE course_id = ?";
-    private static final String READ_ALL = "SELECT * FROM courses";
     private static final String CREATE = "INSERT INTO courses (course_name, course_description) VALUES (?, ?)";
+    private static final String READ_ALL =
+            "SELECT courses.course_id, courses.course_name, courses.course_description, " +
+            "string_agg(students.student_id::text, ','), " +
+            "string_agg(students.first_name, ','), " +
+            "string_agg(students.last_name, ',') " +
+            "FROM students_courses " +
+            "INNER JOIN students " +
+            "ON students_courses.student_id = students.student_id " +
+            "RIGHT JOIN courses " +
+            "ON students_courses.course_id = courses.course_id " +
+            "GROUP BY courses.course_id " +
+            "ORDER BY courses.course_id ASC";
+    private static final String READ_BY_ID =
+            "SELECT courses.course_id, courses.course_name, courses.course_description, " +
+            "string_agg(students.student_id::text, ','), " +
+            "string_agg(students.first_name, ','), " +
+            "string_agg(students.last_name, ',') " +
+            "FROM students_courses " +
+            "INNER JOIN students " +
+            "ON students_courses.student_id = students.student_id " +
+            "RIGHT JOIN courses " +
+            "ON students_courses.course_id = courses.course_id " +
+            "WHERE courses.course_id = ? " +
+            "GROUP BY courses.course_id";
+    private static final String UPDATE =
+            "UPDATE courses set course_name = ?, course_description = ? WHERE course_id = ?";
     private static final String DELETE = "DELETE FROM courses WHERE course_id = ?";
-    private static final String READ_STUDENT_BY_COURSE =
-                    "SELECT students.student_id, students.first_name, students.last_name " +
-                    "FROM students_courses " +
-                    "INNER  JOIN students " +
-                    "ON students_courses.student_id = students.student_id " +
-                    "WHERE students_courses.course_id = ?";
-    private static final String ADD_STUDENT_TO_COURSE = "INSERT INTO students_courses (student_id, course_id) VALUES (?, ?)";
-    private static final String DELETE_STUDENT_FROM_COURSE = "DELETE FROM students_courses WHERE student_id = ? AND course_id = ?";
+    private static final String FIND_BY_COURSE =
+            "SELECT students.student_id, students.first_name, students.last_name " +
+            "FROM students_courses " +
+            "INNER  JOIN students " +
+            "ON students_courses.student_id = students.student_id " +
+            "WHERE students_courses.course_id = ?";
+    private static final String ADD_STUDENT_TO_COURSE =
+            "INSERT INTO students_courses (student_id, course_id) VALUES (?, ?)";
+    private static final String DELETE_STUDENT_FROM_COURSE =
+            "DELETE FROM students_courses WHERE student_id = ? AND course_id = ?";
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
@@ -55,10 +80,27 @@ public class CourseDAO implements DAO<Course,Integer> {
     @Override
     public List<Course> readAll() {
         return jdbcTemplate.query(READ_ALL, (resultSet, rowNum) -> {
+            List<Student> students = new ArrayList<>();
             Course course = new Course();
             course.setCourseId(resultSet.getInt("course_id"));
             course.setCourseName(resultSet.getString("course_name"));
             course.setDescription(resultSet.getString("course_description"));
+            String studentIds = resultSet.getString(4);
+            if(studentIds != null) {
+                String[] splitStudentIds = studentIds.split(",");
+                String firstNames = resultSet.getString(5);
+                String[] splitFirstNames = firstNames.split(",");
+                String lastNames = resultSet.getString(6);
+                String[] splitLastNames = lastNames.split(",");
+                for (int i = 0; i < splitStudentIds.length; i++) {
+                    Student student = new Student();
+                    student.setStudentId(Integer.parseInt(splitStudentIds[i]));
+                    student.setFirstName(splitFirstNames[i]);
+                    student.setLastName(splitLastNames[i]);
+                    students.add(student);
+                }
+                course.setStudents(students);
+            }
             return course;
         });
     }
@@ -66,10 +108,27 @@ public class CourseDAO implements DAO<Course,Integer> {
     @Override
     public Course readByID(Integer id) throws EmptyResultDataAccessException {
         return jdbcTemplate.queryForObject(READ_BY_ID, (resultSet, rowNum) -> {
+            List<Student> students = new ArrayList<>();
             Course course = new Course();
             course.setCourseId(resultSet.getInt("course_id"));
             course.setCourseName(resultSet.getString("course_name"));
             course.setDescription(resultSet.getString("course_description"));
+            String studentIds = resultSet.getString(4);
+            if(studentIds != null) {
+                String[] splitStudentIds = studentIds.split(",");
+                String firstNames = resultSet.getString(5);
+                String[] splitFirstNames = firstNames.split(",");
+                String lastNames = resultSet.getString(6);
+                String[] splitLastNames = lastNames.split(",");
+                for (int i = 0; i < splitStudentIds.length; i++) {
+                    Student student = new Student();
+                    student.setStudentId(Integer.parseInt(splitStudentIds[i]));
+                    student.setFirstName(splitFirstNames[i]);
+                    student.setLastName(splitLastNames[i]);
+                    students.add(student);
+                }
+                course.setStudents(students);
+            }
             return course;
             }, id);
     }
@@ -94,7 +153,7 @@ public class CourseDAO implements DAO<Course,Integer> {
     }
 
     public List<Student> findByCourse(Integer courseId) {
-        return jdbcTemplate.query(READ_STUDENT_BY_COURSE, (resultSet, rowNum) -> {
+        return jdbcTemplate.query(FIND_BY_COURSE, (resultSet, rowNum) -> {
             Student student = new Student();
             student.setStudentId(resultSet.getInt("student_id"));
             student.setFirstName(resultSet.getString("first_name"));

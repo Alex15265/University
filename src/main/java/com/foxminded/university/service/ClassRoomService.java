@@ -2,7 +2,7 @@ package com.foxminded.university.service;
 
 import com.foxminded.university.dao.ClassRoomDAO;
 import com.foxminded.university.dao.entities.ClassRoom;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
 
@@ -10,13 +10,9 @@ import java.rmi.NoSuchObjectException;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class ClassRoomService {
     private final ClassRoomDAO classRoomDAO;
-
-    @Autowired
-    public ClassRoomService(ClassRoomDAO classRoomDAO) {
-        this.classRoomDAO = classRoomDAO;
-    }
 
     public ClassRoom create(Integer roomNumber) {
         ClassRoom classRoom = new ClassRoom();

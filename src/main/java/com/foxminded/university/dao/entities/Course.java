@@ -1,7 +1,6 @@
 package com.foxminded.university.dao.entities;
 
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 

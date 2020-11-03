@@ -88,9 +88,6 @@ class GroupServiceTest {
         groups.add(group3);
 
         when(mockedGroupDAO.readAll()).thenReturn(groups);
-        when(mockedGroupDAO.findByGroup(3)).thenReturn(students1);
-        when(mockedGroupDAO.findByGroup(6)).thenReturn(students2);
-        when(mockedGroupDAO.findByGroup(7)).thenReturn(students3);
 
         assertEquals(groups, groupService.readAll());
         assertEquals(group1, groupService.readAll().get(0));
@@ -101,17 +98,16 @@ class GroupServiceTest {
         assertEquals(students3, groupService.readAll().get(2).getStudents());
 
         verify(mockedGroupDAO, times(7)).readAll();
-        verify(mockedGroupDAO, times(7)).findByGroup(3);
-        verify(mockedGroupDAO, times(7)).findByGroup(6);
-        verify(mockedGroupDAO, times(7)).findByGroup(7);
     }
 
     @Test
     void readById() throws NoSuchObjectException {
         Student student1 = new Student();
+        student1.setStudentId(1);
         student1.setFirstName("Alex");
         student1.setLastName("Belyaev");
         Student student2 = new Student();
+        student2.setStudentId(3);
         student2.setFirstName("Lisa");
         student2.setLastName("Ann");
         List<Student> students = new ArrayList<>();
@@ -123,14 +119,12 @@ class GroupServiceTest {
         group.setStudents(students);
 
         when(mockedGroupDAO.readByID(1)).thenReturn(group);
-        when(mockedGroupDAO.findByGroup(1)).thenReturn(students);
 
         assertEquals(group, groupService.readById(1));
         assertEquals("aa-20", groupService.readById(1).getGroupName());
         assertEquals(students, groupService.readById(1).getStudents());
 
         verify(mockedGroupDAO, times(3)).readByID(1);
-        verify(mockedGroupDAO, times(3)).findByGroup(1);
     }
 
     @Test

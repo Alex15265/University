@@ -2,7 +2,7 @@ package com.foxminded.university.service;
 
 import com.foxminded.university.dao.LessonTimeDAO;
 import com.foxminded.university.dao.entities.LessonTime;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
 
@@ -11,13 +11,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class LessonTimeService {
     private final LessonTimeDAO lessonTimeDAO;
-
-    @Autowired
-    public LessonTimeService(LessonTimeDAO lessonTimeDAO) {
-        this.lessonTimeDAO = lessonTimeDAO;
-    }
 
     public LessonTime create(LocalDateTime lessonStart, LocalDateTime lessonEnd) {
         LessonTime lessonTime = new LessonTime();

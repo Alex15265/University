@@ -12,23 +12,44 @@ import org.springframework.stereotype.Component;
 
 import java.rmi.NoSuchObjectException;
 import java.sql.PreparedStatement;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
 public class ProfessorDAO implements DAO<Professor,Integer> {
-    private static final String UPDATE = "UPDATE professors set first_name = ?, last_name = ? WHERE professor_id = ?";
-    private static final String READ_BY_ID = "SELECT * FROM professors WHERE professor_id = ?";
-    private static final String READ_ALL = "SELECT * FROM professors";
     private static final String CREATE = "INSERT INTO professors (first_name, last_name) VALUES (?, ?)";
+    private static final String READ_ALL =
+            "SELECT professors.professor_id, professors.first_name, professors.last_name, " +
+            "string_agg(courses.course_id::text, ','), " +
+            "string_agg(courses.course_name, ','), " +
+            "string_agg(courses.course_description, ',') " +
+            "FROM professors " +
+            "LEFT JOIN courses " +
+            "ON professors.professor_id = courses.professor_id " +
+            "GROUP BY professors.professor_id " +
+            "ORDER BY professors.professor_id ASC";
+    private static final String READ_BY_ID =
+            "SELECT professors.professor_id, professors.first_name, professors.last_name, " +
+            "string_agg(courses.course_id::text, ','), " +
+            "string_agg(courses.course_name, ','), " +
+            "string_agg(courses.course_description, ',') " +
+            "FROM professors " +
+            "LEFT JOIN courses " +
+            "ON professors.professor_id = courses.professor_id " +
+            "WHERE professors.professor_id = ? " +
+            "GROUP BY professors.professor_id";
+    private static final String UPDATE = "UPDATE professors set first_name = ?, last_name = ? WHERE professor_id = ?";
     private static final String DELETE = "DELETE FROM professors WHERE professor_id = ?";
-    private static final String READ_COURSES_BY_PROFESSOR =
-                    "SELECT courses.course_id, courses.course_name, courses.course_description " +
-                    "FROM courses " +
-                    "INNER  JOIN professors " +
-                    "ON courses.professor_id = professors.professor_id " +
-                    "WHERE professors.professor_id = ?";
-    private static final String ADD_COURSE_TO_PROFESSOR = "UPDATE courses set professor_id = ? WHERE course_id = ?";
-    private static final String DELETE_COURSE_FROM_PROFESSOR = "UPDATE courses set professor_id = null WHERE course_id = ?";
+    private static final String FIND_BY_PROFESSOR =
+            "SELECT courses.course_id, courses.course_name, courses.course_description " +
+            "FROM courses " +
+            "INNER  JOIN professors " +
+            "ON courses.professor_id = professors.professor_id " +
+            "WHERE professors.professor_id = ?";
+    private static final String ADD_COURSE_TO_PROFESSOR =
+            "UPDATE courses set professor_id = ? WHERE course_id = ?";
+    private static final String DELETE_COURSE_FROM_PROFESSOR =
+            "UPDATE courses set professor_id = null WHERE course_id = ?";
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
@@ -54,10 +75,27 @@ public class ProfessorDAO implements DAO<Professor,Integer> {
     @Override
     public List<Professor> readAll() {
         return jdbcTemplate.query(READ_ALL, (resultSet, rowNum) -> {
+            List<Course> courses = new ArrayList<>();
             Professor professor = new Professor();
             professor.setProfessorId(resultSet.getInt("professor_id"));
             professor.setFirstName(resultSet.getString("first_name"));
             professor.setLastName(resultSet.getString("last_name"));
+            String courseIds = resultSet.getString(4);
+            if(courseIds != null) {
+                String[] splitCourseIds = courseIds.split(",");
+                String courseNames = resultSet.getString(5);
+                String[] splitCourseNames = courseNames.split(",");
+                String courseDescriptions = resultSet.getString(6);
+                String[] splitCourseDescriptions = courseDescriptions.split(",");
+                for (int i = 0; i < splitCourseIds.length; i++) {
+                    Course course = new Course();
+                    course.setCourseId(Integer.parseInt(splitCourseIds[i]));
+                    course.setCourseName(splitCourseNames[i]);
+                    course.setDescription(splitCourseDescriptions[i]);
+                    courses.add(course);
+                }
+                professor.setCourses(courses);
+            }
             return professor;
         });
     }
@@ -65,10 +103,27 @@ public class ProfessorDAO implements DAO<Professor,Integer> {
     @Override
     public Professor readByID(Integer id) throws EmptyResultDataAccessException {
         return jdbcTemplate.queryForObject(READ_BY_ID, (resultSet, rowNum) -> {
+            List<Course> courses = new ArrayList<>();
             Professor professor = new Professor();
             professor.setProfessorId(resultSet.getInt("professor_id"));
             professor.setFirstName(resultSet.getString("first_name"));
             professor.setLastName(resultSet.getString("last_name"));
+            String courseIds = resultSet.getString(4);
+            if(courseIds != null) {
+                String[] splitCourseIds = courseIds.split(",");
+                String courseNames = resultSet.getString(5);
+                String[] splitCourseNames = courseNames.split(",");
+                String courseDescriptions = resultSet.getString(6);
+                String[] splitCourseDescriptions = courseDescriptions.split(",");
+                for (int i = 0; i < splitCourseIds.length; i++) {
+                    Course course = new Course();
+                    course.setCourseId(Integer.parseInt(splitCourseIds[i]));
+                    course.setCourseName(splitCourseNames[i]);
+                    course.setDescription(splitCourseDescriptions[i]);
+                    courses.add(course);
+                }
+                professor.setCourses(courses);
+            }
             return professor;
         }, id);
     }
@@ -93,7 +148,7 @@ public class ProfessorDAO implements DAO<Professor,Integer> {
     }
 
     public List<Course> findCoursesByProfessor(Integer professorId) {
-        return jdbcTemplate.query(READ_COURSES_BY_PROFESSOR, (resultSet, rowNum) -> {
+        return jdbcTemplate.query(FIND_BY_PROFESSOR, (resultSet, rowNum) -> {
             Course course = new Course();
             course.setCourseId(resultSet.getInt("course_id"));
             course.setCourseName(resultSet.getString("course_name"));

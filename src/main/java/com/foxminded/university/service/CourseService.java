@@ -3,7 +3,7 @@ package com.foxminded.university.service;
 import com.foxminded.university.dao.CourseDAO;
 import com.foxminded.university.dao.entities.Course;
 import com.foxminded.university.dao.entities.Student;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
 
@@ -11,13 +11,9 @@ import java.rmi.NoSuchObjectException;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class CourseService {
     private final CourseDAO courseDAO;
-
-    @Autowired
-    public CourseService(CourseDAO courseDAO) {
-        this.courseDAO = courseDAO;
-    }
 
     public Course create(String courseName, String description) {
         Course course = new Course();
@@ -27,18 +23,12 @@ public class CourseService {
     }
 
     public List<Course> readAll() {
-        List<Course> courses = courseDAO.readAll();
-        for (Course course: courses) {
-            course.setStudents(courseDAO.findByCourse(course.getCourseId()));
-        }
-        return courses;
+        return courseDAO.readAll();
     }
 
     public Course readByID (Integer courseId) throws NoSuchObjectException {
         try {
-            Course course = courseDAO.readByID(courseId);
-            course.setStudents(courseDAO.findByCourse(courseId));
-            return course;
+            return courseDAO.readByID(courseId);
         } catch (EmptyResultDataAccessException e) {
             throw new NoSuchObjectException("Object not found");
         }

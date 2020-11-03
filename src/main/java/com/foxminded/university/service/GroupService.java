@@ -3,7 +3,7 @@ package com.foxminded.university.service;
 import com.foxminded.university.dao.GroupDAO;
 import com.foxminded.university.dao.entities.Group;
 import com.foxminded.university.dao.entities.Student;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
 
@@ -11,13 +11,9 @@ import java.rmi.NoSuchObjectException;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class GroupService {
     private final GroupDAO groupDAO;
-
-    @Autowired
-    public GroupService(GroupDAO groupDAO) {
-        this.groupDAO = groupDAO;
-    }
 
     public Group create(String groupName) {
         Group group = new Group();
@@ -26,18 +22,12 @@ public class GroupService {
     }
 
     public List<Group> readAll() {
-        List<Group> groups = groupDAO.readAll();
-        for (Group group: groups) {
-            group.setStudents(groupDAO.findByGroup(group.getGroupId()));
-        }
-        return groups;
+        return groupDAO.readAll();
     }
 
     public Group readById(Integer groupId) throws NoSuchObjectException {
         try {
-        Group group = groupDAO.readByID(groupId);
-        group.setStudents(groupDAO.findByGroup(groupId));
-        return group;
+        return groupDAO.readByID(groupId);
         } catch (EmptyResultDataAccessException e) {
             throw new NoSuchObjectException("Object not found");
         }

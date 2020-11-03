@@ -2,7 +2,7 @@ package com.foxminded.university.service;
 
 import com.foxminded.university.dao.StudentDAO;
 import com.foxminded.university.dao.entities.Student;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
 
@@ -10,13 +10,9 @@ import java.rmi.NoSuchObjectException;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class StudentService {
     private final StudentDAO studentDAO;
-
-    @Autowired
-    public StudentService(StudentDAO studentDAO) {
-        this.studentDAO = studentDAO;
-    }
 
     public Student create(String firstName, String lastName) {
         Student student = new Student();
