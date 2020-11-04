@@ -1,10 +1,9 @@
 package com.foxminded.university.dao;
 
-import com.foxminded.university.config.DriverManagerDataSourceInitializer;
 import com.foxminded.university.dao.entities.Student;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -17,6 +16,7 @@ import java.sql.PreparedStatement;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class StudentDAO implements DAO<Student,Integer> {
     private static final String CREATE = "INSERT INTO students (first_name, last_name) VALUES (?, ?)";
     private static final String READ_ALL = "SELECT * FROM students";
@@ -25,11 +25,6 @@ public class StudentDAO implements DAO<Student,Integer> {
     private static final String DELETE = "DELETE FROM students WHERE student_id = ?";
     private final Logger logger = LoggerFactory.getLogger(StudentDAO.class);
     private final JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    public StudentDAO(DriverManagerDataSourceInitializer initializer) {
-        jdbcTemplate = initializer.initialize();
-    }
 
     @Override
     public Student create(Student student) {

@@ -1,10 +1,9 @@
 package com.foxminded.university.dao;
 
-import com.foxminded.university.config.DriverManagerDataSourceInitializer;
 import com.foxminded.university.dao.entities.LessonTime;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -18,6 +17,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class LessonTimeDAO implements DAO<LessonTime,Integer> {
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private static final String CREATE = "INSERT INTO times (lesson_start, lesson_end) VALUES (?, ?)";
@@ -27,11 +27,6 @@ public class LessonTimeDAO implements DAO<LessonTime,Integer> {
     private static final String DELETE = "DELETE FROM times WHERE time_id = ?";
     private final Logger logger = LoggerFactory.getLogger(LessonTimeDAO.class);
     private final JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    public LessonTimeDAO(DriverManagerDataSourceInitializer initializer) {
-        jdbcTemplate = initializer.initialize();
-    }
 
     @Override
     public LessonTime create(LessonTime lessonTime) {

@@ -1,10 +1,9 @@
 package com.foxminded.university.dao;
 
-import com.foxminded.university.config.DriverManagerDataSourceInitializer;
 import com.foxminded.university.dao.entities.*;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -19,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class LessonDAO implements DAO<Lesson,Integer> {
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private static final String CREATE =
@@ -82,11 +82,6 @@ public class LessonDAO implements DAO<Lesson,Integer> {
             "DELETE FROM groups_lessons WHERE group_id = ? AND lesson_id = ?";
     private final Logger logger = LoggerFactory.getLogger(LessonDAO.class);
     private final JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    public LessonDAO(DriverManagerDataSourceInitializer initializer) {
-        jdbcTemplate = initializer.initialize();
-    }
 
     @Override
     public Lesson create(Lesson lesson) {

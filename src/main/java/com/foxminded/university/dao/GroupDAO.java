@@ -1,11 +1,10 @@
 package com.foxminded.university.dao;
 
-import com.foxminded.university.config.DriverManagerDataSourceInitializer;
 import com.foxminded.university.dao.entities.Group;
 import com.foxminded.university.dao.entities.Student;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -18,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class GroupDAO implements DAO<Group,Integer> {
     private static final String CREATE = "INSERT INTO groups (group_name) VALUES (?)";
     private static final String READ_ALL =
@@ -54,11 +54,6 @@ public class GroupDAO implements DAO<Group,Integer> {
             "UPDATE students set group_id = null WHERE student_id = ?";
     private final Logger logger = LoggerFactory.getLogger(GroupDAO.class);
     private final JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    public GroupDAO(DriverManagerDataSourceInitializer initializer) {
-        jdbcTemplate = initializer.initialize();
-    }
 
     @Override
     public Group create(Group group) {

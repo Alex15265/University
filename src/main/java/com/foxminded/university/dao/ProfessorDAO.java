@@ -1,11 +1,10 @@
 package com.foxminded.university.dao;
 
-import com.foxminded.university.config.DriverManagerDataSourceInitializer;
 import com.foxminded.university.dao.entities.Course;
 import com.foxminded.university.dao.entities.Professor;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -18,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class ProfessorDAO implements DAO<Professor,Integer> {
     private static final String CREATE = "INSERT INTO professors (first_name, last_name) VALUES (?, ?)";
     private static final String READ_ALL =
@@ -54,11 +54,6 @@ public class ProfessorDAO implements DAO<Professor,Integer> {
             "UPDATE courses set professor_id = null WHERE course_id = ?";
     private final Logger logger = LoggerFactory.getLogger(ProfessorDAO.class);
     private final JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    public ProfessorDAO(DriverManagerDataSourceInitializer initializer) {
-        jdbcTemplate = initializer.initialize();
-    }
 
     @Override
     public Professor create(Professor professor) {
