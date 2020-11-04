@@ -1,8 +1,9 @@
 package com.foxminded.university.dao;
 
-import com.foxminded.university.config.DriverManagerDataSourceInitializer;
 import com.foxminded.university.dao.entities.LessonTime;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -16,22 +17,20 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class LessonTimeDAO implements DAO<LessonTime,Integer> {
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    private static final String UPDATE = "UPDATE times set lesson_start = ?, lesson_end = ? WHERE time_id = ?";
-    private static final String READ_BY_ID = "SELECT * FROM times WHERE time_id = ?";
-    private static final String READ_ALL = "SELECT * FROM times";
     private static final String CREATE = "INSERT INTO times (lesson_start, lesson_end) VALUES (?, ?)";
+    private static final String READ_ALL = "SELECT * FROM times";
+    private static final String READ_BY_ID = "SELECT * FROM times WHERE time_id = ?";
+    private static final String UPDATE = "UPDATE times set lesson_start = ?, lesson_end = ? WHERE time_id = ?";
     private static final String DELETE = "DELETE FROM times WHERE time_id = ?";
+    private final Logger logger = LoggerFactory.getLogger(LessonTimeDAO.class);
     private final JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    public LessonTimeDAO(DriverManagerDataSourceInitializer initializer) {
-        jdbcTemplate = initializer.initialize();
-    }
 
     @Override
     public LessonTime create(LessonTime lessonTime) {
+        logger.debug("creating lessonTime: {}", lessonTime);
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
                     PreparedStatement resultSet =
@@ -47,6 +46,7 @@ public class LessonTimeDAO implements DAO<LessonTime,Integer> {
 
     @Override
     public List<LessonTime> readAll() {
+        logger.debug("reading all lessonTimes");
         return jdbcTemplate.query(READ_ALL, (resultSet, rowNum) -> {
             LessonTime lessonTime = new LessonTime();
             lessonTime.setTimeId(resultSet.getInt("time_id"));
@@ -59,7 +59,8 @@ public class LessonTimeDAO implements DAO<LessonTime,Integer> {
     }
 
     @Override
-    public LessonTime readByID(Integer id) throws EmptyResultDataAccessException {
+    public LessonTime readByID(Integer lessonTimeId) throws EmptyResultDataAccessException {
+        logger.debug("reading lessonTime with ID: {}", lessonTimeId);
         return jdbcTemplate.queryForObject(READ_BY_ID, (resultSet, rowNum) -> {
             LessonTime lessonTime = new LessonTime();
             lessonTime.setTimeId(resultSet.getInt("time_id"));
@@ -68,11 +69,12 @@ public class LessonTimeDAO implements DAO<LessonTime,Integer> {
             lessonTime.setLessonEnd(LocalDateTime.parse(resultSet.getString("lesson_end"),
                 formatter));
             return lessonTime;
-            }, id);
+            }, lessonTimeId);
     }
 
     @Override
     public LessonTime update(LessonTime lessonTime) throws NoSuchObjectException {
+        logger.debug("updating lessonTime: {}", lessonTime);
         int count = jdbcTemplate.update(connection -> {
             PreparedStatement resultSet =
                     connection.prepareStatement(UPDATE, new String[] {"time_id"});
@@ -81,12 +83,16 @@ public class LessonTimeDAO implements DAO<LessonTime,Integer> {
             resultSet.setInt(3, lessonTime.getTimeId());
             return resultSet;
         });
-        if (count == 0) throw new NoSuchObjectException("Object not found");
+        if (count == 0) {
+            logger.warn("updating lessonTime: {} exception: {}", lessonTime, "Object not found");
+            throw new NoSuchObjectException("Object not found");
+        }
         return lessonTime;
     }
 
     @Override
-    public void delete(Integer id) {
-        jdbcTemplate.update(DELETE, id);
+    public void delete(Integer lessonTimeId) {
+        logger.debug("deleting lessonTime with ID: {}", lessonTimeId);
+        jdbcTemplate.update(DELETE, lessonTimeId);
     }
 }

@@ -1,12 +1,16 @@
 package com.foxminded.university.config;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.stereotype.Component;
 
 @Component
 public class DriverManagerDataSourceInitializer {
+    private final Logger logger = LoggerFactory.getLogger(DriverManagerDataSourceInitializer.class);
     @Value("${url}")
     private String url;
     @Value("${user}")
@@ -14,7 +18,9 @@ public class DriverManagerDataSourceInitializer {
     @Value("${password}")
     private String password;
 
+    @Bean (name = "jdbcTemplate")
     public JdbcTemplate initialize() {
+        logger.info("initialization");
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setUrl(url);
         dataSource.setUsername(user);

@@ -140,9 +140,6 @@ class LessonServiceTest {
         lessons.add(lesson3);
 
         when(mockedLessonDAO.readAll()).thenReturn(lessons);
-        when(mockedLessonDAO.readGroupsByLesson(1)).thenReturn(groups1);
-        when(mockedLessonDAO.readGroupsByLesson(2)).thenReturn(groups2);
-        when(mockedLessonDAO.readGroupsByLesson(3)).thenReturn(groups3);
 
         assertEquals(lessons, lessonService.readAll());
         assertEquals(lesson1, lessonService.readAll().get(0));
@@ -151,9 +148,6 @@ class LessonServiceTest {
         assertEquals(groups3, lessonService.readAll().get(2).getGroups());
 
         verify(mockedLessonDAO, times(5)).readAll();
-        verify(mockedLessonDAO, times(5)).readGroupsByLesson(1);
-        verify(mockedLessonDAO, times(5)).readGroupsByLesson(2);
-        verify(mockedLessonDAO, times(5)).readGroupsByLesson(3);
     }
 
     @Test
@@ -186,13 +180,11 @@ class LessonServiceTest {
         lesson.setGroups(groups);
 
         when(mockedLessonDAO.readByID(1)).thenReturn(lesson);
-        when(mockedLessonDAO.readGroupsByLesson(1)).thenReturn(groups);
 
         assertEquals(lesson, lessonService.readById(1));
         assertEquals(groups, lessonService.readById(1).getGroups());
 
         verify(mockedLessonDAO, times(2)).readByID(1);
-        verify(mockedLessonDAO, times(2)).readGroupsByLesson(1);
     }
 
     @Test
