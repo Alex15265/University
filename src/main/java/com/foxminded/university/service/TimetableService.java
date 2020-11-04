@@ -4,6 +4,8 @@ import com.foxminded.university.dao.entities.Group;
 import com.foxminded.university.dao.entities.Lesson;
 import com.foxminded.university.dao.entities.Timetable;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -14,8 +16,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TimetableService {
     private final LessonService lessonService;
+    private final Logger logger = LoggerFactory.getLogger(TimetableService.class);
 
     public Timetable findByProfessor(Integer professorId, LocalDateTime start, LocalDateTime end) {
+        logger.debug("finding lessons by professor with ID: {}", professorId);
         Timetable professorTimetable = new Timetable();
         List<Lesson> listOfLessons = new ArrayList<>();
         for(Lesson lesson: lessonService.readAll()) {
@@ -29,6 +33,7 @@ public class TimetableService {
     }
 
     public Timetable findByGroup(Integer groupId, LocalDateTime start, LocalDateTime end) {
+        logger.debug("finding lessons by group with ID: {}", groupId);
         Timetable studentTimetable = new Timetable();
         List<Lesson> listOfLessons = new ArrayList<>();
         for(Lesson lesson: lessonService.readAll()) {

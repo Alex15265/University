@@ -3,6 +3,8 @@ package com.foxminded.university.dao;
 import com.foxminded.university.config.DriverManagerDataSourceInitializer;
 import com.foxminded.university.dao.entities.Course;
 import com.foxminded.university.dao.entities.Professor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -50,6 +52,7 @@ public class ProfessorDAO implements DAO<Professor,Integer> {
             "UPDATE courses set professor_id = ? WHERE course_id = ?";
     private static final String DELETE_COURSE_FROM_PROFESSOR =
             "UPDATE courses set professor_id = null WHERE course_id = ?";
+    private final Logger logger = LoggerFactory.getLogger(ProfessorDAO.class);
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
@@ -59,6 +62,7 @@ public class ProfessorDAO implements DAO<Professor,Integer> {
 
     @Override
     public Professor create(Professor professor) {
+        logger.debug("creating professor: {}", professor);
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
                     PreparedStatement resultSet =
@@ -74,6 +78,7 @@ public class ProfessorDAO implements DAO<Professor,Integer> {
 
     @Override
     public List<Professor> readAll() {
+        logger.debug("reading all professors");
         return jdbcTemplate.query(READ_ALL, (resultSet, rowNum) -> {
             List<Course> courses = new ArrayList<>();
             Professor professor = new Professor();
@@ -101,7 +106,8 @@ public class ProfessorDAO implements DAO<Professor,Integer> {
     }
 
     @Override
-    public Professor readByID(Integer id) throws EmptyResultDataAccessException {
+    public Professor readByID(Integer professorId) throws EmptyResultDataAccessException {
+        logger.debug("reading professor with ID: {}", professorId);
         return jdbcTemplate.queryForObject(READ_BY_ID, (resultSet, rowNum) -> {
             List<Course> courses = new ArrayList<>();
             Professor professor = new Professor();
@@ -125,11 +131,12 @@ public class ProfessorDAO implements DAO<Professor,Integer> {
                 professor.setCourses(courses);
             }
             return professor;
-        }, id);
+        }, professorId);
     }
 
     @Override
     public Professor update(Professor professor) throws NoSuchObjectException {
+        logger.debug("updating professor: {}", professor);
         int count = jdbcTemplate.update(connection -> {
             PreparedStatement resultSet =
                     connection.prepareStatement(UPDATE, new String[] {"professor_id"});
@@ -138,16 +145,21 @@ public class ProfessorDAO implements DAO<Professor,Integer> {
             resultSet.setInt(3, professor.getProfessorId());
             return resultSet;
         });
-        if (count == 0) throw new NoSuchObjectException("Object not found");
+        if (count == 0) {
+            logger.warn("updating professor: {} exception: {}", professor, "Object not found");
+            throw new NoSuchObjectException("Object not found");
+        }
         return professor;
     }
 
     @Override
-    public void delete(Integer id) {
-        jdbcTemplate.update(DELETE, id);
+    public void delete(Integer professorId) {
+        logger.debug("deleting professor with ID: {}", professorId);
+        jdbcTemplate.update(DELETE, professorId);
     }
 
     public List<Course> findCoursesByProfessor(Integer professorId) {
+        logger.debug("finding course by professor with ID: {}", professorId);
         return jdbcTemplate.query(FIND_BY_PROFESSOR, (resultSet, rowNum) -> {
             Course course = new Course();
             course.setCourseId(resultSet.getInt("course_id"));
@@ -158,10 +170,12 @@ public class ProfessorDAO implements DAO<Professor,Integer> {
     }
 
     public void addCourseToProfessor(Integer courseId, Integer professorId) {
+        logger.debug("adding course with ID: {} to professor with ID: {}", courseId, professorId);
         jdbcTemplate.update(ADD_COURSE_TO_PROFESSOR, professorId, courseId);
     }
 
     public void deleteCourseFromProfessor(Integer professorId) {
+        logger.debug("deleting course from professor with ID: {}", professorId);
         jdbcTemplate.update(DELETE_COURSE_FROM_PROFESSOR, professorId);
     }
 }

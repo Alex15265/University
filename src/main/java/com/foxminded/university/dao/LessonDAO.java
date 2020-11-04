@@ -2,6 +2,8 @@ package com.foxminded.university.dao;
 
 import com.foxminded.university.config.DriverManagerDataSourceInitializer;
 import com.foxminded.university.dao.entities.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -78,6 +80,7 @@ public class LessonDAO implements DAO<Lesson,Integer> {
             "INSERT INTO groups_lessons (group_id, lesson_id) VALUES (?, ?)";
     private static final String DELETE_GROUP_FROM_LESSON =
             "DELETE FROM groups_lessons WHERE group_id = ? AND lesson_id = ?";
+    private final Logger logger = LoggerFactory.getLogger(LessonDAO.class);
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
@@ -87,6 +90,7 @@ public class LessonDAO implements DAO<Lesson,Integer> {
 
     @Override
     public Lesson create(Lesson lesson) {
+        logger.debug("creating lesson: {}", lesson);
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
                     PreparedStatement resultSet =
@@ -104,6 +108,7 @@ public class LessonDAO implements DAO<Lesson,Integer> {
 
     @Override
     public List<Lesson> readAll() {
+        logger.debug("reading all lessons");
         return jdbcTemplate.query(READ_ALL, (resultSet, rowNum) -> {
             Professor professor = new Professor();
             professor.setProfessorId(resultSet.getInt("professor_id"));
@@ -145,7 +150,8 @@ public class LessonDAO implements DAO<Lesson,Integer> {
     }
 
     @Override
-    public Lesson readByID(Integer id) throws EmptyResultDataAccessException {
+    public Lesson readByID(Integer lessonId) throws EmptyResultDataAccessException {
+        logger.debug("reading lesson with ID: {}", lessonId);
         return jdbcTemplate.queryForObject(READ_BY_ID, (resultSet, rowNum) -> {
             Professor professor = new Professor();
             professor.setProfessorId(resultSet.getInt("professor_id"));
@@ -183,11 +189,12 @@ public class LessonDAO implements DAO<Lesson,Integer> {
             lesson.setTime(lessonTime);
             lesson.setGroups(groups);
             return lesson;
-        }, id);
+        }, lessonId);
     }
 
     @Override
     public Lesson update(Lesson lesson) throws NoSuchObjectException {
+        logger.debug("updating lesson: {}", lesson);
         int count = jdbcTemplate.update(connection -> {
             PreparedStatement resultSet =
                     connection.prepareStatement(UPDATE, new String[] {"lesson_id"});
@@ -198,16 +205,21 @@ public class LessonDAO implements DAO<Lesson,Integer> {
             resultSet.setInt(5, lesson.getLessonId());
             return resultSet;
         });
-        if (count == 0) throw new NoSuchObjectException("Object not found");
+        if (count == 0) {
+            logger.warn("updating lesson: {} exception: {}", lesson, "Object not found");
+            throw new NoSuchObjectException("Object not found");
+        }
         return lesson;
     }
 
     @Override
-    public void delete(Integer id) {
-        jdbcTemplate.update(DELETE, id);
+    public void delete(Integer lessonId) {
+        logger.debug("deleting lesson with ID: {}", lessonId);
+        jdbcTemplate.update(DELETE, lessonId);
     }
 
     public List<Group> readGroupsByLesson(Integer lessonId) {
+        logger.debug("reading groups by lesson with ID: {}", lessonId);
         return jdbcTemplate.query(FIND_BY_LESSON, (resultSet, rowNum) -> {
             Group group = new Group();
             group.setGroupId(resultSet.getInt("group_id"));
@@ -217,10 +229,12 @@ public class LessonDAO implements DAO<Lesson,Integer> {
     }
 
     public void addGroupToLesson(Integer groupId, Integer lessonId) {
+        logger.debug("adding group with ID: {} to lesson with ID: {}", groupId, lessonId);
         jdbcTemplate.update(ADD_GROUP_TO_LESSON, groupId, lessonId);
     }
 
     public void deleteGroupFromLesson(Integer groupId, Integer lessonId) {
+        logger.debug("deleting group with ID: {} from lesson with ID: {}", groupId, lessonId);
         jdbcTemplate.update(DELETE_GROUP_FROM_LESSON, groupId, lessonId);
     }
 }

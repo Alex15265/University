@@ -3,6 +3,8 @@ package com.foxminded.university.dao;
 import com.foxminded.university.config.DriverManagerDataSourceInitializer;
 import com.foxminded.university.dao.entities.Group;
 import com.foxminded.university.dao.entities.Student;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -50,6 +52,7 @@ public class GroupDAO implements DAO<Group,Integer> {
             "UPDATE students set group_id = ? WHERE student_id = ?";
     private static final String DELETE_STUDENT_FROM_GROUP =
             "UPDATE students set group_id = null WHERE student_id = ?";
+    private final Logger logger = LoggerFactory.getLogger(GroupDAO.class);
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
@@ -59,6 +62,7 @@ public class GroupDAO implements DAO<Group,Integer> {
 
     @Override
     public Group create(Group group) {
+        logger.debug("creating group: {}", group);
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
                     PreparedStatement resultSet =
@@ -73,6 +77,7 @@ public class GroupDAO implements DAO<Group,Integer> {
 
     @Override
     public List<Group> readAll() {
+        logger.debug("reading all groups");
         return jdbcTemplate.query(READ_ALL, (resultSet, rowNum) -> {
             List<Student> students = new ArrayList<>();
             Group group = new Group();
@@ -99,7 +104,8 @@ public class GroupDAO implements DAO<Group,Integer> {
     }
 
     @Override
-    public Group readByID(Integer id) throws EmptyResultDataAccessException {
+    public Group readByID(Integer groupId) throws EmptyResultDataAccessException {
+        logger.debug("reading group with ID: {}", groupId);
         return jdbcTemplate.queryForObject(READ_BY_ID, (resultSet, rowNum) -> {
             List<Student> students = new ArrayList<>();
             Group group = new Group();
@@ -122,11 +128,12 @@ public class GroupDAO implements DAO<Group,Integer> {
                 group.setStudents(students);
             }
             return group;
-            }, id);
+            }, groupId);
     }
 
     @Override
     public Group update(Group group) throws NoSuchObjectException {
+        logger.debug("updating group: {}", group);
         int count = jdbcTemplate.update(connection -> {
             PreparedStatement resultSet =
                     connection.prepareStatement(UPDATE, new String[] {"group_id"});
@@ -134,16 +141,21 @@ public class GroupDAO implements DAO<Group,Integer> {
             resultSet.setInt(2, group.getGroupId());
             return resultSet;
         });
-        if (count == 0) throw new NoSuchObjectException("Object not found");
+        if (count == 0) {
+            logger.warn("updating group: {} exception: {}", group, "Object not found");
+            throw new NoSuchObjectException("Object not found");
+        }
         return group;
     }
 
     @Override
-    public void delete(Integer id) {
-        jdbcTemplate.update(DELETE, id);
+    public void delete(Integer groupId) {
+        logger.debug("deleting group with ID: {}", groupId);
+        jdbcTemplate.update(DELETE, groupId);
     }
 
     public List<Student> findByGroup(Integer groupId) {
+        logger.debug("finding group with ID: {}", groupId);
         return jdbcTemplate.query(FIND_BY_GROUP, (resultSet, rowNum) -> {
             Student student = new Student();
             student.setStudentId(resultSet.getInt("student_id"));
@@ -154,10 +166,12 @@ public class GroupDAO implements DAO<Group,Integer> {
     }
 
     public void addStudentToGroup(Integer studentId, Integer groupId) {
+        logger.debug("adding student with ID: {} to group with ID: {}", studentId, groupId);
         jdbcTemplate.update(ADD_STUDENT_TO_GROUP, groupId, studentId);
     }
 
     public void deleteStudentFromGroup(Integer studentId) {
+        logger.debug("deleting student with ID: {} from his group", studentId);
         jdbcTemplate.update(DELETE_STUDENT_FROM_GROUP, studentId);
     }
 }
