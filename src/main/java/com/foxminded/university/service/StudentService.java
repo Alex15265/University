@@ -17,11 +17,12 @@ public class StudentService {
     private final StudentDAO studentDAO;
     private final Logger logger = LoggerFactory.getLogger(StudentService.class);
 
-    public Student create(String firstName, String lastName) {
-        logger.debug("creating student with firstName: {} and lastName: {}", firstName, lastName);
+    public Student create(String firstName, String lastName, Integer groupId) {
+        logger.debug("creating student with firstName: {}, lastName: {} and groupId: {}", firstName, lastName, groupId);
         Student student = new Student();
         student.setFirstName(firstName);
         student.setLastName(lastName);
+        student.setGroupId(groupId);
         return studentDAO.create(student);
     }
 
@@ -40,13 +41,14 @@ public class StudentService {
         }
     }
 
-    public Student update(Integer studentId, String firstName, String lastName) throws NoSuchObjectException {
-        logger.debug("updating student with ID: {}, new firstName: {} and lastName: {}",
-                studentId, firstName, lastName);
+    public Student update(Integer studentId, String firstName, String lastName, Integer groupId) throws NoSuchObjectException {
+        logger.debug("updating student with ID: {}, new firstName: {}, lastName: {} and groupId: {}",
+                studentId, firstName, lastName, groupId);
         Student student = new Student();
         student.setStudentId(studentId);
         student.setFirstName(firstName);
         student.setLastName(lastName);
+        student.setGroupId(groupId);
         return studentDAO.update(student);
     }
 

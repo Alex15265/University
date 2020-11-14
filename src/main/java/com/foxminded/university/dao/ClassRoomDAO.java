@@ -19,7 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ClassRoomDAO implements DAO<ClassRoom,Integer> {
     private static final String CREATE = "INSERT INTO classrooms (room_number) VALUES (?)";
-    private static final String READ_ALL = "SELECT * FROM classrooms";
+    private static final String READ_ALL = "SELECT * FROM classrooms ORDER BY room_id";
     private static final String READ_BY_ID = "SELECT * FROM classrooms WHERE room_id = ?";
     private static final String UPDATE = "UPDATE classrooms set room_number = ? WHERE room_id = ?";
     private static final String DELETE = "DELETE FROM classrooms WHERE room_id = ?";

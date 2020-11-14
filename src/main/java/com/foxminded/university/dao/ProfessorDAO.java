@@ -43,7 +43,7 @@ public class ProfessorDAO implements DAO<Professor,Integer> {
     private static final String UPDATE = "UPDATE professors set first_name = ?, last_name = ? WHERE professor_id = ?";
     private static final String DELETE = "DELETE FROM professors WHERE professor_id = ?";
     private static final String FIND_BY_PROFESSOR =
-            "SELECT courses.course_id, courses.course_name, courses.course_description " +
+            "SELECT courses.course_id, courses.course_name, courses.course_description, courses.professor_id " +
             "FROM courses " +
             "INNER  JOIN professors " +
             "ON courses.professor_id = professors.professor_id " +
@@ -160,6 +160,7 @@ public class ProfessorDAO implements DAO<Professor,Integer> {
             course.setCourseId(resultSet.getInt("course_id"));
             course.setCourseName(resultSet.getString("course_name"));
             course.setDescription(resultSet.getString("course_description"));
+            course.setProfessorId(resultSet.getInt("professor_id"));
             return course;
         }, professorId);
     }

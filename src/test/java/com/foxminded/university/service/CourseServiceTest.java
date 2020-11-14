@@ -30,10 +30,11 @@ class CourseServiceTest {
         Course course = new Course();
         course.setCourseName("History");
         course.setDescription("History Description");
+        course.setProfessorId(1);
 
         when(mockedCourseDAO.create(course)).thenReturn(course);
 
-        assertEquals(course, courseService.create("History", "History Description"));
+        assertEquals(course, courseService.create("History", "History Description", 1));
 
         verify(mockedCourseDAO, times(1)).create(course);
     }
@@ -130,10 +131,11 @@ class CourseServiceTest {
         course.setCourseId(1);
         course.setCourseName("History");
         course.setDescription("History Description");
+        course.setProfessorId(1);
 
         when(mockedCourseDAO.update(course)).thenReturn(course);
 
-        assertEquals(course, courseService.update(1, "History", "History Description"));
+        assertEquals(course, courseService.update(1, "History", "History Description", 1));
 
         verify(mockedCourseDAO, times(1)).update(course);
     }
@@ -192,12 +194,8 @@ class CourseServiceTest {
 
     @Test
     void update_ShouldThrowExceptionWhenInputIsNonExistentID() throws NoSuchObjectException {
-        Course course = new Course();
-        course.setCourseId(1);
-        course.setCourseName("History");
-        course.setDescription("History Description");
         when(mockedCourseDAO.update(anyObject())).thenThrow(NoSuchObjectException.class);
         Assertions.assertThrows(NoSuchObjectException.class, () ->
-                courseService.update(1, "History", "History Description"));
+                courseService.update(1, "History", "History Description", 1));
     }
 }
