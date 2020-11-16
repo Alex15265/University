@@ -19,9 +19,10 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class CourseDAO implements DAO<Course,Integer> {
-    private static final String CREATE = "INSERT INTO courses (course_name, course_description) VALUES (?, ?)";
+    private static final String CREATE = "INSERT INTO courses (course_name, course_description, professor_id) " +
+            "VALUES (?, ?, ?)";
     private static final String READ_ALL =
-            "SELECT courses.course_id, courses.course_name, courses.course_description, " +
+            "SELECT courses.course_id, courses.course_name, courses.course_description, courses.professor_id, " +
             "string_agg(students.student_id::text, ','), " +
             "string_agg(students.first_name, ','), " +
             "string_agg(students.last_name, ',') " +
@@ -33,7 +34,7 @@ public class CourseDAO implements DAO<Course,Integer> {
             "GROUP BY courses.course_id " +
             "ORDER BY courses.course_id ASC";
     private static final String READ_BY_ID =
-            "SELECT courses.course_id, courses.course_name, courses.course_description, " +
+            "SELECT courses.course_id, courses.course_name, courses.course_description, courses.professor_id, " +
             "string_agg(students.student_id::text, ','), " +
             "string_agg(students.first_name, ','), " +
             "string_agg(students.last_name, ',') " +
@@ -45,10 +46,11 @@ public class CourseDAO implements DAO<Course,Integer> {
             "WHERE courses.course_id = ? " +
             "GROUP BY courses.course_id";
     private static final String UPDATE =
-            "UPDATE courses set course_name = ?, course_description = ? WHERE course_id = ?";
+            "UPDATE courses set course_name = ?, course_description = ?, professor_id = ? " +
+                    "WHERE course_id = ?";
     private static final String DELETE = "DELETE FROM courses WHERE course_id = ?";
     private static final String FIND_BY_COURSE =
-            "SELECT students.student_id, students.first_name, students.last_name " +
+            "SELECT students.student_id, students.first_name, students.last_name, students.group_id " +
             "FROM students_courses " +
             "INNER  JOIN students " +
             "ON students_courses.student_id = students.student_id " +
@@ -57,6 +59,10 @@ public class CourseDAO implements DAO<Course,Integer> {
             "INSERT INTO students_courses (student_id, course_id) VALUES (?, ?)";
     private static final String DELETE_STUDENT_FROM_COURSE =
             "DELETE FROM students_courses WHERE student_id = ? AND course_id = ?";
+    private static final String ADD_PROFESSOR_TO_COURSE =
+            "UPDATE courses set professor_id = ? WHERE course_id = ?";
+    private static final String DELETE_PROFESSOR_FROM_COURSE =
+            "UPDATE courses set professor_id = null WHERE course_id = ?";
     private final Logger logger = LoggerFactory.getLogger(CourseDAO.class);
     private final JdbcTemplate jdbcTemplate;
 
@@ -69,6 +75,7 @@ public class CourseDAO implements DAO<Course,Integer> {
                             connection.prepareStatement(CREATE, new String[] {"course_id"});
                     resultSet.setString(1, course.getCourseName());
                     resultSet.setString(2, course.getDescription());
+                    resultSet.setInt(3, course.getProfessorId());
                     return resultSet;
                 },
                 keyHolder);
@@ -85,12 +92,13 @@ public class CourseDAO implements DAO<Course,Integer> {
             course.setCourseId(resultSet.getInt("course_id"));
             course.setCourseName(resultSet.getString("course_name"));
             course.setDescription(resultSet.getString("course_description"));
-            String studentIds = resultSet.getString(4);
+            course.setProfessorId(resultSet.getInt("professor_id"));
+            String studentIds = resultSet.getString(5);
             if(studentIds != null) {
                 String[] splitStudentIds = studentIds.split(",");
-                String firstNames = resultSet.getString(5);
+                String firstNames = resultSet.getString(6);
                 String[] splitFirstNames = firstNames.split(",");
-                String lastNames = resultSet.getString(6);
+                String lastNames = resultSet.getString(7);
                 String[] splitLastNames = lastNames.split(",");
                 for (int i = 0; i < splitStudentIds.length; i++) {
                     Student student = new Student();
@@ -114,12 +122,13 @@ public class CourseDAO implements DAO<Course,Integer> {
             course.setCourseId(resultSet.getInt("course_id"));
             course.setCourseName(resultSet.getString("course_name"));
             course.setDescription(resultSet.getString("course_description"));
-            String studentIds = resultSet.getString(4);
+            course.setProfessorId(resultSet.getInt("professor_id"));
+            String studentIds = resultSet.getString(5);
             if(studentIds != null) {
                 String[] splitStudentIds = studentIds.split(",");
-                String firstNames = resultSet.getString(5);
+                String firstNames = resultSet.getString(6);
                 String[] splitFirstNames = firstNames.split(",");
-                String lastNames = resultSet.getString(6);
+                String lastNames = resultSet.getString(7);
                 String[] splitLastNames = lastNames.split(",");
                 for (int i = 0; i < splitStudentIds.length; i++) {
                     Student student = new Student();
@@ -142,7 +151,8 @@ public class CourseDAO implements DAO<Course,Integer> {
                     connection.prepareStatement(UPDATE, new String[] {"course_id"});
             resultSet.setString(1, course.getCourseName());
             resultSet.setString(2, course.getDescription());
-            resultSet.setInt(3, course.getCourseId());
+            resultSet.setInt(3, course.getProfessorId());
+            resultSet.setInt(4, course.getCourseId());
             return resultSet;
         });
         if (count == 0) {
@@ -165,6 +175,7 @@ public class CourseDAO implements DAO<Course,Integer> {
             student.setStudentId(resultSet.getInt("student_id"));
             student.setFirstName(resultSet.getString("first_name"));
             student.setLastName(resultSet.getString("last_name"));
+            student.setGroupId(resultSet.getInt("group_id"));
             return student;
         }, courseId);
     }
@@ -177,5 +188,15 @@ public class CourseDAO implements DAO<Course,Integer> {
     public void deleteStudentFromCourse(Integer studentId, Integer courseId) {
         logger.debug("deleting student with ID: {} from course with ID: {}", studentId, courseId);
         jdbcTemplate.update(DELETE_STUDENT_FROM_COURSE, studentId, courseId);
+    }
+
+    public void addProfessorToCourse(Integer professorId, Integer courseId) {
+        logger.debug("adding professor with ID: {} to course with ID: {}", professorId, courseId);
+        jdbcTemplate.update(ADD_PROFESSOR_TO_COURSE, professorId, courseId);
+    }
+
+    public void deleteProfessorFromCourse(Integer courseId) {
+        logger.debug("deleting professor from course with ID: {}", courseId);
+        jdbcTemplate.update(DELETE_PROFESSOR_FROM_COURSE, courseId);
     }
 }

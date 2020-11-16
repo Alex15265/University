@@ -9,5 +9,6 @@ public class Course {
     private Integer courseId;
     private String courseName;
     private String description;
+    private Integer professorId;
     private List<Student> students;
 }

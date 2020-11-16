@@ -43,7 +43,7 @@ public class GroupDAO implements DAO<Group,Integer> {
     private static final String UPDATE = "UPDATE groups set group_name = ? WHERE group_id = ?";
     private static final String DELETE = "DELETE FROM groups WHERE group_id = ?";
     private static final String FIND_BY_GROUP =
-            "SELECT students.student_id, students.first_name, students.last_name " +
+            "SELECT students.student_id, students.first_name, students.last_name, students.group_id " +
             "FROM groups " +
             "INNER  JOIN students " +
             "ON groups.group_id = students.group_id " +
@@ -156,6 +156,7 @@ public class GroupDAO implements DAO<Group,Integer> {
             student.setStudentId(resultSet.getInt("student_id"));
             student.setFirstName(resultSet.getString("first_name"));
             student.setLastName(resultSet.getString("last_name"));
+            student.setGroupId(resultSet.getInt("group_id"));
             return student;
         }, groupId);
     }

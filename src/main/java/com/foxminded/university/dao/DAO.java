@@ -6,7 +6,7 @@ import java.util.List;
 public interface DAO<T, ID> {
     T create(T t);
 
-    List<T> readAll();
+    List<T> readAll() throws ClassNotFoundException;
 
     T readByID(ID id);
 

@@ -18,10 +18,11 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class StudentDAO implements DAO<Student,Integer> {
-    private static final String CREATE = "INSERT INTO students (first_name, last_name) VALUES (?, ?)";
-    private static final String READ_ALL = "SELECT * FROM students";
+    private static final String CREATE = "INSERT INTO students (first_name, last_name, group_id) VALUES (?, ?, ?)";
+    private static final String READ_ALL = "SELECT * FROM students ORDER BY student_id";
     private static final String READ_BY_ID = "SELECT * FROM students WHERE student_id = ?";
-    private static final String UPDATE = "UPDATE students set first_name = ?, last_name = ? WHERE student_id = ?";
+    private static final String UPDATE = "UPDATE students set first_name = ?, last_name = ?, group_id = ? " +
+            "WHERE student_id = ?";
     private static final String DELETE = "DELETE FROM students WHERE student_id = ?";
     private final Logger logger = LoggerFactory.getLogger(StudentDAO.class);
     private final JdbcTemplate jdbcTemplate;
@@ -35,6 +36,7 @@ public class StudentDAO implements DAO<Student,Integer> {
                     connection.prepareStatement(CREATE, new String[] {"student_id"});
                     resultSet.setString(1, student.getFirstName());
                     resultSet.setString(2, student.getLastName());
+                    resultSet.setInt(3, student.getGroupId());
                     return resultSet;
                 },
                 keyHolder);
@@ -64,7 +66,8 @@ public class StudentDAO implements DAO<Student,Integer> {
                     connection.prepareStatement(UPDATE, new String[] {"student_id"});
             resultSet.setString(1, student.getFirstName());
             resultSet.setString(2, student.getLastName());
-            resultSet.setInt(3, student.getStudentId());
+            resultSet.setInt(3, student.getGroupId());
+            resultSet.setInt(4, student.getStudentId());
             return resultSet;
         });
         if (count == 0) {

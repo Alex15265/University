@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Students By Course</title>
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+          integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+          crossorigin="anonymous">
+    <style>
+    </style>
+</head>
+<body>
+<div class="container my-2">
+    <h1>Students By Course</h1>
+    <a th:href = "@{/courses}" class="btn btn-link btn-sm mb-3"> Back to Courses </a>
+    <a th:href = "@{/}" class="btn btn-link btn-sm mb-3"> Home Page </a>
+    <table border="1" class="table table-striped table-responsive-md w-50">
+        <thead>
+        <tr class="d-flex">
+            <th class="col-2"> <em>Student ID</em> </th>
+            <th class="col"> <em>First Name</em> </th>
+            <th class="col"> <em>Last Name</em> </th>
+            <th class="col-2"> <em>Group ID</em> </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="d-flex" th:each="student: ${students}">
+            <th class="col-2" th:text="${student.studentId}"></th>
+            <td class="col" th:text="${student.firstName}"></td>
+            <td class="col" th:text="${student.lastName}"></td>
+            <td class="col-2" th:text="${student.groupId}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

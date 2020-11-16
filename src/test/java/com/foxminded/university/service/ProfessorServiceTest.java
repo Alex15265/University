@@ -181,9 +181,6 @@ class ProfessorServiceTest {
 
     @Test
     void update_ShouldThrowExceptionWhenInputIsNonExistentID() throws NoSuchObjectException {
-        ClassRoom classRoom = new ClassRoom();
-        classRoom.setRoomId(234);
-        classRoom.setRoomId(13);
         when(mockedProfessorDAO.update(anyObject())).thenThrow(NoSuchObjectException.class);
         Assertions.assertThrows(NoSuchObjectException.class, () ->
                 professorService.update(234, "Alex", "Belyaev"));

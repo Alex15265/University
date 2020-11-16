@@ -21,7 +21,7 @@ import java.util.List;
 public class LessonTimeDAO implements DAO<LessonTime,Integer> {
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private static final String CREATE = "INSERT INTO times (lesson_start, lesson_end) VALUES (?, ?)";
-    private static final String READ_ALL = "SELECT * FROM times";
+    private static final String READ_ALL = "SELECT * FROM times ORDER BY time_id";
     private static final String READ_BY_ID = "SELECT * FROM times WHERE time_id = ?";
     private static final String UPDATE = "UPDATE times set lesson_start = ?, lesson_end = ? WHERE time_id = ?";
     private static final String DELETE = "DELETE FROM times WHERE time_id = ?";

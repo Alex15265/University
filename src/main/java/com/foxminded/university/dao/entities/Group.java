@@ -9,4 +9,9 @@ public class Group {
     private Integer groupId;
     private String groupName;
     private List<Student> students;
+
+    @Override
+    public String toString() {
+        return groupName;
+    }
 }

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.rmi.NoSuchObjectException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Component
@@ -19,7 +20,7 @@ public class LessonTimeService {
     private final Logger logger = LoggerFactory.getLogger(LessonTimeService.class);
 
     public LessonTime create(LocalDateTime lessonStart, LocalDateTime lessonEnd) {
-        logger.debug("creating lessonTime with lessonStart: {} adn lessonEnd: {}", lessonStart, lessonEnd);
+        logger.debug("creating lessonTime with lessonStart: {} and lessonEnd: {}", lessonStart, lessonEnd);
         LessonTime lessonTime = new LessonTime();
         lessonTime.setLessonStart(lessonStart);
         lessonTime.setLessonEnd(lessonEnd);

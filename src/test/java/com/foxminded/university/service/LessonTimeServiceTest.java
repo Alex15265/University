@@ -115,9 +115,6 @@ class LessonTimeServiceTest {
 
     @Test
     void update_ShouldThrowExceptionWhenInputIsNonExistentID() throws NoSuchObjectException {
-        ClassRoom classRoom = new ClassRoom();
-        classRoom.setRoomId(234);
-        classRoom.setRoomId(13);
         when(mockedLessonTimeDAO.update(anyObject())).thenThrow(NoSuchObjectException.class);
         Assertions.assertThrows(NoSuchObjectException.class, () ->
                 lessonTimeService.update(234, LocalDateTime.of(2020, 9, 1, 8, 0),

@@ -30,10 +30,11 @@ class StudentServiceTest {
         Student student = new Student();
         student.setFirstName("Alex");
         student.setLastName("Belyaev");
+        student.setGroupId(1);
 
         when(mockedStudentDAO.create(student)).thenReturn(student);
 
-        assertEquals(student, studentService.create("Alex", "Belyaev"));
+        assertEquals(student, studentService.create("Alex", "Belyaev", 1));
 
         verify(mockedStudentDAO, times(1)).create(student);
     }
@@ -90,10 +91,11 @@ class StudentServiceTest {
         student.setStudentId(5);
         student.setFirstName("Ann");
         student.setLastName("Akimenko");
+        student.setGroupId(2);
 
         when(mockedStudentDAO.update(student)).thenReturn(student);
 
-        assertEquals(student, studentService.update(5, "Ann", "Akimenko"));
+        assertEquals(student, studentService.update(5, "Ann", "Akimenko", 2));
 
         verify(mockedStudentDAO, times(1)).update(student);
     }
@@ -114,11 +116,8 @@ class StudentServiceTest {
 
     @Test
     void update_ShouldThrowExceptionWhenInputIsNonExistentID() throws NoSuchObjectException {
-        ClassRoom classRoom = new ClassRoom();
-        classRoom.setRoomId(234);
-        classRoom.setRoomId(13);
         when(mockedStudentDAO.update(anyObject())).thenThrow(NoSuchObjectException.class);
         Assertions.assertThrows(NoSuchObjectException.class, () ->
-                studentService.update(234, "Alex", "Belyaev"));
+                studentService.update(234, "Alex", "Belyaev", 1));
     }
 }

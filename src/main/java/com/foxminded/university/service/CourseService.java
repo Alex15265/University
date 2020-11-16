@@ -18,11 +18,12 @@ public class CourseService {
     private final CourseDAO courseDAO;
     private final Logger logger = LoggerFactory.getLogger(CourseService.class);
 
-    public Course create(String courseName, String description) {
+    public Course create(String courseName, String description, Integer professorId) {
         logger.debug("creating course with courseName: {} and courseDescription: {}", courseName, description);
         Course course = new Course();
         course.setCourseName(courseName);
         course.setDescription(description);
+        course.setProfessorId(professorId);
         return courseDAO.create(course);
     }
 
@@ -41,13 +42,14 @@ public class CourseService {
         }
     }
 
-    public Course update(Integer courseId, String courseName, String courseDescription) throws NoSuchObjectException {
+    public Course update(Integer courseId, String courseName, String courseDescription, Integer professorId) throws NoSuchObjectException {
         logger.debug("updating course with Id: {}, new courseName: {} and description: {}",
                 courseId, courseName, courseDescription);
         Course course = new Course();
         course.setCourseId(courseId);
         course.setCourseName(courseName);
         course.setDescription(courseDescription);
+        course.setProfessorId(professorId);
         return courseDAO.update(course);
     }
 

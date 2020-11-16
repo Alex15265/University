@@ -30,9 +30,9 @@ public class LessonDAO implements DAO<Lesson,Integer> {
             "string_agg(groups.group_id::text, ','), " +
             "string_agg(groups.group_name, ',') " +
             "FROM groups_lessons " +
-            "INNER JOIN groups " +
+            "RIGHT JOIN groups " +
             "ON groups.group_id = groups_lessons.group_id " +
-            "INNER JOIN lessons " +
+            "RIGHT JOIN lessons " +
             "ON lessons.lesson_id = groups_lessons.lesson_id " +
             "INNER JOIN professors " +
             "ON professors.professor_id = lessons.professor_id " +
@@ -45,6 +45,7 @@ public class LessonDAO implements DAO<Lesson,Integer> {
             "GROUP BY lessons.lesson_id, professors.professor_id, " +
             "courses.course_id, classrooms.room_id, times.time_id " +
             "ORDER BY lessons.lesson_id ASC";
+
     private static final String READ_BY_ID =
             "SELECT lessons.lesson_id, professors.professor_id, professors.first_name, " +
             "professors.last_name, courses.course_id, courses.course_name, courses.course_description, " +
@@ -124,14 +125,16 @@ public class LessonDAO implements DAO<Lesson,Integer> {
                     formatter));
             List<Group> groups = new ArrayList<>();
             String groupIds = resultSet.getString(13);
-            String[] splitGroupIds = groupIds.split(",");
-            String groupNames = resultSet.getString(14);
-            String[] splitGroupNames = groupNames.split(",");
-            for (int i = 0; i < splitGroupIds.length; i++) {
-                Group group = new Group();
-                group.setGroupId(Integer.parseInt(splitGroupIds[i]));
-                group.setGroupName(splitGroupNames[i]);
-                groups.add(group);
+            if (groupIds != null) {
+                String[] splitGroupIds = groupIds.split(",");
+                String groupNames = resultSet.getString(14);
+                String[] splitGroupNames = groupNames.split(",");
+                for (int i = 0; i < splitGroupIds.length; i++) {
+                    Group group = new Group();
+                    group.setGroupId(Integer.parseInt(splitGroupIds[i]));
+                    group.setGroupName(splitGroupNames[i]);
+                    groups.add(group);
+                }
             }
             Lesson lesson = new Lesson();
             lesson.setLessonId(resultSet.getInt("lesson_id"));

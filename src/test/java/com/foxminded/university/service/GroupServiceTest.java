@@ -201,9 +201,6 @@ class GroupServiceTest {
 
     @Test
     void update_ShouldThrowExceptionWhenInputIsNonExistentID() throws NoSuchObjectException {
-        ClassRoom classRoom = new ClassRoom();
-        classRoom.setRoomId(234);
-        classRoom.setRoomId(13);
         when(mockedGroupDAO.update(anyObject())).thenThrow(NoSuchObjectException.class);
         Assertions.assertThrows(NoSuchObjectException.class, () ->
                 groupService.update(234, "aa-99"));
