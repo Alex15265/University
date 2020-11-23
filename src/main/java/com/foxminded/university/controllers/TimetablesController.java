@@ -4,23 +4,19 @@ import com.foxminded.university.dao.entities.Group;
 import com.foxminded.university.dao.entities.LessonTime;
 import com.foxminded.university.dao.entities.Professor;
 import com.foxminded.university.service.TimetableService;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
 @Controller
+@RequiredArgsConstructor
 public class TimetablesController {
     private final Logger logger = LoggerFactory.getLogger(TimetablesController.class);
     private final TimetableService timetableService;
-
-    @Autowired
-    public TimetablesController(TimetableService timetableService) {
-        this.timetableService = timetableService;
-    }
 
     @GetMapping("/timetableForm")
     public String showTimetableForm(Model model) {

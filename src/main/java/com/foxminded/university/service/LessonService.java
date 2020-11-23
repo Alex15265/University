@@ -6,12 +6,12 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.rmi.NoSuchObjectException;
 import java.util.List;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class LessonService {
     private final LessonDAO lessonDAO;
@@ -47,7 +47,7 @@ public class LessonService {
         }
     }
 
-    public Lesson update(Integer lessonId, Integer professorId, Integer courseId, Integer roomId, Integer timeId) throws NoSuchObjectException, NoSuchObjectException {
+    public Lesson update(Integer lessonId, Integer professorId, Integer courseId, Integer roomId, Integer timeId) throws NoSuchObjectException {
         logger.debug("updating lesson with ID: {}, new professorID: {}, courseID: {}, roomID: {} and timeID: {}",
                 lessonId, professorId, courseId, roomId, timeId);
         Lesson lesson = new Lesson();

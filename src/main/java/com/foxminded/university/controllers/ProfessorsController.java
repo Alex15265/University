@@ -2,6 +2,7 @@ package com.foxminded.university.controllers;
 
 import com.foxminded.university.dao.entities.Professor;
 import com.foxminded.university.service.ProfessorService;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,14 +16,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import java.rmi.NoSuchObjectException;
 
 @Controller
+@RequiredArgsConstructor
 public class ProfessorsController {
     private final Logger logger = LoggerFactory.getLogger(ProfessorsController.class);
     private final ProfessorService professorService;
-
-    @Autowired
-    public ProfessorsController(ProfessorService professorService) {
-        this.professorService = professorService;
-    }
 
     @GetMapping("/professors")
     public String showProfessors(Model model) {

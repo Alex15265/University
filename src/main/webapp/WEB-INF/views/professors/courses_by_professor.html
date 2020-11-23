@@ -21,7 +21,7 @@
             <th class="col-1"> <em>Course ID</em> </th>
             <th class="col-3"> <em>Course Name</em> </th>
             <th class="col"> <em>Description</em> </th>
-            <th class="col-1"> <em>Professor ID</em> </th>
+            <th class="col-1"> <em>Professor</em> </th>
         </tr>
         </thead>
         <tbody>
@@ -29,7 +29,7 @@
             <th class="col-1" th:text="${course.courseId}"></th>
             <td class="col-3" th:text="${course.courseName}"></td>
             <td class="col" th:text="${course.description}"></td>
-            <td class="col-1" th:text="${course.professorId}"></td>
+            <td class="col-1" th:text="|${course.professor.firstName} ${course.professor.lastName}|"></td>
         </tr>
         </tbody>
     </table>

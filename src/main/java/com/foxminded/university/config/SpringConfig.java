@@ -18,7 +18,7 @@ import org.thymeleaf.spring5.view.ThymeleafViewResolver;
 @ComponentScan("com.foxminded.university")
 @EnableWebMvc
 public class SpringConfig implements WebMvcConfigurer {
-    private final Logger logger = LoggerFactory.getLogger(DriverManagerDataSourceInitializer.class);
+    private final Logger logger = LoggerFactory.getLogger(SessionFactoryInitializer.class);
     private final ApplicationContext applicationContext;
 
     @Autowired

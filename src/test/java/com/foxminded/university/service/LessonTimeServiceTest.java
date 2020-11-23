@@ -1,7 +1,6 @@
 package com.foxminded.university.service;
 
 import com.foxminded.university.dao.LessonTimeDAO;
-import com.foxminded.university.dao.entities.ClassRoom;
 import com.foxminded.university.dao.entities.LessonTime;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

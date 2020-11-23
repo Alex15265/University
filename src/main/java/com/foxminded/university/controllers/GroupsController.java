@@ -2,9 +2,9 @@ package com.foxminded.university.controllers;
 
 import com.foxminded.university.dao.entities.Group;
 import com.foxminded.university.service.GroupService;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,14 +15,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import java.rmi.NoSuchObjectException;
 
 @Controller
+@RequiredArgsConstructor
 public class GroupsController {
     private final Logger logger = LoggerFactory.getLogger(GroupsController.class);
     private final GroupService groupService;
-
-    @Autowired
-    public GroupsController(GroupService groupService) {
-        this.groupService = groupService;
-    }
 
     @GetMapping("/groups")
     public String showGroups(Model model) {
@@ -34,7 +30,7 @@ public class GroupsController {
     @GetMapping("/studentsByGroup/{id}")
     public String showStudentsByGroup(@PathVariable("id") Integer groupId, Model model) {
         logger.debug("showing students by group with ID: {}", groupId);
-        model.addAttribute("students", groupService.findByGroup(groupId));
+        model.addAttribute("students", groupService.findStudentsByGroup(groupId));
         return "groups/students_by_group";
     }
 

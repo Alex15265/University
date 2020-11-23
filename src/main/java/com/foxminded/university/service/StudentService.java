@@ -1,5 +1,6 @@
 package com.foxminded.university.service;
 
+import com.foxminded.university.dao.GroupDAO;
 import com.foxminded.university.dao.StudentDAO;
 import com.foxminded.university.dao.entities.Student;
 import lombok.RequiredArgsConstructor;
@@ -7,14 +8,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.rmi.NoSuchObjectException;
 import java.util.List;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class StudentService {
     private final StudentDAO studentDAO;
+    private final GroupDAO groupDAO;
     private final Logger logger = LoggerFactory.getLogger(StudentService.class);
 
     public Student create(String firstName, String lastName, Integer groupId) {
@@ -22,7 +25,7 @@ public class StudentService {
         Student student = new Student();
         student.setFirstName(firstName);
         student.setLastName(lastName);
-        student.setGroupId(groupId);
+        student.setGroup(groupDAO.readByID(groupId));
         return studentDAO.create(student);
     }
 
@@ -48,7 +51,7 @@ public class StudentService {
         student.setStudentId(studentId);
         student.setFirstName(firstName);
         student.setLastName(lastName);
-        student.setGroupId(groupId);
+        student.setGroup(groupDAO.readByID(groupId));
         return studentDAO.update(student);
     }
 

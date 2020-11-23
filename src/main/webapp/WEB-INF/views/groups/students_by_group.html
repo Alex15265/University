@@ -21,7 +21,7 @@
             <th class="col-2"> <em>Student ID</em> </th>
             <th class="col"> <em>First Name</em> </th>
             <th class="col"> <em>Last Name</em> </th>
-            <th class="col-2"> <em>Group ID</em> </th>
+            <th class="col-2"> <em>Group</em> </th>
         </tr>
         </thead>
         <tbody>
@@ -29,7 +29,7 @@
             <th class="col-2" th:text="${student.studentId}"></th>
             <td class="col" th:text="${student.firstName}"></td>
             <td class="col" th:text="${student.lastName}"></td>
-            <td class="col-2" th:text="${student.groupId}"></td>
+            <td class="col-2" th:text="${student.group.groupName}"></td>
         </tr>
         </tbody>
     </table>

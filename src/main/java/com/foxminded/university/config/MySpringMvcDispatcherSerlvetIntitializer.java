@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
 public class MySpringMvcDispatcherSerlvetIntitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
-    private final Logger logger = LoggerFactory.getLogger(DriverManagerDataSourceInitializer.class);
+    private final Logger logger = LoggerFactory.getLogger(SessionFactoryInitializer.class);
 
     @Override
     protected Class<?>[] getRootConfigClasses() {

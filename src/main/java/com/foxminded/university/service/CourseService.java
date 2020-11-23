@@ -1,21 +1,23 @@
 package com.foxminded.university.service;
 
 import com.foxminded.university.dao.CourseDAO;
+import com.foxminded.university.dao.ProfessorDAO;
 import com.foxminded.university.dao.entities.Course;
 import com.foxminded.university.dao.entities.Student;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.rmi.NoSuchObjectException;
 import java.util.List;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class CourseService {
     private final CourseDAO courseDAO;
+    private final ProfessorDAO professorDAO;
     private final Logger logger = LoggerFactory.getLogger(CourseService.class);
 
     public Course create(String courseName, String description, Integer professorId) {
@@ -23,7 +25,7 @@ public class CourseService {
         Course course = new Course();
         course.setCourseName(courseName);
         course.setDescription(description);
-        course.setProfessorId(professorId);
+        course.setProfessor(professorDAO.readByID(professorId));
         return courseDAO.create(course);
     }
 
@@ -49,7 +51,7 @@ public class CourseService {
         course.setCourseId(courseId);
         course.setCourseName(courseName);
         course.setDescription(courseDescription);
-        course.setProfessorId(professorId);
+        course.setProfessor(professorDAO.readByID(professorId));
         return courseDAO.update(course);
     }
 
@@ -68,8 +70,8 @@ public class CourseService {
         courseDAO.deleteStudentFromCourse(studentId, courseId);
     }
 
-    public List<Student> findByCourse(Integer courseId) {
-        logger.debug("finding students by course with ID: {}", courseId);
-        return courseDAO.findByCourse(courseId);
+    public List<Student> findStudentsByCourse(Integer courseId) {
+        logger.debug("finding student by course with ID: {}", courseId);
+        return courseDAO.findStudentsByCourse(courseId);
     }
 }
