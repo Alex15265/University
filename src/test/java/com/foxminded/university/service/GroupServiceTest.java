@@ -1,7 +1,6 @@
 package com.foxminded.university.service;
 
 import com.foxminded.university.dao.GroupDAO;
-import com.foxminded.university.dao.entities.ClassRoom;
 import com.foxminded.university.dao.entities.Group;
 import com.foxminded.university.dao.entities.Student;
 import org.junit.jupiter.api.Assertions;
@@ -156,9 +155,9 @@ class GroupServiceTest {
 
     @Test
     void deleteStudentFromGroup() {
-        groupService.deleteStudentFromGroup(1);
+        groupService.deleteStudentFromGroup(1, 1);
 
-        verify(mockedGroupDAO, times(1)).deleteStudentFromGroup(1);
+        verify(mockedGroupDAO, times(1)).deleteStudentFromGroup(1, 1);
     }
 
     @Test
@@ -181,14 +180,14 @@ class GroupServiceTest {
         students.add(student2);
         students.add(student3);
 
-        when(mockedGroupDAO.findByGroup(1)).thenReturn(students);
+        when(mockedGroupDAO.findStudentsByGroup(1)).thenReturn(students);
 
-        assertEquals(students, groupService.findByGroup(1));
-        assertEquals(student1, groupService.findByGroup(1).get(0));
-        assertEquals(student2, groupService.findByGroup(1).get(1));
-        assertEquals(student3, groupService.findByGroup(1).get(2));
+        assertEquals(students, groupService.findStudentsByGroup(1));
+        assertEquals(student1, groupService.findStudentsByGroup(1).get(0));
+        assertEquals(student2, groupService.findStudentsByGroup(1).get(1));
+        assertEquals(student3, groupService.findStudentsByGroup(1).get(2));
 
-        verify(mockedGroupDAO, times(4)).findByGroup(1);
+        verify(mockedGroupDAO, times(4)).findStudentsByGroup(1);
 
     }
 

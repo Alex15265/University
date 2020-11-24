@@ -2,24 +2,23 @@ package com.foxminded.university.controllers;
 
 import com.foxminded.university.dao.entities.Student;
 import com.foxminded.university.service.StudentService;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import java.rmi.NoSuchObjectException;
 
 @Controller
+@RequiredArgsConstructor
 public class StudentsController {
     private final Logger logger = LoggerFactory.getLogger(StudentsController.class);
     private final StudentService studentService;
-
-    @Autowired
-    public StudentsController(StudentService studentService) {
-        this.studentService = studentService;
-    }
 
     @GetMapping("/students")
     public String showStudents(Model model) {
@@ -39,7 +38,7 @@ public class StudentsController {
     @PostMapping("/saveStudent")
     public String saveStudent(@ModelAttribute("student") Student student) {
         logger.debug("saving new student: {}", student);
-        studentService.create(student.getFirstName(), student.getLastName(), student.getGroupId());
+        studentService.create(student.getFirstName(), student.getLastName(), student.getGroup().getGroupId());
         return "redirect:/students";
     }
 
@@ -53,7 +52,7 @@ public class StudentsController {
     @PostMapping("/updateStudent/{id}")
     public String update(@ModelAttribute("student") Student student, @PathVariable("id") Integer studentId) throws NoSuchObjectException {
         logger.debug("updating student with ID: {}", studentId);
-        studentService.update(studentId, student.getFirstName(), student.getLastName(), student.getGroupId());
+        studentService.update(studentId, student.getFirstName(), student.getLastName(), student.getGroup().getGroupId());
         return "redirect:/students";
     }
 

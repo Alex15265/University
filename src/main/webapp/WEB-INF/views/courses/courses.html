@@ -21,7 +21,7 @@
             <th class="col-1"> <em>Course ID</em> </th>
             <th class="col-2"> <em>Course Name</em> </th>
             <th class="col"> <em>Description</em> </th>
-            <th class="col-1"> <em>Professor ID</em> </th>
+            <th class="col-1"> <em>Professor</em> </th>
             <th class="col-2"> <em>Actions</em> </th>
         </tr>
         </thead>
@@ -30,7 +30,7 @@
             <th class="col-1" th:text="${course.courseId}"></th>
             <td class="col-2" th:text="${course.courseName}"></td>
             <td class="col" th:text="${course.description}"></td>
-            <td class="col-1" th:text="${course.professorId}"></td>
+            <td class="col-1" th:text="|${course.professor.firstName} ${course.professor.lastName}|"></td>
             <td class="col-2"> <a th:href="@{/updateCourseForm/{id}(id=${course.courseId})}" class="btn btn-outline-primary">Update</a>
                 <a th:href="@{/deleteCourse/{id}(id=${course.courseId})}" class="btn btn-outline-danger">Delete</a>
                 <a th:href="@{/studentsByCourse/{id}(id=${course.courseId})}" class="mt-2 btn btn-outline-primary btn-sm">Show Students</a>

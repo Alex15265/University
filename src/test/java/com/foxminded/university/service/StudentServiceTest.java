@@ -1,7 +1,7 @@
 package com.foxminded.university.service;
 
+import com.foxminded.university.dao.GroupDAO;
 import com.foxminded.university.dao.StudentDAO;
-import com.foxminded.university.dao.entities.ClassRoom;
 import com.foxminded.university.dao.entities.Student;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,12 +17,14 @@ import static org.mockito.Mockito.*;
 
 class StudentServiceTest {
     StudentDAO mockedStudentDAO;
+    GroupDAO mockedGroupDAO;
     StudentService studentService;
 
     @BeforeEach
     void init() {
         mockedStudentDAO = mock(StudentDAO.class);
-        studentService = new StudentService(mockedStudentDAO);
+        mockedGroupDAO = mock(GroupDAO.class);
+        studentService = new StudentService(mockedStudentDAO, mockedGroupDAO);
     }
 
     @Test
@@ -30,7 +32,6 @@ class StudentServiceTest {
         Student student = new Student();
         student.setFirstName("Alex");
         student.setLastName("Belyaev");
-        student.setGroupId(1);
 
         when(mockedStudentDAO.create(student)).thenReturn(student);
 
@@ -91,7 +92,6 @@ class StudentServiceTest {
         student.setStudentId(5);
         student.setFirstName("Ann");
         student.setLastName("Akimenko");
-        student.setGroupId(2);
 
         when(mockedStudentDAO.update(student)).thenReturn(student);
 

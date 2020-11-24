@@ -6,12 +6,12 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.rmi.NoSuchObjectException;
 import java.util.List;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class ClassRoomService {
     private final ClassRoomDAO classRoomDAO;

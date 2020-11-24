@@ -7,12 +7,12 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.rmi.NoSuchObjectException;
 import java.util.List;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class GroupService {
     private final GroupDAO groupDAO;
@@ -58,13 +58,12 @@ public class GroupService {
         groupDAO.addStudentToGroup(studentId, groupId);
     }
 
-    public void deleteStudentFromGroup(Integer studentId) {
-        logger.debug("deleting student with ID: {} from group", studentId);
-        groupDAO.deleteStudentFromGroup(studentId);
+    public void deleteStudentFromGroup(Integer studentId, Integer groupId) {
+        logger.debug("deleting student with ID: {} from group with ID: {}", studentId, groupId);
+        groupDAO.deleteStudentFromGroup(studentId, groupId);
     }
 
-    public List<Student> findByGroup(Integer groupId) {
-        logger.debug("finding student by group with ID: {}", groupId);
-        return groupDAO.findByGroup(groupId);
+    public List<Student> findStudentsByGroup(Integer groupId) {
+        return groupDAO.findStudentsByGroup(groupId);
     }
 }

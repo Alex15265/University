@@ -1,6 +1,7 @@
 package com.foxminded.university.service;
 
 import com.foxminded.university.dao.CourseDAO;
+import com.foxminded.university.dao.ProfessorDAO;
 import com.foxminded.university.dao.entities.Course;
 import com.foxminded.university.dao.entities.Student;
 import org.junit.jupiter.api.Assertions;
@@ -17,12 +18,14 @@ import static org.mockito.Mockito.*;
 
 class CourseServiceTest {
     CourseDAO mockedCourseDAO;
+    ProfessorDAO mockedProfessorDAO;
     CourseService courseService;
 
     @BeforeEach
     void init() {
         mockedCourseDAO = mock(CourseDAO.class);
-        courseService = new CourseService(mockedCourseDAO);
+        mockedProfessorDAO = mock(ProfessorDAO.class);
+        courseService = new CourseService(mockedCourseDAO, mockedProfessorDAO);
     }
 
     @Test
@@ -30,7 +33,6 @@ class CourseServiceTest {
         Course course = new Course();
         course.setCourseName("History");
         course.setDescription("History Description");
-        course.setProfessorId(1);
 
         when(mockedCourseDAO.create(course)).thenReturn(course);
 
@@ -131,7 +133,6 @@ class CourseServiceTest {
         course.setCourseId(1);
         course.setCourseName("History");
         course.setDescription("History Description");
-        course.setProfessorId(1);
 
         when(mockedCourseDAO.update(course)).thenReturn(course);
 
@@ -176,13 +177,13 @@ class CourseServiceTest {
         students.add(student1);
         students.add(student2);
 
-        when(mockedCourseDAO.findByCourse(1)).thenReturn(students);
+        when(mockedCourseDAO.findStudentsByCourse(1)).thenReturn(students);
 
-        assertEquals(students, courseService.findByCourse(1));
-        assertEquals(student1, courseService.findByCourse(1).get(0));
-        assertEquals(student2, courseService.findByCourse(1).get(1));
+        assertEquals(students, courseService.findStudentsByCourse(1));
+        assertEquals(student1, courseService.findStudentsByCourse(1).get(0));
+        assertEquals(student2, courseService.findStudentsByCourse(1).get(1));
 
-        verify(mockedCourseDAO, times(3)).findByCourse(1);
+        verify(mockedCourseDAO, times(3)).findStudentsByCourse(1);
     }
 
     @Test

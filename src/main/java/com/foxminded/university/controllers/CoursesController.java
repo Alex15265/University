@@ -3,9 +3,9 @@ package com.foxminded.university.controllers;
 import com.foxminded.university.dao.entities.Course;
 import com.foxminded.university.dao.entities.Student;
 import com.foxminded.university.service.CourseService;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,14 +16,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import java.rmi.NoSuchObjectException;
 
 @Controller
+@RequiredArgsConstructor
 public class CoursesController {
     private final Logger logger = LoggerFactory.getLogger(CoursesController.class);
     private final CourseService courseService;
-
-    @Autowired
-    public CoursesController(CourseService courseService) {
-        this.courseService = courseService;
-    }
 
     @GetMapping("/courses")
     public String showCourses(Model model) {
@@ -35,7 +31,7 @@ public class CoursesController {
     @GetMapping("/studentsByCourse/{id}")
     public String showStudentsByCourse(@PathVariable("id") Integer courseId, Model model) {
         logger.debug("showing students by course with ID: {}", courseId);
-        model.addAttribute("students", courseService.findByCourse(courseId));
+        model.addAttribute("students", courseService.findStudentsByCourse(courseId));
         return "courses/students_by_course";
     }
 
@@ -50,7 +46,7 @@ public class CoursesController {
     @PostMapping("/saveCourse")
     public String saveCourse(@ModelAttribute("course") Course course) {
         logger.debug("saving new course: {}", course);
-        courseService.create(course.getCourseName(), course.getDescription(), course.getProfessorId());
+        courseService.create(course.getCourseName(), course.getDescription(), course.getProfessor().getProfessorId());
         return "redirect:/courses";
     }
 
@@ -64,7 +60,7 @@ public class CoursesController {
     @PostMapping("/updateCourse/{id}")
     public String update(@ModelAttribute("course") Course course, @PathVariable("id") Integer courseId) throws NoSuchObjectException {
         logger.debug("updating course with ID: {}", courseId);
-        courseService.update(courseId, course.getCourseName(), course.getDescription(), course.getProfessorId());
+        courseService.update(courseId, course.getCourseName(), course.getDescription(), course.getProfessor().getProfessorId());
         return "redirect:/courses";
     }
 

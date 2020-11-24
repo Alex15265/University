@@ -8,11 +8,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.rmi.NoSuchObjectException;
 import java.util.List;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class ProfessorService {
     private final ProfessorDAO professorDAO;
@@ -56,18 +57,7 @@ public class ProfessorService {
         professorDAO.delete(professorId);
     }
 
-    public void addCourseToProfessor(Integer courseId, Integer professorId) {
-        logger.debug("adding course with ID: {} to professor with ID: {}", courseId, professorId);
-        professorDAO.addCourseToProfessor(courseId, professorId);
-    }
-
-    public void deleteCourseFromProfessor(Integer professorId) {
-        logger.debug("deleting course from professor with ID: {}", professorId);
-        professorDAO.deleteCourseFromProfessor(professorId);
-    }
-
     public List<Course> findCoursesByProfessor(Integer professorId) {
-        logger.debug("finding courses by professor with ID: {}", professorId);
         return professorDAO.findCoursesByProfessor(professorId);
     }
 }

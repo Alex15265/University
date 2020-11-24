@@ -1,7 +1,6 @@
 package com.foxminded.university.service;
 
 import com.foxminded.university.dao.ProfessorDAO;
-import com.foxminded.university.dao.entities.ClassRoom;
 import com.foxminded.university.dao.entities.Course;
 import com.foxminded.university.dao.entities.Professor;
 import org.junit.jupiter.api.Assertions;
@@ -132,20 +131,6 @@ class ProfessorServiceTest {
         professorService.delete(1);
 
         verify(mockedProfessorDAO, times(1)).delete(1);
-    }
-
-    @Test
-    void addCourseToProfessor() {
-        professorService.addCourseToProfessor(1,1);
-
-        verify(mockedProfessorDAO, times(1)).addCourseToProfessor(1,1);
-    }
-
-    @Test
-    void deleteCourseFromProfessor() {
-        professorService.deleteCourseFromProfessor(1);
-
-        verify(mockedProfessorDAO, times(1)).deleteCourseFromProfessor(1);
     }
 
     @Test
