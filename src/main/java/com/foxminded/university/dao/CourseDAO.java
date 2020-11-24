@@ -61,13 +61,12 @@ public class CourseDAO implements DAO<Course,Integer> {
     @Override
     public void delete(Integer courseId) {
         logger.debug("deleting course with ID: {}", courseId);
+        Course course = new Course();
+        course.setCourseId(courseId);
         try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            Course course = session.load(Course.class, courseId);
-            if (course != null) {
-                session.delete(course);
-                session.getTransaction().commit();
-            }
+            session.delete(course);
+            session.getTransaction().commit();
         }
     }
 

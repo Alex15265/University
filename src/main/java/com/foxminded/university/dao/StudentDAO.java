@@ -59,13 +59,12 @@ public class StudentDAO implements DAO<Student,Integer> {
     @Override
     public void delete(Integer studentId) {
         logger.debug("deleting student with ID: {}", studentId);
+        Student student = new Student();
+        student.setStudentId(studentId);
         try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            Student student = session.load(Student.class, studentId);
-            if (student != null) {
-                session.delete(student);
-                session.getTransaction().commit();
-            }
+            session.delete(student);
+            session.getTransaction().commit();
         }
     }
 }

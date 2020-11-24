@@ -60,13 +60,12 @@ public class LessonDAO implements DAO<Lesson,Integer> {
     @Override
     public void delete(Integer lessonId) {
         logger.debug("deleting lesson with ID: {}", lessonId);
+        Lesson lesson = new Lesson();
+        lesson.setLessonId(lessonId);
         try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            Lesson lesson = session.load(Lesson.class, lessonId);
-            if (lesson != null) {
-                session.delete(lesson);
-                session.getTransaction().commit();
-            }
+            session.delete(lesson);
+            session.getTransaction().commit();
         }
     }
 

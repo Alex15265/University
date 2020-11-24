@@ -59,13 +59,12 @@ public class LessonTimeDAO implements DAO<LessonTime,Integer> {
     @Override
     public void delete(Integer lessonTimeId) {
         logger.debug("deleting lessonTime with ID: {}", lessonTimeId);
+        LessonTime lessonTime = new LessonTime();
+        lessonTime.setTimeId(lessonTimeId);
         try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            LessonTime lessonTime = session.load(LessonTime.class, lessonTimeId);
-            if (lessonTime != null) {
-                session.delete(lessonTime);
-                session.getTransaction().commit();
-            }
+            session.delete(lessonTime);
+            session.getTransaction().commit();
         }
     }
 }

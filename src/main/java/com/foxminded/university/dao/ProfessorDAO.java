@@ -61,13 +61,12 @@ public class ProfessorDAO implements DAO<Professor,Integer> {
     @Override
     public void delete(Integer professorId) {
         logger.debug("deleting professor with ID: {}", professorId);
+        Professor professor = new Professor();
+        professor.setProfessorId(professorId);
         try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            Professor professor = session.load(Professor.class, professorId);
-            if (professor != null) {
-                session.delete(professor);
-                session.getTransaction().commit();
-            }
+            session.delete(professor);
+            session.getTransaction().commit();
         }
     }
 

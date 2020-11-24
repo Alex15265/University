@@ -4,10 +4,12 @@ import com.foxminded.university.dao.entities.ClassRoom;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.rmi.NoSuchObjectException;
 import java.util.List;
@@ -59,13 +61,12 @@ public class ClassRoomDAO implements DAO<ClassRoom,Integer> {
     @Override
     public void delete(Integer classRoomId) {
         logger.debug("deleting room with ID: {}", classRoomId);
+        ClassRoom classRoom = new ClassRoom();
+        classRoom.setRoomId(classRoomId);
         try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            ClassRoom classRoom = session.load(ClassRoom.class, classRoomId);
-            if (classRoom != null) {
-                session.delete(classRoom);
-                session.getTransaction().commit();
-            }
+            session.delete(classRoom);
+            session.getTransaction().commit();
         }
     }
 }

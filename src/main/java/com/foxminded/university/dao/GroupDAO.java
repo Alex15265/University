@@ -61,13 +61,12 @@ public class GroupDAO implements DAO<Group,Integer> {
     @Override
     public void delete(Integer groupId) {
         logger.debug("deleting group with ID: {}", groupId);
+        Group group = new Group();
+        group.setGroupId(groupId);
         try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            Group group = session.load(Group.class, groupId);
-            if (group != null) {
-                session.delete(group);
-                session.getTransaction().commit();
-            }
+            session.delete(group);
+            session.getTransaction().commit();
         }
     }
 
