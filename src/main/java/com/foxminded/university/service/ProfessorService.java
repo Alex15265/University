@@ -1,22 +1,22 @@
 package com.foxminded.university.service;
 
-import com.foxminded.university.dao.ProfessorDAO;
-import com.foxminded.university.dao.entities.Course;
-import com.foxminded.university.dao.entities.Professor;
+import com.foxminded.university.entities.Course;
+import com.foxminded.university.entities.Professor;
+import com.foxminded.university.repositories.ProfessorRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-import java.rmi.NoSuchObjectException;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class ProfessorService {
-    private final ProfessorDAO professorDAO;
+    private final ProfessorRepository professorRepository;
     private final Logger logger = LoggerFactory.getLogger(ProfessorService.class);
 
     public Professor create(String firstName, String lastName) {
@@ -24,40 +24,50 @@ public class ProfessorService {
         Professor professor = new Professor();
         professor.setFirstName(firstName);
         professor.setLastName(lastName);
-        return professorDAO.create(professor);
+        return professorRepository.save(professor);
     }
 
     public List<Professor> readAll() {
         logger.debug("reading all professors");
-        return professorDAO.readAll();
+        List<Professor> professors = new ArrayList<>();
+        professorRepository.findAll().forEach(professors::add);
+        professors.sort(Comparator.comparing(Professor::getProfessorId));
+        return professors;
     }
 
-    public Professor readById(Integer professorId) throws NoSuchObjectException {
+    public Professor readById(Integer professorId) {
         logger.debug("reading professor with ID: {}", professorId);
-        try {
-        return professorDAO.readByID(professorId);
-        } catch (EmptyResultDataAccessException e) {
-            logger.warn("reading professor with ID: {} exception: {}", professorId, e.getMessage());
-            throw new NoSuchObjectException("Object not found");
+        Optional<Professor> professorOptional = professorRepository.findById(professorId);
+        Professor professor = new Professor();
+        if (professorOptional.isPresent()) {
+            professor = professorOptional.get();
         }
+        return professor;
     }
 
-    public Professor update(Integer professorId, String firstName, String lastName) throws NoSuchObjectException {
+    public Professor update(Integer professorId, String firstName, String lastName) {
         logger.debug("updating professor with ID: {}, new firstName: {} and lastName: {}",
                 professorId, firstName, lastName);
         Professor professor = new Professor();
         professor.setProfessorId(professorId);
         professor.setFirstName(firstName);
         professor.setLastName(lastName);
-        return professorDAO.update(professor);
+        return professorRepository.save(professor);
     }
 
     public void delete(Integer professorId) {
         logger.debug("deleting professor with ID: {}", professorId);
-        professorDAO.delete(professorId);
+        professorRepository.deleteById(professorId);
     }
 
     public List<Course> findCoursesByProfessor(Integer professorId) {
-        return professorDAO.findCoursesByProfessor(professorId);
+        logger.debug("finding courses by professor with ID: {}", professorId);
+        Optional<Professor> professorOptional = professorRepository.findById(professorId);
+        List<Course> courses = new ArrayList<>();
+        if (professorOptional.isPresent()) {
+            courses = professorOptional.get().getCourses();
+        }
+        courses.sort(Comparator.comparing(Course::getCourseId));
+        return courses;
     }
 }

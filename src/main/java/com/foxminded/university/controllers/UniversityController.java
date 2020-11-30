@@ -13,6 +13,6 @@ public class UniversityController {
     @GetMapping("/")
     public String showUniversity(Model model) {
         logger.debug("showing university");
-        return "university/index";
+        return "views/university/index";
     }
 }

@@ -1,8 +1,8 @@
 package com.foxminded.university.controllers;
 
-import com.foxminded.university.dao.entities.Group;
-import com.foxminded.university.dao.entities.LessonTime;
-import com.foxminded.university.dao.entities.Professor;
+import com.foxminded.university.entities.Group;
+import com.foxminded.university.entities.LessonTime;
+import com.foxminded.university.entities.Professor;
 import com.foxminded.university.service.TimetableService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -27,7 +27,7 @@ public class TimetablesController {
         model.addAttribute("group", group);
         model.addAttribute("professor", professor);
         model.addAttribute("time", time);
-        return "timetables/timetable_form";
+        return "views/timetables/timetable_form";
     }
 
     @GetMapping("/findByProfessor")
@@ -36,7 +36,7 @@ public class TimetablesController {
         logger.debug("showing lessons by professor with ID: {}", professor.getProfessorId());
         model.addAttribute("lessons", timetableService.findByProfessor(professor.getProfessorId(),
                 lessonTime.getLessonStart(), lessonTime.getLessonEnd()).getListOfLessons());
-        return "timetables/timetable";
+        return "views/timetables/timetable";
     }
 
     @GetMapping("/findByGroup")
@@ -45,6 +45,6 @@ public class TimetablesController {
         logger.debug("showing lessons by group with ID: {}", group.getGroupId());
         model.addAttribute("lessons", timetableService.findByGroup(group.getGroupId(),
                 lessonTime.getLessonStart(), lessonTime.getLessonEnd()).getListOfLessons());
-        return "timetables/timetable";
+        return "views/timetables/timetable";
     }
 }

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Courses By Professor</title>
+
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+          integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+          crossorigin="anonymous">
+</head>
+<body>
+
+<div class="container my-2">
+    <h1>Courses By Professor</h1>
+    <a th:href = "@{/professors}" class="btn btn-link btn-sm mb-3"> Back to Professors </a>
+    <a th:href = "@{/}" class="btn btn-link btn-sm mb-3"> Home Page </a>
+    <table border="1" class = "table table-striped table-responsive-md">
+        <thead>
+        <tr class="d-flex">
+            <th class="col-1"> <em>Course ID</em> </th>
+            <th class="col-3"> <em>Course Name</em> </th>
+            <th class="col"> <em>Description</em> </th>
+            <th class="col-1"> <em>Professor</em> </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="d-flex" th:each="course: ${courses}">
+            <th class="col-1" th:text="${course.courseId}"></th>
+            <td class="col-3" th:text="${course.courseName}"></td>
+            <td class="col" th:text="${course.description}"></td>
+            <td class="col-1" th:text="|${course.professor.firstName} ${course.professor.lastName}|"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

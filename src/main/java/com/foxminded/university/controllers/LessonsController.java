@@ -1,7 +1,7 @@
 package com.foxminded.university.controllers;
 
-import com.foxminded.university.dao.entities.Group;
-import com.foxminded.university.dao.entities.Lesson;
+import com.foxminded.university.entities.Group;
+import com.foxminded.university.entities.Lesson;
 import com.foxminded.university.service.LessonService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import java.rmi.NoSuchObjectException;
-
 @Controller
 @RequiredArgsConstructor
 public class LessonsController {
@@ -25,7 +23,7 @@ public class LessonsController {
     public String showLessons(Model model) {
         logger.debug("showing all lessons");
         model.addAttribute("lessons", lessonService.readAll());
-        return "lessons/lessons";
+        return "views/lessons/lessons";
     }
 
     @GetMapping("/newLessonForm")
@@ -33,11 +31,11 @@ public class LessonsController {
         logger.debug("showing new Lesson form");
         Lesson lesson = new Lesson();
         model.addAttribute("lesson", lesson);
-        return "lessons/new_lesson";
+        return "views/lessons/new_lesson";
     }
 
     @PostMapping("/saveLesson")
-    public String saveLesson(@ModelAttribute("lesson") Lesson lesson, Model model) throws NoSuchObjectException {
+    public String saveLesson(@ModelAttribute("lesson") Lesson lesson, Model model) {
         logger.debug("saving new lesson: {}", lesson);
         lessonService.create(lesson.getProfessor().getProfessorId(), lesson.getCourse().getCourseId(),
                 lesson.getClassRoom().getRoomId(), lesson.getTime().getTimeId());
@@ -45,14 +43,14 @@ public class LessonsController {
     }
 
     @GetMapping("/updateLessonForm/{id}")
-    public String showUpdateLessonForm(@PathVariable("id") Integer lessonId, Model model) throws NoSuchObjectException {
+    public String showUpdateLessonForm(@PathVariable("id") Integer lessonId, Model model) {
         logger.debug("showing update lesson form");
         model.addAttribute("lesson", lessonService.readById(lessonId));
-        return "lessons/update_lesson";
+        return "views/lessons/update_lesson";
     }
 
     @PostMapping("/updateLesson/{id}")
-    public String update(@ModelAttribute("lesson") Lesson lesson, @PathVariable("id") Integer lessonId) throws NoSuchObjectException {
+    public String update(@ModelAttribute("lesson") Lesson lesson, @PathVariable("id") Integer lessonId) {
         logger.debug("updating lesson with ID: {}", lessonId);
         lessonService.update(lessonId, lesson.getProfessor().getProfessorId(), lesson.getCourse().getCourseId(),
                 lesson.getClassRoom().getRoomId(), lesson.getTime().getTimeId());
@@ -67,12 +65,12 @@ public class LessonsController {
     }
 
     @GetMapping("/editGroupForm/{id}")
-    public String showEditGroupForm(@PathVariable("id") Integer lessonId, Model model) throws NoSuchObjectException {
+    public String showEditGroupForm(@PathVariable("id") Integer lessonId, Model model) {
         logger.debug("showing update lesson form");
         model.addAttribute("lesson", lessonService.readById(lessonId));
         Group group = new Group();
         model.addAttribute("group", group);
-        return "lessons/edit_group";
+        return "views/lessons/edit_group";
     }
 
     @PostMapping("/addGroup/{id}")

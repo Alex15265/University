@@ -1,6 +1,6 @@
 package com.foxminded.university.controllers;
 
-import com.foxminded.university.dao.entities.Group;
+import com.foxminded.university.entities.Group;
 import com.foxminded.university.service.GroupService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import java.rmi.NoSuchObjectException;
-
 @Controller
 @RequiredArgsConstructor
 public class GroupsController {
@@ -24,14 +22,14 @@ public class GroupsController {
     public String showGroups(Model model) {
         logger.debug("showing all groups");
         model.addAttribute("groups", groupService.readAll());
-        return "groups/groups";
+        return "views/groups/groups";
     }
 
     @GetMapping("/studentsByGroup/{id}")
     public String showStudentsByGroup(@PathVariable("id") Integer groupId, Model model) {
         logger.debug("showing students by group with ID: {}", groupId);
         model.addAttribute("students", groupService.findStudentsByGroup(groupId));
-        return "groups/students_by_group";
+        return "views/groups/students_by_group";
     }
 
     @GetMapping("/newGroupForm")
@@ -39,7 +37,7 @@ public class GroupsController {
         logger.debug("showing new group form");
         Group group = new Group();
         model.addAttribute("group", group);
-        return "groups/new_group";
+        return "views/groups/new_group";
     }
 
     @PostMapping("/saveGroup")
@@ -50,14 +48,14 @@ public class GroupsController {
     }
 
     @GetMapping("/updateGroupForm/{id}")
-    public String showUpdateGroupForm(@PathVariable("id") Integer groupId, Model model) throws NoSuchObjectException {
+    public String showUpdateGroupForm(@PathVariable("id") Integer groupId, Model model) {
         logger.debug("showing update group form");
         model.addAttribute("group", groupService.readById(groupId));
-        return "groups/update_group";
+        return "views/groups/update_group";
     }
 
     @PostMapping("/updateGroup/{id}")
-    public String update(@ModelAttribute("group") Group group, @PathVariable("id") Integer groupId) throws NoSuchObjectException {
+    public String update(@ModelAttribute("group") Group group, @PathVariable("id") Integer groupId) {
         logger.debug("updating group with ID: {}", groupId);
         groupService.update(groupId, group.getGroupName());
         return "redirect:/groups";
