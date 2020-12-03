@@ -1,6 +1,6 @@
 package com.foxminded.university.controllers;
 
-import com.foxminded.university.dao.entities.ClassRoom;
+import com.foxminded.university.entities.ClassRoom;
 import com.foxminded.university.service.ClassRoomService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import java.rmi.NoSuchObjectException;
-
 @Controller
 @RequiredArgsConstructor
 public class ClassRoomsController {
@@ -24,7 +22,7 @@ public class ClassRoomsController {
     public String showClassRooms(Model model) {
         logger.debug("showing all classrooms");
         model.addAttribute("classrooms", classRoomService.readAll());
-        return "classrooms/classrooms";
+        return "views/classrooms/classrooms";
     }
 
     @GetMapping("/newClassRoomForm")
@@ -32,7 +30,7 @@ public class ClassRoomsController {
         logger.debug("showing new ClassRoom form");
         ClassRoom classRoom = new ClassRoom();
         model.addAttribute("classroom", classRoom);
-        return "classrooms/new_classroom";
+        return "views/classrooms/new_classroom";
     }
 
     @PostMapping("/saveClassRoom")
@@ -43,14 +41,15 @@ public class ClassRoomsController {
     }
 
     @GetMapping("/updateClassRoomForm/{id}")
-    public String showUpdateClassRoomForm(@PathVariable("id") Integer roomId, Model model) throws NoSuchObjectException {
+    public String showUpdateClassRoomForm(@PathVariable("id") Integer roomId, Model model) {
         logger.debug("showing update classRoom form");
         model.addAttribute("classroom", classRoomService.readByID(roomId));
-        return "classrooms/update_classroom";
+        return "views/classrooms/update_classroom";
     }
 
     @PostMapping("/updateClassRoom/{id}")
-    public String update(@ModelAttribute("classRoom") ClassRoom classRoom, @PathVariable("id") Integer roomId) throws NoSuchObjectException {
+    public String update(@ModelAttribute("classRoom") ClassRoom classRoom,
+                         @PathVariable("id") Integer roomId) {
         logger.debug("updating classRoom with ID: {}", roomId);
         classRoomService.update(roomId, classRoom.getRoomNumber());
         return "redirect:/classRooms";

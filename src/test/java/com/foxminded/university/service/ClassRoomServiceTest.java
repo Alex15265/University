@@ -1,13 +1,11 @@
 package com.foxminded.university.service;
 
-import com.foxminded.university.dao.ClassRoomDAO;
-import com.foxminded.university.dao.entities.ClassRoom;
+import com.foxminded.university.entities.ClassRoom;
+import com.foxminded.university.repositories.ClassRoomRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.dao.EmptyResultDataAccessException;
 
-import java.rmi.NoSuchObjectException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,13 +13,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 class ClassRoomServiceTest {
-    ClassRoomDAO mockedClassRoomDAO;
+    ClassRoomRepository mockedClassRoomRep;
     ClassRoomService classRoomService;
 
     @BeforeEach
     void init() {
-        mockedClassRoomDAO = mock(ClassRoomDAO.class);
-        classRoomService = new ClassRoomService(mockedClassRoomDAO);
+        mockedClassRoomRep = mock(ClassRoomRepository.class);
+        classRoomService = new ClassRoomService(mockedClassRoomRep);
     }
 
     @Test
@@ -29,11 +27,11 @@ class ClassRoomServiceTest {
         ClassRoom classRoom = new ClassRoom();
         classRoom.setRoomNumber(1);
 
-        when(mockedClassRoomDAO.create(classRoom)).thenReturn(classRoom);
+        when(mockedClassRoomRep.save(classRoom)).thenReturn(classRoom);
 
         assertEquals(classRoom, classRoomService.create(1));
 
-        verify(mockedClassRoomDAO, times(1)).create(classRoom);
+        verify(mockedClassRoomRep, times(1)).save(classRoom);
     }
 
     @Test
@@ -49,60 +47,61 @@ class ClassRoomServiceTest {
         classRooms.add(classRoom2);
         classRooms.add(classRoom3);
 
-        when(mockedClassRoomDAO.readAll()).thenReturn(classRooms);
+        when(mockedClassRoomRep.findByOrderByRoomIdAsc()).thenReturn(classRooms);
 
         assertEquals(classRooms, classRoomService.readAll());
         assertEquals(classRoom1, classRoomService.readAll().get(0));
         assertEquals(classRoom2, classRoomService.readAll().get(1));
         assertEquals(classRoom3, classRoomService.readAll().get(2));
 
-        verify(mockedClassRoomDAO, times(4)).readAll();
+        verify(mockedClassRoomRep, times(4)).findByOrderByRoomIdAsc();
     }
 
     @Test
-    void readByID() throws NoSuchObjectException {
+    void readByID() {
         ClassRoom classRoom = new ClassRoom();
         classRoom.setRoomNumber(23);
 
-        when(mockedClassRoomDAO.readByID(1)).thenReturn(classRoom);
+        when(mockedClassRoomRep.findById(1)).thenReturn(java.util.Optional.of(classRoom));
 
         assertEquals(classRoom, classRoomService.readByID(1));
         assertEquals(23, classRoomService.readByID(1).getRoomNumber());
 
-        verify(mockedClassRoomDAO, times(2)).readByID(1);
+        verify(mockedClassRoomRep, times(2)).findById(1);
     }
 
     @Test
-    void update() throws NoSuchObjectException {
+    void update() {
         ClassRoom classRoom = new ClassRoom();
         classRoom.setRoomId(1);
         classRoom.setRoomNumber(23);
 
-        when(mockedClassRoomDAO.update(classRoom)).thenReturn(classRoom);
+        when(mockedClassRoomRep.save(classRoom)).thenReturn(classRoom);
+        when(mockedClassRoomRep.existsById(classRoom.getRoomId())).thenReturn(true);
 
         assertEquals(classRoom, classRoomService.update(1, 23));
 
-        verify(mockedClassRoomDAO, times(1)).update(classRoom);
+        verify(mockedClassRoomRep, times(1)).save(classRoom);
+        verify(mockedClassRoomRep, times(1)).existsById(classRoom.getRoomId());
     }
 
     @Test
     void delete() {
+        when(mockedClassRoomRep.existsById(1)).thenReturn(true);
+
         classRoomService.delete(1);
 
-        verify(mockedClassRoomDAO, times(1)).delete(1);
+        verify(mockedClassRoomRep, times(1)).deleteById(1);
+        verify(mockedClassRoomRep, times(1)).existsById(1);
     }
 
     @Test
-    void readByID_ShouldThrowExceptionWhenInputIsNonExistentID() {
-        when(mockedClassRoomDAO.readByID(1234)).thenThrow(EmptyResultDataAccessException.class);
-        Assertions.assertThrows(NoSuchObjectException.class, () ->
-                classRoomService.readByID(1234));
-    }
+    void create_ShouldThrowExceptionWhenInputClassRoomIsAlreadyExist() {
+        ClassRoom classRoom = new ClassRoom();
+        classRoom.setRoomNumber(101);
+        when(mockedClassRoomRep.findByRoomNumber(101)).thenReturn(classRoom);
 
-    @Test
-    void update_ShouldThrowExceptionWhenInputIsNonExistentID() throws NoSuchObjectException {
-        when(mockedClassRoomDAO.update(anyObject())).thenThrow(NoSuchObjectException.class);
-        Assertions.assertThrows(NoSuchObjectException.class, () ->
-                classRoomService.update(234, 13));
+        Assertions.assertThrows(IllegalArgumentException.class, () ->
+                classRoomService.create(101));
     }
 }

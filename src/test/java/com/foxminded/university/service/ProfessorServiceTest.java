@@ -1,14 +1,13 @@
 package com.foxminded.university.service;
 
-import com.foxminded.university.dao.ProfessorDAO;
-import com.foxminded.university.dao.entities.Course;
-import com.foxminded.university.dao.entities.Professor;
+import com.foxminded.university.entities.Course;
+import com.foxminded.university.entities.Professor;
+import com.foxminded.university.repositories.ProfessorRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.dao.EmptyResultDataAccessException;
 
-import java.rmi.NoSuchObjectException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,13 +15,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 class ProfessorServiceTest {
-    ProfessorDAO mockedProfessorDAO;
+    ProfessorRepository mockedProfessorRep;
     ProfessorService professorService;
 
     @BeforeEach
     void init() {
-        mockedProfessorDAO = mock(ProfessorDAO.class);
-        professorService = new ProfessorService(mockedProfessorDAO);
+        mockedProfessorRep = mock(ProfessorRepository.class);
+        professorService = new ProfessorService(mockedProfessorRep);
     }
 
     @Test
@@ -31,11 +30,11 @@ class ProfessorServiceTest {
         professor.setFirstName("John");
         professor.setLastName("Smith");
 
-        when(mockedProfessorDAO.create(professor)).thenReturn(professor);
+        when(mockedProfessorRep.save(professor)).thenReturn(professor);
 
         assertEquals(professor, professorService.create("John", "Smith"));
 
-        verify(mockedProfessorDAO, times(1)).create(professor);
+        verify(mockedProfessorRep, times(1)).save(professor);
     }
 
     @Test
@@ -70,7 +69,7 @@ class ProfessorServiceTest {
         professors.add(professor1);
         professors.add(professor2);
 
-        when(mockedProfessorDAO.readAll()).thenReturn(professors);
+        when(mockedProfessorRep.findByOrderByProfessorIdAsc()).thenReturn(professors);
 
         assertEquals(professors, professorService.readAll());
         assertEquals(professor1, professorService.readAll().get(0));
@@ -78,11 +77,11 @@ class ProfessorServiceTest {
         assertEquals(courses1, professorService.readAll().get(0).getCourses());
         assertEquals(courses2, professorService.readAll().get(1).getCourses());
 
-        verify(mockedProfessorDAO, times(5)).readAll();
+        verify(mockedProfessorRep, times(5)).findByOrderByProfessorIdAsc();
     }
 
     @Test
-    void readById() throws NoSuchObjectException {
+    void readById() {
         List<Course> courses = new ArrayList<>();
         Course course1 = new Course();
         course1.setCourseId(1);
@@ -102,35 +101,38 @@ class ProfessorServiceTest {
         professor.setLastName("Foster");
         professor.setCourses(courses);
 
-        when(mockedProfessorDAO.readByID(3)).thenReturn(professor);
+        when(mockedProfessorRep.findById(3)).thenReturn(java.util.Optional.of(professor));
 
         assertEquals(professor, professorService.readById(3));
         assertEquals("Jade", professorService.readById(3).getFirstName());
         assertEquals("Foster", professorService.readById(3).getLastName());
         assertEquals(courses, professorService.readById(3).getCourses());
 
-        verify(mockedProfessorDAO, times(4)).readByID(3);
+        verify(mockedProfessorRep, times(4)).findById(3);
     }
 
     @Test
-    void update() throws NoSuchObjectException {
+    void update() {
         Professor professor = new Professor();
         professor.setProfessorId(1);
         professor.setFirstName("Alex");
         professor.setLastName("Smith");
 
-        when(mockedProfessorDAO.update(professor)).thenReturn(professor);
+        when(mockedProfessorRep.save(professor)).thenReturn(professor);
+        when(mockedProfessorRep.existsById(1)).thenReturn(true);
 
         assertEquals(professor, professorService.update(1, "Alex", "Smith"));
 
-        verify(mockedProfessorDAO, times(1)).update(professor);
+        verify(mockedProfessorRep, times(1)).save(professor);
     }
 
     @Test
     void delete() {
+        when(mockedProfessorRep.existsById(1)).thenReturn(true);
+
         professorService.delete(1);
 
-        verify(mockedProfessorDAO, times(1)).delete(1);
+        verify(mockedProfessorRep, times(1)).deleteById(1);
     }
 
     @Test
@@ -148,26 +150,30 @@ class ProfessorServiceTest {
         courses.add(course1);
         courses.add(course2);
 
-        when(mockedProfessorDAO.findCoursesByProfessor(1)).thenReturn(courses);
+        Professor professor = new Professor();
+        professor.setProfessorId(1);
+        professor.setCourses(courses);
+
+        when(mockedProfessorRep.findById(1)).thenReturn(java.util.Optional.of(professor));
 
         assertEquals(courses, professorService.findCoursesByProfessor(1));
         assertEquals(course1, professorService.findCoursesByProfessor(1).get(0));
         assertEquals(course2, professorService.findCoursesByProfessor(1).get(1));
 
-        verify(mockedProfessorDAO, times(3)).findCoursesByProfessor(1);
+        verify(mockedProfessorRep, times(3)).findById(1);
     }
 
     @Test
     void readByID_ShouldThrowExceptionWhenInputIsNonExistentID() {
-        when(mockedProfessorDAO.readByID(1234)).thenThrow(EmptyResultDataAccessException.class);
-        Assertions.assertThrows(NoSuchObjectException.class, () ->
+        when(mockedProfessorRep.findById(1234)).thenThrow(EmptyResultDataAccessException.class);
+        Assertions.assertThrows(EmptyResultDataAccessException.class, () ->
                 professorService.readById(1234));
     }
 
     @Test
-    void update_ShouldThrowExceptionWhenInputIsNonExistentID() throws NoSuchObjectException {
-        when(mockedProfessorDAO.update(anyObject())).thenThrow(NoSuchObjectException.class);
-        Assertions.assertThrows(NoSuchObjectException.class, () ->
+    void update_ShouldThrowExceptionWhenInputIsNonExistentID() {
+        when(mockedProfessorRep.save(anyObject())).thenThrow(EmptyResultDataAccessException.class);
+        Assertions.assertThrows(EmptyResultDataAccessException.class, () ->
                 professorService.update(234, "Alex", "Belyaev"));
     }
 }

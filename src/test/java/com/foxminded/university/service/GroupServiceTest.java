@@ -1,14 +1,14 @@
 package com.foxminded.university.service;
 
-import com.foxminded.university.dao.GroupDAO;
-import com.foxminded.university.dao.entities.Group;
-import com.foxminded.university.dao.entities.Student;
+import com.foxminded.university.entities.Group;
+import com.foxminded.university.entities.Student;
+import com.foxminded.university.repositories.GroupRepository;
+import com.foxminded.university.repositories.StudentRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.dao.EmptyResultDataAccessException;
 
-import java.rmi.NoSuchObjectException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,25 +16,27 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 class GroupServiceTest {
-    GroupDAO mockedGroupDAO;
+    GroupRepository mockedGroupRep;
+    StudentRepository mockedStudentRep;
     GroupService groupService;
 
     @BeforeEach
     void init() {
-        mockedGroupDAO = mock(GroupDAO.class);
-        groupService = new GroupService(mockedGroupDAO);
+        mockedGroupRep = mock(GroupRepository.class);
+        mockedStudentRep = mock(StudentRepository.class);
+        groupService = new GroupService(mockedGroupRep, mockedStudentRep);
     }
 
     @Test
     void create() {
         Group group = new Group();
-        group.setGroupName("aa-20");
+        group.setGroupName("bu-20");
 
-        when(mockedGroupDAO.create(group)).thenReturn(group);
+        when(mockedGroupRep.save(group)).thenReturn(group);
 
-        assertEquals(group, groupService.create("aa-20"));
+        assertEquals(group, groupService.create("bu-20"));
 
-        verify(mockedGroupDAO, times(1)).create(group);
+        verify(mockedGroupRep, times(1)).save(group);
     }
 
     @Test
@@ -86,7 +88,7 @@ class GroupServiceTest {
         groups.add(group2);
         groups.add(group3);
 
-        when(mockedGroupDAO.readAll()).thenReturn(groups);
+        when(mockedGroupRep.findByOrderByGroupIdAsc()).thenReturn(groups);
 
         assertEquals(groups, groupService.readAll());
         assertEquals(group1, groupService.readAll().get(0));
@@ -96,11 +98,11 @@ class GroupServiceTest {
         assertEquals(students2, groupService.readAll().get(1).getStudents());
         assertEquals(students3, groupService.readAll().get(2).getStudents());
 
-        verify(mockedGroupDAO, times(7)).readAll();
+        verify(mockedGroupRep, times(7)).findByOrderByGroupIdAsc();
     }
 
     @Test
-    void readById() throws NoSuchObjectException {
+    void readById() {
         Student student1 = new Student();
         student1.setStudentId(1);
         student1.setFirstName("Alex");
@@ -117,47 +119,36 @@ class GroupServiceTest {
         group.setGroupName("aa-20");
         group.setStudents(students);
 
-        when(mockedGroupDAO.readByID(1)).thenReturn(group);
+        when(mockedGroupRep.findById(1)).thenReturn(java.util.Optional.of(group));
 
         assertEquals(group, groupService.readById(1));
         assertEquals("aa-20", groupService.readById(1).getGroupName());
         assertEquals(students, groupService.readById(1).getStudents());
 
-        verify(mockedGroupDAO, times(3)).readByID(1);
+        verify(mockedGroupRep, times(3)).findById(1);
     }
 
     @Test
-    void update() throws NoSuchObjectException {
+    void update() {
         Group group = new Group();
         group.setGroupId(7);
         group.setGroupName("bd-17");
 
-        when(mockedGroupDAO.update(group)).thenReturn(group);
+        when(mockedGroupRep.save(group)).thenReturn(group);
+        when(mockedGroupRep.existsById(7)).thenReturn(true);
 
         assertEquals(group, groupService.update(7, "bd-17"));
 
-        verify(mockedGroupDAO, times(1)).update(group);
+        verify(mockedGroupRep, times(1)).save(group);
     }
 
     @Test
     void delete() {
+        when(mockedGroupRep.existsById(1)).thenReturn(true);
+
         groupService.delete(1);
 
-        verify(mockedGroupDAO, times(1)).delete(1);
-    }
-
-    @Test
-    void addStudentToGroup() {
-        groupService.addStudentToGroup(1,1);
-
-        verify(mockedGroupDAO, times(1)).addStudentToGroup(1,1);
-    }
-
-    @Test
-    void deleteStudentFromGroup() {
-        groupService.deleteStudentFromGroup(1, 1);
-
-        verify(mockedGroupDAO, times(1)).deleteStudentFromGroup(1, 1);
+        verify(mockedGroupRep, times(1)).deleteById(1);
     }
 
     @Test
@@ -180,28 +171,31 @@ class GroupServiceTest {
         students.add(student2);
         students.add(student3);
 
-        when(mockedGroupDAO.findStudentsByGroup(1)).thenReturn(students);
+        Group group = new Group();
+        group.setStudents(students);
+
+        when(mockedGroupRep.findById(1)).thenReturn(java.util.Optional.of(group));
 
         assertEquals(students, groupService.findStudentsByGroup(1));
         assertEquals(student1, groupService.findStudentsByGroup(1).get(0));
         assertEquals(student2, groupService.findStudentsByGroup(1).get(1));
         assertEquals(student3, groupService.findStudentsByGroup(1).get(2));
 
-        verify(mockedGroupDAO, times(4)).findStudentsByGroup(1);
+        verify(mockedGroupRep, times(4)).findById(1);
 
     }
 
     @Test
     void readByID_ShouldThrowExceptionWhenInputIsNonExistentID() {
-        when(mockedGroupDAO.readByID(1234)).thenThrow(EmptyResultDataAccessException.class);
-        Assertions.assertThrows(NoSuchObjectException.class, () ->
+        when(mockedGroupRep.findById(1234)).thenThrow(EmptyResultDataAccessException.class);
+        Assertions.assertThrows(EmptyResultDataAccessException.class, () ->
                 groupService.readById(1234));
     }
 
     @Test
-    void update_ShouldThrowExceptionWhenInputIsNonExistentID() throws NoSuchObjectException {
-        when(mockedGroupDAO.update(anyObject())).thenThrow(NoSuchObjectException.class);
-        Assertions.assertThrows(NoSuchObjectException.class, () ->
+    void update_ShouldThrowExceptionWhenInputIsNonExistentID() {
+        when(mockedGroupRep.save(anyObject())).thenThrow(EmptyResultDataAccessException.class);
+        Assertions.assertThrows(EmptyResultDataAccessException.class, () ->
                 groupService.update(234, "aa-99"));
     }
 }

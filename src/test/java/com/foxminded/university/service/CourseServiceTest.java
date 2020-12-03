@@ -1,15 +1,14 @@
 package com.foxminded.university.service;
 
-import com.foxminded.university.dao.CourseDAO;
-import com.foxminded.university.dao.ProfessorDAO;
-import com.foxminded.university.dao.entities.Course;
-import com.foxminded.university.dao.entities.Student;
-import org.junit.jupiter.api.Assertions;
+import com.foxminded.university.entities.Course;
+import com.foxminded.university.entities.Professor;
+import com.foxminded.university.entities.Student;
+import com.foxminded.university.repositories.CourseRepository;
+import com.foxminded.university.repositories.ProfessorRepository;
+import com.foxminded.university.repositories.StudentRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.dao.EmptyResultDataAccessException;
 
-import java.rmi.NoSuchObjectException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,15 +16,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 class CourseServiceTest {
-    CourseDAO mockedCourseDAO;
-    ProfessorDAO mockedProfessorDAO;
+    CourseRepository mockedCourseRep;
+    ProfessorRepository mockedProfessorRep;
+    StudentRepository mockedStudentRep;
     CourseService courseService;
 
     @BeforeEach
     void init() {
-        mockedCourseDAO = mock(CourseDAO.class);
-        mockedProfessorDAO = mock(ProfessorDAO.class);
-        courseService = new CourseService(mockedCourseDAO, mockedProfessorDAO);
+        mockedCourseRep = mock(CourseRepository.class);
+        mockedProfessorRep = mock(ProfessorRepository.class);
+        mockedStudentRep = mock(StudentRepository.class);
+        courseService = new CourseService(mockedCourseRep, mockedProfessorRep, mockedStudentRep);
     }
 
     @Test
@@ -33,12 +34,17 @@ class CourseServiceTest {
         Course course = new Course();
         course.setCourseName("History");
         course.setDescription("History Description");
+        Professor professor = new Professor();
+        professor.setProfessorId(1);
+        course.setProfessor(professor);
 
-        when(mockedCourseDAO.create(course)).thenReturn(course);
+        when(mockedCourseRep.save(course)).thenReturn(course);
+        when(mockedProfessorRep.findById(professor.getProfessorId())).thenReturn(java.util.Optional.of(professor));
 
         assertEquals(course, courseService.create("History", "History Description", 1));
 
-        verify(mockedCourseDAO, times(1)).create(course);
+        verify(mockedCourseRep, times(1)).save(course);
+        verify(mockedProfessorRep, times(1)).findById(professor.getProfessorId());
     }
 
     @Test
@@ -85,7 +91,7 @@ class CourseServiceTest {
         courses.add(course1);
         courses.add(course2);
 
-        when(mockedCourseDAO.readAll()).thenReturn(courses);
+        when(mockedCourseRep.findByOrderByCourseIdAsc()).thenReturn(courses);
 
         assertEquals(courses, courseService.readAll());
         assertEquals(course1, courseService.readAll().get(0));
@@ -93,11 +99,11 @@ class CourseServiceTest {
         assertEquals(students1, courseService.readAll().get(0).getStudents());
         assertEquals(students2, courseService.readAll().get(1).getStudents());
 
-        verify(mockedCourseDAO, times(5)).readAll();
+        verify(mockedCourseRep, times(5)).findByOrderByCourseIdAsc();
     }
 
     @Test
-    void readByID() throws NoSuchObjectException {
+    void readByID() {
         Student student1 = new Student();
         student1.setStudentId(1);
         student1.setFirstName("Alex");
@@ -116,7 +122,7 @@ class CourseServiceTest {
         course.setDescription("History Description");
         course.setStudents(students);
 
-        when(mockedCourseDAO.readByID(1)).thenReturn(course);
+        when(mockedCourseRep.findById(1)).thenReturn(java.util.Optional.of(course));
 
         assertEquals(course, courseService.readByID(1));
         assertEquals(2,courseService.readByID(1).getCourseId());
@@ -124,42 +130,37 @@ class CourseServiceTest {
         assertEquals("History Description", courseService.readByID(1).getDescription());
         assertEquals(students, courseService.readByID(1).getStudents());
 
-        verify(mockedCourseDAO, times(5)).readByID(1);
+        verify(mockedCourseRep, times(5)).findById(1);
     }
 
     @Test
-    void update() throws NoSuchObjectException {
+    void update() {
         Course course = new Course();
         course.setCourseId(1);
         course.setCourseName("History");
         course.setDescription("History Description");
+        Professor professor = new Professor();
+        professor.setProfessorId(1);
+        course.setProfessor(professor);
 
-        when(mockedCourseDAO.update(course)).thenReturn(course);
+        when(mockedCourseRep.save(course)).thenReturn(course);
+        when(mockedCourseRep.existsById(1)).thenReturn(true);
+        when(mockedProfessorRep.findById(1)).thenReturn(java.util.Optional.of(professor));
 
         assertEquals(course, courseService.update(1, "History", "History Description", 1));
 
-        verify(mockedCourseDAO, times(1)).update(course);
+        verify(mockedCourseRep, times(1)).save(course);
+        verify(mockedCourseRep, times(1)).existsById(1);
+        verify(mockedProfessorRep, times(1)).findById(1);
     }
 
     @Test
     void delete() {
+        when(mockedCourseRep.existsById(1)).thenReturn(true);
+
         courseService.delete(1);
 
-        verify(mockedCourseDAO, times(1)).delete(1);
-    }
-
-    @Test
-    void addStudentToCourse() {
-        courseService.addStudentToCourse(1,1);
-
-        verify(mockedCourseDAO, times(1)).addStudentToCourse(1,1);
-    }
-
-    @Test
-    void deleteStudentFromCourse() {
-        courseService.deleteStudentFromCourse(1,1);
-
-        verify(mockedCourseDAO, times(1)).deleteStudentFromCourse(1,1);
+        verify(mockedCourseRep, times(1)).deleteById(1);
     }
 
     @Test
@@ -177,26 +178,15 @@ class CourseServiceTest {
         students.add(student1);
         students.add(student2);
 
-        when(mockedCourseDAO.findStudentsByCourse(1)).thenReturn(students);
+        Course course = new Course();
+        course.setStudents(students);
+
+        when(mockedCourseRep.findById(1)).thenReturn(java.util.Optional.of(course));
 
         assertEquals(students, courseService.findStudentsByCourse(1));
         assertEquals(student1, courseService.findStudentsByCourse(1).get(0));
         assertEquals(student2, courseService.findStudentsByCourse(1).get(1));
 
-        verify(mockedCourseDAO, times(3)).findStudentsByCourse(1);
-    }
-
-    @Test
-    void readByID_ShouldThrowExceptionWhenInputIsNonExistentID() {
-        when(mockedCourseDAO.readByID(1234)).thenThrow(EmptyResultDataAccessException.class);
-        Assertions.assertThrows(NoSuchObjectException.class, () ->
-                courseService.readByID(1234));
-    }
-
-    @Test
-    void update_ShouldThrowExceptionWhenInputIsNonExistentID() throws NoSuchObjectException {
-        when(mockedCourseDAO.update(anyObject())).thenThrow(NoSuchObjectException.class);
-        Assertions.assertThrows(NoSuchObjectException.class, () ->
-                courseService.update(1, "History", "History Description", 1));
+        verify(mockedCourseRep, times(3)).findById(1);
     }
 }

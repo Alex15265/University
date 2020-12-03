@@ -1,13 +1,13 @@
 package com.foxminded.university.service;
 
-import com.foxminded.university.dao.LessonDAO;
-import com.foxminded.university.dao.entities.*;
+import com.foxminded.university.entities.*;
+import com.foxminded.university.repositories.GroupRepository;
+import com.foxminded.university.repositories.LessonRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.dao.EmptyResultDataAccessException;
 
-import java.rmi.NoSuchObjectException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +16,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 class LessonServiceTest {
-    LessonDAO mockedLessonDAO;
+    LessonRepository mockedLessonRep;
+    GroupRepository mockedGroupRep;
     ProfessorService mockedProfessorService;
     CourseService mockedCourseService;
     ClassRoomService mockedClassRoomService;
@@ -25,17 +26,17 @@ class LessonServiceTest {
 
     @BeforeEach
     void init() {
-        mockedLessonDAO = mock(LessonDAO.class);
+        mockedLessonRep = mock(LessonRepository.class);
         mockedProfessorService = mock(ProfessorService.class);
         mockedCourseService = mock(CourseService.class);
         mockedClassRoomService = mock(ClassRoomService.class);
         mockedLessonTimeService = mock(LessonTimeService.class);
-        lessonService = new LessonService(mockedLessonDAO, mockedProfessorService, mockedCourseService,
+        lessonService = new LessonService(mockedLessonRep, mockedGroupRep, mockedProfessorService, mockedCourseService,
                 mockedClassRoomService, mockedLessonTimeService);
     }
 
     @Test
-    void create() throws NoSuchObjectException {
+    void create() {
         Professor professor = new Professor();
         professor.setFirstName("John");
         professor.setLastName("Smith");
@@ -54,7 +55,7 @@ class LessonServiceTest {
         lesson.setClassRoom(classRoom);
         lesson.setTime(lessonTime);
 
-        when(mockedLessonDAO.create(lesson)).thenReturn(lesson);
+        when(mockedLessonRep.save(lesson)).thenReturn(lesson);
         when(mockedProfessorService.readById(1)).thenReturn(professor);
         when(mockedCourseService.readByID(4)).thenReturn(course);
         when(mockedClassRoomService.readByID(2)).thenReturn(classRoom);
@@ -66,7 +67,7 @@ class LessonServiceTest {
         assertEquals(classRoom, lessonService.create(1,4,2,3).getClassRoom());
         assertEquals(lessonTime, lessonService.create(1,4,2,3).getTime());
 
-        verify(mockedLessonDAO, times(5)).create(lesson);
+        verify(mockedLessonRep, times(5)).save(lesson);
         verify(mockedProfessorService, times(5)).readById(1);
         verify(mockedCourseService, times(5)).readByID(4);
         verify(mockedClassRoomService, times(5)).readByID(2);
@@ -139,7 +140,7 @@ class LessonServiceTest {
         lessons.add(lesson2);
         lessons.add(lesson3);
 
-        when(mockedLessonDAO.readAll()).thenReturn(lessons);
+        when(mockedLessonRep.findByOrderByLessonIdAsc()).thenReturn(lessons);
 
         assertEquals(lessons, lessonService.readAll());
         assertEquals(lesson1, lessonService.readAll().get(0));
@@ -147,11 +148,11 @@ class LessonServiceTest {
         assertEquals(lesson3, lessonService.readAll().get(2));
         assertEquals(groups3, lessonService.readAll().get(2).getGroups());
 
-        verify(mockedLessonDAO, times(5)).readAll();
+        verify(mockedLessonRep, times(5)).findByOrderByLessonIdAsc();
     }
 
     @Test
-    void readById() throws NoSuchObjectException {
+    void readById() {
         Professor professor = new Professor();
         professor.setFirstName("John");
         professor.setLastName("Smith");
@@ -179,16 +180,16 @@ class LessonServiceTest {
         lesson.setTime(lessonTime);
         lesson.setGroups(groups);
 
-        when(mockedLessonDAO.readByID(1)).thenReturn(lesson);
+        when(mockedLessonRep.findById(1)).thenReturn(java.util.Optional.of(lesson));
 
         assertEquals(lesson, lessonService.readById(1));
         assertEquals(groups, lessonService.readById(1).getGroups());
 
-        verify(mockedLessonDAO, times(2)).readByID(1);
+        verify(mockedLessonRep, times(2)).findById(1);
     }
 
     @Test
-    void update() throws NoSuchObjectException {
+    void update() {
         Professor professor = new Professor();
         professor.setProfessorId(2);
         professor.setFirstName("John");
@@ -212,11 +213,12 @@ class LessonServiceTest {
         lesson.setClassRoom(classRoom);
         lesson.setTime(lessonTime);
 
-        when(mockedLessonDAO.update(lesson)).thenReturn(lesson);
+        when(mockedLessonRep.save(lesson)).thenReturn(lesson);
         when(mockedProfessorService.readById(2)).thenReturn(professor);
         when(mockedCourseService.readByID(1)).thenReturn(course);
         when(mockedClassRoomService.readByID(3)).thenReturn(classRoom);
         when(mockedLessonTimeService.readByID(1)).thenReturn(lessonTime);
+        when(mockedLessonRep.existsById(7)).thenReturn(true);
 
         assertEquals(lesson, lessonService.update(7,2,1,3, 1));
         assertEquals(professor, lessonService.update(7,2,1,3, 1).getProfessor());
@@ -224,7 +226,7 @@ class LessonServiceTest {
         assertEquals(classRoom, lessonService.update(7,2,1,3, 1).getClassRoom());
         assertEquals(lessonTime, lessonService.update(7,2,1,3, 1).getTime());
 
-        verify(mockedLessonDAO, times(5)).update(lesson);
+        verify(mockedLessonRep, times(5)).save(lesson);
         verify(mockedProfessorService, times(5)).readById(2);
         verify(mockedCourseService, times(5)).readByID(1);
         verify(mockedClassRoomService, times(5)).readByID(3);
@@ -233,36 +235,24 @@ class LessonServiceTest {
 
     @Test
     void delete() {
+        when(mockedLessonRep.existsById(1)).thenReturn(true);
+
         lessonService.delete(1);
 
-        verify(mockedLessonDAO, times(1)).delete(1);
-    }
-
-    @Test
-    void addGroupToLesson() {
-        lessonService.addGroupToLesson(1,1);
-
-        verify(mockedLessonDAO, times(1)).addGroupToLesson(1,1);
-    }
-
-    @Test
-    void deleteGroupFromLesson() {
-        lessonService.deleteGroupFromLesson(1,1);
-
-        verify(mockedLessonDAO, times(1)).deleteGroupFromLesson(1,1);
+        verify(mockedLessonRep, times(1)).deleteById(1);
     }
 
     @Test
     void readByID_ShouldThrowExceptionWhenInputIsNonExistentID() {
-        when(mockedLessonDAO.readByID(1234)).thenThrow(EmptyResultDataAccessException.class);
-        Assertions.assertThrows(NoSuchObjectException.class, () ->
+        when(mockedLessonRep.findById(1234)).thenThrow(EmptyResultDataAccessException.class);
+        Assertions.assertThrows(EmptyResultDataAccessException.class, () ->
                 lessonService.readById(1234));
     }
 
     @Test
-    void update_ShouldThrowExceptionWhenInputIsNonExistentID() throws NoSuchObjectException {
-        when(mockedLessonDAO.update(anyObject())).thenThrow(NoSuchObjectException.class);
-        Assertions.assertThrows(NoSuchObjectException.class, () ->
+    void update_ShouldThrowExceptionWhenInputIsNonExistentID() {
+        when(mockedLessonRep.save(anyObject())).thenThrow(EmptyResultDataAccessException.class);
+        Assertions.assertThrows(EmptyResultDataAccessException.class, () ->
                 lessonService.update(1, 1, 1, 1, 1));
     }
 }

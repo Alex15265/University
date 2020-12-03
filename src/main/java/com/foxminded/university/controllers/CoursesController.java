@@ -1,7 +1,7 @@
 package com.foxminded.university.controllers;
 
-import com.foxminded.university.dao.entities.Course;
-import com.foxminded.university.dao.entities.Student;
+import com.foxminded.university.entities.Course;
+import com.foxminded.university.entities.Student;
 import com.foxminded.university.service.CourseService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import java.rmi.NoSuchObjectException;
-
 @Controller
 @RequiredArgsConstructor
 public class CoursesController {
@@ -25,14 +23,14 @@ public class CoursesController {
     public String showCourses(Model model) {
         logger.debug("showing all courses");
         model.addAttribute("courses", courseService.readAll());
-        return "courses/courses";
+        return "views/courses/courses";
     }
 
     @GetMapping("/studentsByCourse/{id}")
     public String showStudentsByCourse(@PathVariable("id") Integer courseId, Model model) {
         logger.debug("showing students by course with ID: {}", courseId);
         model.addAttribute("students", courseService.findStudentsByCourse(courseId));
-        return "courses/students_by_course";
+        return "views/courses/students_by_course";
     }
 
     @GetMapping("/newCourseForm")
@@ -40,27 +38,29 @@ public class CoursesController {
         logger.debug("showing new Course form");
         Course course = new Course();
         model.addAttribute("course", course);
-        return "courses/new_course";
+        return "views/courses/new_course";
     }
 
     @PostMapping("/saveCourse")
     public String saveCourse(@ModelAttribute("course") Course course) {
         logger.debug("saving new course: {}", course);
-        courseService.create(course.getCourseName(), course.getDescription(), course.getProfessor().getProfessorId());
+        courseService.create(course.getCourseName(), course.getDescription(),
+                course.getProfessor().getProfessorId());
         return "redirect:/courses";
     }
 
     @GetMapping("/updateCourseForm/{id}")
-    public String showUpdateCourseForm(@PathVariable("id") Integer courseId, Model model) throws NoSuchObjectException {
+    public String showUpdateCourseForm(@PathVariable("id") Integer courseId, Model model) {
         logger.debug("showing update course form");
         model.addAttribute("course", courseService.readByID(courseId));
-        return "courses/update_course";
+        return "views/courses/update_course";
     }
 
     @PostMapping("/updateCourse/{id}")
-    public String update(@ModelAttribute("course") Course course, @PathVariable("id") Integer courseId) throws NoSuchObjectException {
+    public String update(@ModelAttribute("course") Course course, @PathVariable("id") Integer courseId) {
         logger.debug("updating course with ID: {}", courseId);
-        courseService.update(courseId, course.getCourseName(), course.getDescription(), course.getProfessor().getProfessorId());
+        courseService.update(courseId, course.getCourseName(), course.getDescription(),
+                course.getProfessor().getProfessorId());
         return "redirect:/courses";
     }
 
@@ -72,12 +72,12 @@ public class CoursesController {
     }
 
     @GetMapping("/editStudentForm/{id}")
-    public String showEditStudentForm(@PathVariable("id") Integer courseId, Model model) throws NoSuchObjectException {
+    public String showEditStudentForm(@PathVariable("id") Integer courseId, Model model) {
         logger.debug("showing edit student form");
         model.addAttribute("course", courseService.readByID(courseId));
         Student student = new Student();
         model.addAttribute("student", student);
-        return "courses/edit_student";
+        return "views/courses/edit_student";
     }
 
     @PostMapping("/addStudent/{id}")

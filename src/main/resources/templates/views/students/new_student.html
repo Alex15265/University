@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>New Student</title>
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+          integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+          crossorigin="anonymous">
+</head>
+<body>
+<div class="container">
+    <h1>New Student</h1>
+    <hr>
+    <form action="#" th:action="@{/saveStudent}" th:object="${student}"
+          method="POST">
+        <input type="text" th:field="*{firstName}"
+               placeholder="Student First Name" class="form-control mb-4 col-4">
+        <input type="text" th:field="*{lastName}"
+               placeholder="Student Last Name" class="form-control mb-4 col-4">
+        <input type="text" th:field="*{group.groupId}"
+               placeholder="Group ID" class="form-control mb-4 col-4">
+        <button type="submit" class="btn btn-outline-info col-2"> Save Student</button>
+    </form>
+    <hr>
+    <a th:href = "@{/students}"> Back to Students</a>
+</div>
+</body>
+</html>

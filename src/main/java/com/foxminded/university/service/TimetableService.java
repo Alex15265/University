@@ -1,8 +1,8 @@
 package com.foxminded.university.service;
 
-import com.foxminded.university.dao.entities.Group;
-import com.foxminded.university.dao.entities.Lesson;
-import com.foxminded.university.dao.entities.Timetable;
+import com.foxminded.university.entities.Group;
+import com.foxminded.university.entities.Lesson;
+import com.foxminded.university.entities.Timetable;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

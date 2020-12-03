@@ -1,6 +1,6 @@
 package com.foxminded.university.controllers;
 
-import com.foxminded.university.dao.entities.LessonTime;
+import com.foxminded.university.entities.LessonTime;
 import com.foxminded.university.service.LessonTimeService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import java.rmi.NoSuchObjectException;
-
 @Controller
 @RequiredArgsConstructor
 public class LessonTimesController {
@@ -24,7 +22,7 @@ public class LessonTimesController {
     public String showLessonTimes(Model model) {
         logger.debug("showing all lessonTimes");
         model.addAttribute("lessonTimes", lessonTimeService.readAll());
-        return "lessontimes/lessontimes";
+        return "views/lessontimes/lessontimes";
     }
 
     @GetMapping("/newLessonTimeForm")
@@ -32,7 +30,7 @@ public class LessonTimesController {
         logger.debug("showing new LessonTime form");
         LessonTime lessonTime = new LessonTime();
         model.addAttribute("lessonTime", lessonTime);
-        return "lessontimes/new_lessontime";
+        return "views/lessontimes/new_lessontime";
     }
 
     @PostMapping("/saveLessonTime")
@@ -43,14 +41,14 @@ public class LessonTimesController {
     }
 
     @GetMapping("/updateLessonTimeForm/{id}")
-    public String showUpdateLessonTimeForm(@PathVariable("id") Integer timeId, Model model) throws NoSuchObjectException {
+    public String showUpdateLessonTimeForm(@PathVariable("id") Integer timeId, Model model) {
         logger.debug("showing update lessonTime form");
         model.addAttribute("lessonTime", lessonTimeService.readByID(timeId));
-        return "lessontimes/update_lessontime";
+        return "views/lessontimes/update_lessontime";
     }
 
     @PostMapping("/updateLessonTime/{id}")
-    public String update(@ModelAttribute("lessonTime") LessonTime lessonTime, @PathVariable("id") Integer timeId) throws NoSuchObjectException {
+    public String update(@ModelAttribute("lessonTime") LessonTime lessonTime, @PathVariable("id") Integer timeId) {
         logger.debug("updating lessonTime with ID: {}", timeId);
         lessonTimeService.update(timeId, lessonTime.getLessonStart(), lessonTime.getLessonEnd());
         return "redirect:/lessonTimes";
