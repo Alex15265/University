@@ -7,10 +7,10 @@ import com.foxminded.university.repositories.StudentRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Comparator;
+import java.rmi.NoSuchObjectException;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,50 +27,50 @@ public class StudentService {
         student.setFirstName(firstName);
         student.setLastName(lastName);
         Optional<Group> groupOptional = groupRepository.findById(groupId);
-        Group group = new Group();
-        if (groupOptional.isPresent()) {
-            group = groupOptional.get();
+        if (!groupOptional.isPresent()) {
+            throw new EmptyResultDataAccessException("Student not found", 1);
         }
-        student.setGroup(group);
+        student.setGroup(groupOptional.get());
         return studentRepository.save(student);
     }
 
     public List<Student> readAll() {
         logger.debug("reading all students");
-        List<Student> students = new ArrayList<>();
-        studentRepository.findAll().forEach(students::add);
-        students.sort(Comparator.comparing(Student::getStudentId));
-        return students;
+        return studentRepository.findByOrderByStudentIdAsc();
     }
 
     public Student readByID(Integer studentId) {
         logger.debug("reading student with ID: {}", studentId);
         Optional<Student> studentOptional = studentRepository.findById(studentId);
-        Student student = new Student();
-        if (studentOptional.isPresent()) {
-            student = studentOptional.get();
+        if (!studentOptional.isPresent()) {
+            throw new EmptyResultDataAccessException("Student not found", 1);
         }
-        return student;
+        return studentOptional.get();
     }
 
     public Student update(Integer studentId, String firstName, String lastName, Integer groupId) {
         logger.debug("updating student with ID: {}, new firstName: {}, lastName: {} and groupId: {}",
                 studentId, firstName, lastName, groupId);
+        if (!studentRepository.existsById(studentId)) {
+            throw new EmptyResultDataAccessException("Student not found", 1);
+        }
         Student student = new Student();
         student.setStudentId(studentId);
         student.setFirstName(firstName);
         student.setLastName(lastName);
         Optional<Group> groupOptional = groupRepository.findById(groupId);
-        Group group = new Group();
-        if (groupOptional.isPresent()) {
-            group = groupOptional.get();
+        if (!groupOptional.isPresent()) {
+            throw new EmptyResultDataAccessException("Group not found", 1);
         }
-        student.setGroup(group);
+        student.setGroup(groupOptional.get());
         return studentRepository.save(student);
     }
 
     public void delete(Integer studentId) {
         logger.debug("deleting student with ID: {}", studentId);
+        if (!studentRepository.existsById(studentId)) {
+            throw new EmptyResultDataAccessException("Student not found", 1);
+        }
         studentRepository.deleteById(studentId);
     }
 }

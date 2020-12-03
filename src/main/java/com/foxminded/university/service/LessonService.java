@@ -7,10 +7,9 @@ import com.foxminded.university.repositories.LessonRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,30 +32,32 @@ public class LessonService {
         lesson.setCourse(courseService.readByID(courseId));
         lesson.setClassRoom(classRoomService.readByID(roomId));
         lesson.setTime(lessonTimeService.readByID(timeId));
+        if (lessonRepository.findByProfessorAndTime(lesson.getProfessor(), lesson.getTime()) != null) {
+            throw new IllegalArgumentException("Lesson already exist");
+        }
         return lessonRepository.save(lesson);
     }
 
     public List<Lesson> readAll() {
         logger.debug("reading all lessons");
-        List<Lesson> lessons = new ArrayList<>();
-        lessonRepository.findAll().forEach(lessons::add);
-        lessons.sort(Comparator.comparing(Lesson::getLessonId));
-        return lessons;
+        return lessonRepository.findByOrderByLessonIdAsc();
     }
 
     public Lesson readById(Integer lessonId) {
         logger.debug("reading lesson with ID: {}", lessonId);
         Optional<Lesson> lessonOptional = lessonRepository.findById(lessonId);
-        Lesson lesson = new Lesson();
-        if (lessonOptional.isPresent()) {
-            lesson = lessonOptional.get();
+        if (!lessonOptional.isPresent()) {
+            throw new EmptyResultDataAccessException("Lesson not found", 1);
         }
-        return lesson;
+        return lessonOptional.get();
     }
 
     public Lesson update(Integer lessonId, Integer professorId, Integer courseId, Integer roomId, Integer timeId) {
         logger.debug("updating lesson with ID: {}, new professorID: {}, courseID: {}, roomID: {} and timeID: {}",
                 lessonId, professorId, courseId, roomId, timeId);
+        if (!lessonRepository.existsById(lessonId)) {
+            throw new EmptyResultDataAccessException("Lesson not found", 1);
+        }
         Lesson lesson = new Lesson();
         lesson.setLessonId(lessonId);
         lesson.setProfessor(professorService.readById(professorId));
@@ -68,21 +69,24 @@ public class LessonService {
 
     public void delete(Integer lessonId) {
         logger.debug("deleting lesson with ID: {}", lessonId);
+        if (!lessonRepository.existsById(lessonId)) {
+            throw new EmptyResultDataAccessException("Lesson not found", 1);
+        }
         lessonRepository.deleteById(lessonId);
     }
 
     public void addGroupToLesson(Integer groupId, Integer lessonId) {
         logger.debug("adding group with ID: {} to lesson with ID: {}", groupId, lessonId);
         Optional<Group> groupOptional = groupRepository.findById(groupId);
-        Group group = new Group();
-        if (groupOptional.isPresent()) {
-            group = groupOptional.get();
+        if (!groupOptional.isPresent()) {
+            throw new EmptyResultDataAccessException("Group not found", 1);
         }
+        Group group = groupOptional.get();
         Optional<Lesson> lessonOptional = lessonRepository.findById(lessonId);
-        Lesson lesson = new Lesson();
-        if (lessonOptional.isPresent()) {
-            lesson = lessonOptional.get();
+        if (!lessonOptional.isPresent()) {
+            throw new EmptyResultDataAccessException("Lesson not found", 1);
         }
+        Lesson lesson = lessonOptional.get();
         lesson.getGroups().add(group);
         lessonRepository.save(lesson);
     }
@@ -90,15 +94,15 @@ public class LessonService {
     public void deleteGroupFromLesson(Integer groupId, Integer lessonId) {
         logger.debug("deleting group with ID: {} from lesson with ID: {}", groupId, lessonId);
         Optional<Group> groupOptional = groupRepository.findById(groupId);
-        Group group = new Group();
-        if (groupOptional.isPresent()) {
-            group = groupOptional.get();
+        if (!groupOptional.isPresent()) {
+            throw new EmptyResultDataAccessException("Group not found", 1);
         }
+        Group group = groupOptional.get();
         Optional<Lesson> lessonOptional = lessonRepository.findById(lessonId);
-        Lesson lesson = new Lesson();
-        if (lessonOptional.isPresent()) {
-            lesson = lessonOptional.get();
+        if (!lessonOptional.isPresent()) {
+            throw new EmptyResultDataAccessException("Lesson not found", 1);
         }
+        Lesson lesson = lessonOptional.get();
         lesson.getGroups().remove(group);
         lessonRepository.save(lesson);
     }

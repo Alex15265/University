@@ -5,10 +5,9 @@ import com.foxminded.university.repositories.ClassRoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,29 +21,31 @@ public class ClassRoomService {
         logger.debug("creating classroom with roomNumber: {}", roomNumber);
         ClassRoom classRoom = new ClassRoom();
         classRoom.setRoomNumber(roomNumber);
+        if (classRoomRepository.findByRoomNumber(roomNumber) != null) {
+            throw new IllegalArgumentException("ClassRoom already exist");
+        }
         return classRoomRepository.save(classRoom);
     }
 
     public List<ClassRoom> readAll() {
         logger.debug("reading all rooms");
-        List<ClassRoom> classRooms = new ArrayList<>();
-        classRoomRepository.findAll().forEach(classRooms::add);
-        classRooms.sort(Comparator.comparing(ClassRoom::getRoomId));
-        return classRooms;
+        return classRoomRepository.findByOrderByRoomIdAsc();
     }
 
     public ClassRoom readByID(Integer classRoomId) {
         logger.debug("reading room with ID: {}", classRoomId);
         Optional<ClassRoom> classRoomOptional = classRoomRepository.findById(classRoomId);
-        ClassRoom classRoom = new ClassRoom();
-        if (classRoomOptional.isPresent()) {
-            classRoom = classRoomOptional.get();
+        if (!classRoomOptional.isPresent()) {
+            throw new EmptyResultDataAccessException("ClassRoom not found", 1);
         }
-        return classRoom;
+        return classRoomOptional.get();
     }
 
     public ClassRoom update(Integer roomId, Integer roomNumber) {
         logger.debug("updating room with ID: {}, new roomNumber: {}", roomId, roomNumber);
+        if (!classRoomRepository.existsById(roomId)) {
+            throw new EmptyResultDataAccessException("ClassRoom not found", 1);
+        }
         ClassRoom classRoom = new ClassRoom();
         classRoom.setRoomId(roomId);
         classRoom.setRoomNumber(roomNumber);
@@ -53,6 +54,9 @@ public class ClassRoomService {
 
     public void delete(Integer roomId) {
         logger.debug("deleting room with ID: {}", roomId);
+        if (!classRoomRepository.existsById(roomId)) {
+            throw new EmptyResultDataAccessException("ClassRoom not found", 1);
+        }
         classRoomRepository.deleteById(roomId);
     }
 }

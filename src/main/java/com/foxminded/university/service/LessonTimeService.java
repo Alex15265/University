@@ -5,11 +5,10 @@ import com.foxminded.university.repositories.LessonTimeRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,30 +23,32 @@ public class LessonTimeService {
         LessonTime lessonTime = new LessonTime();
         lessonTime.setLessonStart(lessonStart);
         lessonTime.setLessonEnd(lessonEnd);
+        if (lessonTimeRepository.findByLessonStart(lessonStart) != null) {
+            throw new IllegalArgumentException("LessonTime already exist");
+        }
         return lessonTimeRepository.save(lessonTime);
     }
 
     public List<LessonTime> readAll() {
         logger.debug("reading all lessonTimes");
-        List<LessonTime> lessonTimes = new ArrayList<>();
-        lessonTimeRepository.findAll().forEach(lessonTimes::add);
-        lessonTimes.sort(Comparator.comparing(LessonTime::getTimeId));
-        return lessonTimes;
+        return lessonTimeRepository.findByOrderByTimeIdAsc();
     }
 
     public LessonTime readByID(Integer lessonTimeId) {
         logger.debug("reading lessonTime with ID: {}", lessonTimeId);
         Optional<LessonTime> lessonTimeOptional = lessonTimeRepository.findById(lessonTimeId);
-        LessonTime lessonTime = new LessonTime();
-        if (lessonTimeOptional.isPresent()) {
-            lessonTime = lessonTimeOptional.get();
+        if (!lessonTimeOptional.isPresent()) {
+            throw new EmptyResultDataAccessException("LessonTime not found", 1);
         }
-        return lessonTime;
+        return lessonTimeOptional.get();
     }
 
     public LessonTime update(Integer timeId, LocalDateTime lessonStart, LocalDateTime lessonEnd) {
         logger.debug("updating lessonTime with ID: {}, new lessonStart: {} and lessonEnd: {}",
                 timeId, lessonStart, lessonEnd);
+        if (!lessonTimeRepository.existsById(timeId)) {
+            throw new EmptyResultDataAccessException("LessonTime not found", 1);
+        }
         LessonTime lessonTime = new LessonTime();
         lessonTime.setTimeId(timeId);
         lessonTime.setLessonStart(lessonStart);
@@ -57,6 +58,9 @@ public class LessonTimeService {
 
     public void delete(Integer timeId) {
         logger.debug("deleting lessonTime with ID: {}", timeId);
+        if (!lessonTimeRepository.existsById(timeId)) {
+            throw new EmptyResultDataAccessException("LessonTime not found", 1);
+        }
         lessonTimeRepository.deleteById(timeId);
     }
 }

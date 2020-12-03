@@ -6,9 +6,9 @@ import com.foxminded.university.repositories.ProfessorRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -29,25 +29,24 @@ public class ProfessorService {
 
     public List<Professor> readAll() {
         logger.debug("reading all professors");
-        List<Professor> professors = new ArrayList<>();
-        professorRepository.findAll().forEach(professors::add);
-        professors.sort(Comparator.comparing(Professor::getProfessorId));
-        return professors;
+        return professorRepository.findByOrderByProfessorIdAsc();
     }
 
     public Professor readById(Integer professorId) {
         logger.debug("reading professor with ID: {}", professorId);
         Optional<Professor> professorOptional = professorRepository.findById(professorId);
-        Professor professor = new Professor();
-        if (professorOptional.isPresent()) {
-            professor = professorOptional.get();
+        if (!professorOptional.isPresent()) {
+            throw new EmptyResultDataAccessException("Professor not found", 1);
         }
-        return professor;
+        return professorOptional.get();
     }
 
     public Professor update(Integer professorId, String firstName, String lastName) {
         logger.debug("updating professor with ID: {}, new firstName: {} and lastName: {}",
                 professorId, firstName, lastName);
+        if (!professorRepository.existsById(professorId)) {
+            throw new EmptyResultDataAccessException("Professor not found", 1);
+        }
         Professor professor = new Professor();
         professor.setProfessorId(professorId);
         professor.setFirstName(firstName);
@@ -57,16 +56,19 @@ public class ProfessorService {
 
     public void delete(Integer professorId) {
         logger.debug("deleting professor with ID: {}", professorId);
+        if (!professorRepository.existsById(professorId)) {
+            throw new EmptyResultDataAccessException("Professor not found", 1);
+        }
         professorRepository.deleteById(professorId);
     }
 
     public List<Course> findCoursesByProfessor(Integer professorId) {
         logger.debug("finding courses by professor with ID: {}", professorId);
         Optional<Professor> professorOptional = professorRepository.findById(professorId);
-        List<Course> courses = new ArrayList<>();
-        if (professorOptional.isPresent()) {
-            courses = professorOptional.get().getCourses();
+        if (!professorOptional.isPresent()) {
+            throw new EmptyResultDataAccessException("Professor not found", 1);
         }
+        List<Course> courses = professorOptional.get().getCourses();
         courses.sort(Comparator.comparing(Course::getCourseId));
         return courses;
     }

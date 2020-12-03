@@ -48,7 +48,8 @@ public class ClassRoomsController {
     }
 
     @PostMapping("/updateClassRoom/{id}")
-    public String update(@ModelAttribute("classRoom") ClassRoom classRoom, @PathVariable("id") Integer roomId) {
+    public String update(@ModelAttribute("classRoom") ClassRoom classRoom,
+                         @PathVariable("id") Integer roomId) {
         logger.debug("updating classRoom with ID: {}", roomId);
         classRoomService.update(roomId, classRoom.getRoomNumber());
         return "redirect:/classRooms";
