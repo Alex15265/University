@@ -1,8 +1,8 @@
 package com.foxminded.university.entities;
 
 import lombok.Data;
-
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
 import java.util.List;
 
 @Data
@@ -14,8 +14,10 @@ public class Student {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer studentId;
     @Column(name = "first_name")
+    @NotEmpty(message = "This field cannot be empty")
     private String firstName;
     @Column(name = "last_name")
+    @NotEmpty(message = "This field cannot be empty")
     private String lastName;
     @ManyToOne(fetch=FetchType.EAGER)
     @JoinColumn(name="group_id")

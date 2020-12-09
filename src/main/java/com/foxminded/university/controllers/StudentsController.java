@@ -7,10 +7,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+
+import javax.validation.Valid;
 
 @Controller
 @RequiredArgsConstructor
@@ -34,8 +37,11 @@ public class StudentsController {
     }
 
     @PostMapping("/saveStudent")
-    public String saveStudent(@ModelAttribute("student") Student student) {
+    public String saveStudent(@ModelAttribute("student") @Valid Student student, Errors errors) {
         logger.debug("saving new student: {}", student);
+        if (errors.hasErrors()) {
+            return "views/students/new_student";
+        }
         studentService.create(student.getFirstName(), student.getLastName(), student.getGroup().getGroupId());
         return "redirect:/students";
     }

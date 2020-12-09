@@ -7,10 +7,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+
+import javax.validation.Valid;
 
 @Controller
 @RequiredArgsConstructor
@@ -41,8 +44,11 @@ public class GroupsController {
     }
 
     @PostMapping("/saveGroup")
-    public String saveGroup(@ModelAttribute("group") Group group) {
+    public String saveGroup(@ModelAttribute("group") @Valid Group group, Errors errors) {
         logger.debug("saving new group: {}", group);
+        if (errors.hasErrors()) {
+            return "views/groups/new_group";
+        }
         groupService.create(group.getGroupName());
         return "redirect:/groups";
     }

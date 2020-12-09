@@ -1,5 +1,7 @@
 # University
 
+This app is a tutorial Foxminded project and contains the following tasks:
+
 [Task 9] - Decompose university
     
     Analyze and decompose University (create UML class diagram for application).
@@ -51,3 +53,15 @@
     the Service layer should use and depend on the JPA interfaces, 
     not the Hibernate ones.
    
+[Task 18] - Spring Boot
+   
+    Convert application to Spring Boot. 
+    
+[Task 19] - Spring Data JPA
+    
+    Rewrite the DAO layer. Use Spring Data JPA instead of Hibernate.
+    
+[Task 20] - Validation
+
+    Add validation to your models. It could be name validation, time validation, number of students 
+    in groups, etc. Ask your mentor for validations that should be implemented in your code.
