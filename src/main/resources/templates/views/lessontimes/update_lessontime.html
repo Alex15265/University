@@ -7,14 +7,16 @@
           href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
 </head>
 <body>
-<div class="container">
+<div class="container mt-4">
     <h1>Update LessonTime</h1>
     <hr>
     <form action="#" th:action="@{/updateLessonTime/{id}(id=${lessonTime.timeId})}" th:object="${lessonTime}"
           method="POST">
         <input type="hidden" th:field="*{timeId}" />
-        <input type="text" th:field="*{lessonStart}" class="form-control mb-4 col-4">
-        <input type="text" th:field="*{lessonEnd}" class="form-control mb-4 col-4">
+        <input type="text" th:field="*{lessonStart}" pattern="[0-9]{2}.[0-9]{2}.[0-9]{2} [0-9]{1,2}:[0-9]{2}"
+               class="form-control mb-4 col-4">
+        <input type="text" th:field="*{lessonEnd}" pattern="[0-9]{2}.[0-9]{2}.[0-9]{2} [0-9]{1,2}:[0-9]{2}"
+               class="form-control mb-4 col-4">
         <button type="submit" class="btn btn-outline-info col-2"> Update LessonTime</button>
     </form>
     <hr>

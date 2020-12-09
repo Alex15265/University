@@ -9,18 +9,18 @@
           crossorigin="anonymous">
 </head>
 <body>
-<div class="container">
+<div class="container mt-4">
     <h1>New Lesson</h1>
     <hr>
     <form action="#" th:action="@{/saveLesson}" th:object="${lesson}"
           method="POST">
-        <input type="text" th:field="*{professor.professorId}"
+        <input type="number" th:field="*{professor.professorId}"
                placeholder="ProfessorID" class="form-control mb-4 col-4">
-        <input type="text" th:field="*{course.courseId}"
+        <input type="number" th:field="*{course.courseId}"
                placeholder="CourseID" class="form-control mb-4 col-4">
-        <input type="text" th:field="*{classRoom.roomId}"
+        <input type="number" th:field="*{classRoom.roomId}"
                placeholder="ClassRoomID" class="form-control mb-4 col-4">
-        <input type="text" th:field="*{time.timeId}"
+        <input type="number" th:field="*{time.timeId}"
                placeholder="LessonTimeID" class="form-control mb-4 col-4">
         <button type="submit" class="btn btn-outline-info col-2"> Save Lesson</button>
     </form>

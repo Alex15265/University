@@ -3,6 +3,7 @@ package com.foxminded.university.entities;
 import lombok.Data;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
 import java.util.List;
 
 @Data
@@ -14,6 +15,7 @@ public class Group {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer groupId;
     @Column(name = "group_name")
+    @NotEmpty(message = "This field cannot be empty")
     private String groupName;
     @OneToMany(mappedBy = "group", fetch = FetchType.LAZY, cascade= {CascadeType.REMOVE})
     private List<Student> students;

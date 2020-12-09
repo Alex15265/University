@@ -7,10 +7,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+
+import javax.validation.Valid;
 
 @Controller
 @RequiredArgsConstructor
@@ -34,8 +37,11 @@ public class ClassRoomsController {
     }
 
     @PostMapping("/saveClassRoom")
-    public String saveClassRoom(@ModelAttribute("classRoom") ClassRoom classRoom) {
-        logger.debug("saving new classRoom: {}", classRoom);
+    public String saveClassRoom(@ModelAttribute("classroom") @Valid ClassRoom classRoom, Errors errors) {
+        logger.debug("saving new classroom: {}", classRoom);
+        if (errors.hasErrors()) {
+            return "views/classrooms/new_classroom";
+        }
         classRoomService.create(classRoom.getRoomNumber());
         return "redirect:/classRooms";
     }
@@ -48,8 +54,7 @@ public class ClassRoomsController {
     }
 
     @PostMapping("/updateClassRoom/{id}")
-    public String update(@ModelAttribute("classRoom") ClassRoom classRoom,
-                         @PathVariable("id") Integer roomId) {
+    public String update(@ModelAttribute("classroom") ClassRoom classRoom, @PathVariable("id") Integer roomId) {
         logger.debug("updating classRoom with ID: {}", roomId);
         classRoomService.update(roomId, classRoom.getRoomNumber());
         return "redirect:/classRooms";

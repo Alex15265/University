@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
-import java.rmi.NoSuchObjectException;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,7 +27,7 @@ public class StudentService {
         student.setLastName(lastName);
         Optional<Group> groupOptional = groupRepository.findById(groupId);
         if (!groupOptional.isPresent()) {
-            throw new EmptyResultDataAccessException("Student not found", 1);
+            throw new EmptyResultDataAccessException("Group not found", 1);
         }
         student.setGroup(groupOptional.get());
         return studentRepository.save(student);
