@@ -5,10 +5,7 @@ import com.foxminded.university.service.ClassRoomService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -30,19 +27,19 @@ public class ClassRoomsRestController {
         return classRoomService.readByID(roomId);
     }
 
-    @GetMapping("/api/saveClassRoom")
+    @PostMapping("/api/classRooms")
     public ClassRoom saveClassRoom(@RequestParam Integer roomNumber) {
         logger.debug("saving new classroom with roomNumber: {}", roomNumber);
         return classRoomService.create(roomNumber);
     }
 
-    @GetMapping("/api/updateClassRoom/{id}")
+    @PatchMapping("/api/classRooms/{id}")
     public ClassRoom update(@RequestParam Integer roomNumber, @PathVariable("id") Integer roomId) {
         logger.debug("updating classRoom with ID: {}", roomId);
         return classRoomService.update(roomId, roomNumber);
     }
 
-    @GetMapping("/api/deleteClassRoom/{id}")
+    @DeleteMapping("/api/classRooms/{id}")
     public void deleteClassRoom(@PathVariable("id") Integer roomId) {
         logger.debug("deleting classRoom with ID: {}", roomId);
         classRoomService.delete(roomId);

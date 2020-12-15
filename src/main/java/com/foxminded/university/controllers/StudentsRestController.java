@@ -27,21 +27,21 @@ public class StudentsRestController {
         return studentService.readByID(studentId);
     }
 
-    @GetMapping("/api/saveStudent")
+    @PostMapping("/api/students")
     public Student saveStudent(@RequestParam String firstName, @RequestParam String lastName,
                                @RequestParam Integer groupId) {
         logger.debug("saving new student with firstName: {}, lastName: {}, groupID: {}", firstName, lastName, groupId);
         return studentService.create(firstName, lastName, groupId);
     }
 
-    @GetMapping("/api/updateStudent/{id}")
+    @PatchMapping("/api/students/{id}")
     public Student update(@RequestParam String firstName, @RequestParam String lastName,
                          @RequestParam Integer groupId, @PathVariable("id") Integer studentId) {
         logger.debug("updating student with ID: {}", studentId);
         return studentService.update(studentId, firstName, lastName, groupId);
     }
 
-    @GetMapping("/api/deleteStudent/{id}")
+    @DeleteMapping("/api/students/{id}")
     public void deleteStudent(@PathVariable("id") Integer studentId) {
         logger.debug("deleting student with ID: {}", studentId);
         studentService.delete(studentId);

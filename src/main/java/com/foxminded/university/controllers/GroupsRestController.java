@@ -6,10 +6,7 @@ import com.foxminded.university.service.GroupService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -31,25 +28,25 @@ public class GroupsRestController {
         return groupService.readById(groupId);
     }
 
-    @GetMapping("/api/studentsByGroup/{id}")
+    @GetMapping("/api/groups/{id}/students")
     public List<Student> showStudentsByGroup(@PathVariable("id") Integer groupId) {
         logger.debug("showing students by group with ID: {}", groupId);
         return groupService.findStudentsByGroup(groupId);
     }
 
-    @GetMapping("/api/saveGroup")
+    @PostMapping("/api/groups")
     public Group saveGroup(@RequestParam String groupName) {
         logger.debug("saving new group with groupName: {}", groupName);
         return groupService.create(groupName);
     }
 
-    @GetMapping("/api/updateGroup/{id}")
+    @PatchMapping("/api/groups/{id}")
     public Group update(@RequestParam String groupName, @PathVariable("id") Integer groupId) {
         logger.debug("updating group with ID: {}", groupId);
         return groupService.update(groupId, groupName);
     }
 
-    @GetMapping("/api/deleteGroup/{id}")
+    @DeleteMapping("/api/groups/{id}")
     public void deleteGroup(@PathVariable("id") Integer groupId) {
         logger.debug("deleting group with ID: {}", groupId);
         groupService.delete(groupId);

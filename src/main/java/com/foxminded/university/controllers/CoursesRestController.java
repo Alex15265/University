@@ -7,10 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -32,13 +29,13 @@ public class CoursesRestController {
         return courseService.readByID(courseId);
     }
 
-    @GetMapping("/api/studentsByCourse/{id}")
+    @GetMapping("/api/courses/{id}/students")
     public List<Student> showStudentsByCourse(@PathVariable("id") Integer courseId) {
         logger.debug("showing students by course with ID: {}", courseId);
         return courseService.findStudentsByCourse(courseId);
     }
 
-    @GetMapping("/api/saveCourse")
+    @PostMapping("/api/courses")
     public Course saveCourse(@RequestParam String courseName, @RequestParam String courseDescription,
                              @RequestParam Integer professorId) {
         logger.debug("saving new course with courseName: {}, courseDescription: {}, professorId: {}", courseName,
@@ -46,26 +43,26 @@ public class CoursesRestController {
         return courseService.create(courseName, courseDescription, professorId);
     }
 
-    @GetMapping("/api/updateCourse/{id}")
+    @PatchMapping("/api/courses/{id}")
     public Course update(@RequestParam String courseName, @RequestParam String courseDescription,
                          @RequestParam Integer professorId, @PathVariable("id") Integer courseId) {
         logger.debug("updating course with ID: {}", courseId);
         return courseService.update(courseId, courseName, courseDescription, professorId);
     }
 
-    @GetMapping("/api/deleteCourse/{id}")
+    @DeleteMapping("/api/courses/{id}")
     public void deleteCourse(@PathVariable("id") Integer courseId) {
         logger.debug("deleting course with ID: {}", courseId);
         courseService.delete(courseId);
     }
 
-    @GetMapping("/api/addStudentToCourse/{id}")
+    @PostMapping("/api/courses/{id}/students")
     public void addStudent(@RequestParam Integer studentId, @PathVariable("id") Integer courseId) {
         logger.debug("adding student with ID: {} to course with ID: {}", studentId, courseId);
         courseService.addStudentToCourse(studentId, courseId);
     }
 
-    @GetMapping("/api/deleteStudentFromCourse/{id}")
+    @DeleteMapping("/api/courses/{id}/students")
     public void deleteStudent(@RequestParam Integer studentId, @PathVariable("id") Integer courseId) {
         logger.debug("adding student with ID: {} to course with ID: {}", studentId, courseId);
         courseService.deleteStudentFromCourse(studentId, courseId);

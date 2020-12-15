@@ -18,7 +18,7 @@ public class TimetablesRestController {
     private final Logger logger = LoggerFactory.getLogger(TimetablesRestController.class);
     private final TimetableService timetableService;
 
-    @GetMapping("/api/findByProfessor")
+    @GetMapping("/api/professorTimetable")
     public List<Lesson> findByProfessor(@RequestParam Integer professorId, @RequestParam String startTime,
                                         @RequestParam String endTime) {
         logger.debug("showing lessons by professor with ID: {}", professorId);
@@ -26,7 +26,7 @@ public class TimetablesRestController {
                 LocalDateTime.parse(startTime), LocalDateTime.parse(endTime)).getListOfLessons();
     }
 
-    @GetMapping("/api/findByGroup")
+    @GetMapping("/api/groupTimetable")
     public List<Lesson> findByGroup(@RequestParam Integer groupId, @RequestParam String startTime,
                                         @RequestParam String endTime) {
         logger.debug("showing lessons by group with ID: {}", groupId);
