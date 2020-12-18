@@ -1,14 +1,21 @@
 package com.foxminded.university.controllers;
 
+import com.foxminded.university.dto.courses.CourseDTOResponse;
+import com.foxminded.university.dto.professor.ProfessorDTORequest;
+import com.foxminded.university.dto.professor.ProfessorDTOResponse;
 import com.foxminded.university.entities.Course;
 import com.foxminded.university.entities.Professor;
+import com.foxminded.university.mappers.CourseMapper;
+import com.foxminded.university.mappers.ProfessorMapper;
 import com.foxminded.university.service.ProfessorService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -17,34 +24,43 @@ public class ProfessorsRestController {
     private final ProfessorService professorService;
 
     @GetMapping("/api/professors")
-    public List<Professor> showProfessors() {
+    public List<ProfessorDTOResponse> showProfessors() {
         logger.debug("showing all professors");
-        return professorService.readAll();
+        List<Professor> professors = professorService.readAll();
+        return professors.stream().map(ProfessorMapper.INSTANCE::professorToProfessorDTOResponse)
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/api/professors/{id}")
-    public Professor showProfessor(@PathVariable("id") Integer professorId) {
+    public ProfessorDTOResponse showProfessor(@PathVariable("id") Integer professorId) {
         logger.debug("showing professor with ID: {}", professorId);
-        return professorService.readById(professorId);
+        Professor professor = professorService.readById(professorId);
+        return ProfessorMapper.INSTANCE.professorToProfessorDTOResponse(professor);
     }
 
     @GetMapping("/api/professors/{id}/courses")
-    public List<Course> showCoursesByProfessor(@PathVariable("id") Integer professorId) {
+    public List<CourseDTOResponse> showCoursesByProfessor(@PathVariable("id") Integer professorId) {
         logger.debug("showing courses by professor with ID: {}", professorId);
-        return professorService.findCoursesByProfessor(professorId);
+        List<Course> courses = professorService.findCoursesByProfessor(professorId);
+        return courses.stream().map(CourseMapper.INSTANCE::courseToCourseDTOResponse)
+                .collect(Collectors.toList());
     }
 
     @PostMapping("/api/professors")
-    public Professor saveProfessor(@RequestParam String firstName, @RequestParam String lastName) {
-        logger.debug("saving new professor with firstName: {}, lastName: {}", firstName, lastName);
-        return professorService.create(firstName, lastName);
+    public ProfessorDTOResponse saveProfessor(@Valid @RequestBody ProfessorDTORequest professorDTORequest) {
+        logger.debug("saving new professor: {}", professorDTORequest);
+        Professor professor = professorService.create(professorDTORequest.getFirstName(),
+                professorDTORequest.getLastName());
+        return ProfessorMapper.INSTANCE.professorToProfessorDTOResponse(professor);
     }
 
     @PatchMapping("/api/professors/{id}")
-    public Professor update(@RequestParam String firstName, @RequestParam String lastName,
+    public ProfessorDTOResponse update(@Valid @RequestBody ProfessorDTORequest professorDTORequest,
                           @PathVariable("id") Integer professorId) {
         logger.debug("updating professor with ID: {}", professorId);
-        return professorService.update(professorId, firstName, lastName);
+        Professor professor = professorService.update(professorId, professorDTORequest.getFirstName(),
+                professorDTORequest.getLastName());
+        return ProfessorMapper.INSTANCE.professorToProfessorDTOResponse(professor);
     }
 
     @DeleteMapping("/api/professors/{id}")

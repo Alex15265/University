@@ -1,13 +1,18 @@
 package com.foxminded.university.controllers;
 
+import com.foxminded.university.dto.lesson.LessonDTORequest;
+import com.foxminded.university.dto.lesson.LessonDTOResponse;
 import com.foxminded.university.entities.Lesson;
+import com.foxminded.university.mappers.LessonMapper;
 import com.foxminded.university.service.LessonService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -16,30 +21,33 @@ public class LessonsRestController {
     private final LessonService lessonService;
 
     @GetMapping("/api/lessons")
-    public List<Lesson> showLessons() {
+    public List<LessonDTOResponse> showLessons() {
         logger.debug("showing all lessons");
-        return lessonService.readAll();
+        List<Lesson> lessons = lessonService.readAll();
+        return lessons.stream().map(LessonMapper.INSTANCE::lessonToLessonDTOResponse).collect(Collectors.toList());
     }
 
     @GetMapping("/api/lessons/{id}")
-    public Lesson showLesson(@PathVariable("id") Integer lessonId) {
+    public LessonDTOResponse showLesson(@PathVariable("id") Integer lessonId) {
         logger.debug("showing lesson with ID: {}", lessonId);
-        return lessonService.readById(lessonId);
+        Lesson lesson = lessonService.readById(lessonId);
+        return LessonMapper.INSTANCE.lessonToLessonDTOResponse(lesson);
     }
 
     @PostMapping("/api/lessons")
-    public Lesson saveLesson(@RequestParam Integer professorId, @RequestParam Integer courseId,
-                             @RequestParam Integer roomId, @RequestParam Integer timeId) {
-        logger.debug("saving new lesson with professorId: {}, courseId: {}, roomId: {}, timeId: {}",
-                professorId, courseId, roomId, timeId);
-        return lessonService.create(professorId, courseId, roomId, timeId);
+    public LessonDTOResponse saveLesson(@Valid @RequestBody LessonDTORequest lessonDTORequest) {
+        logger.debug("saving new lesson: {}", lessonDTORequest);
+        Lesson lesson = lessonService.create(lessonDTORequest.getProfessorId(), lessonDTORequest.getCourseId(),
+                lessonDTORequest.getRoomId(), lessonDTORequest.getTimeId());
+        return LessonMapper.INSTANCE.lessonToLessonDTOResponse(lesson);
     }
 
     @PatchMapping("/api/lessons/{id}")
-    public Lesson update(@RequestParam Integer professorId, @RequestParam Integer courseId, @RequestParam Integer roomId,
-                         @RequestParam Integer timeId, @PathVariable("id") Integer lessonId) {
+    public LessonDTOResponse update(@Valid @RequestBody LessonDTORequest lessonDTORequest, @PathVariable("id") Integer lessonId) {
         logger.debug("updating lesson with ID: {}", lessonId);
-        return lessonService.update(lessonId, professorId, courseId, roomId, timeId);
+        Lesson lesson = lessonService.update(lessonId, lessonDTORequest.getProfessorId(), lessonDTORequest.getCourseId(),
+                lessonDTORequest.getRoomId(), lessonDTORequest.getTimeId());
+        return LessonMapper.INSTANCE.lessonToLessonDTOResponse(lesson);
     }
 
     @DeleteMapping("/api/lessons/{id}")

@@ -1,13 +1,18 @@
 package com.foxminded.university.controllers;
 
+import com.foxminded.university.dto.classRoom.ClassRoomDTORequest;
+import com.foxminded.university.dto.classRoom.ClassRoomDTOResponse;
 import com.foxminded.university.entities.ClassRoom;
+import com.foxminded.university.mappers.ClassRoomMapper;
 import com.foxminded.university.service.ClassRoomService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -16,27 +21,33 @@ public class ClassRoomsRestController {
     private final ClassRoomService classRoomService;
 
     @GetMapping("/api/classRooms")
-    public List<ClassRoom> showClassRooms() {
+    public List<ClassRoomDTOResponse> showClassRooms() {
         logger.debug("showing all classrooms");
-        return classRoomService.readAll();
+        List<ClassRoom> classRooms = classRoomService.readAll();
+        return classRooms.stream().map(ClassRoomMapper.INSTANCE::classRoomToClassRoomDTOResponse)
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/api/classRooms/{id}")
-    public ClassRoom showCourse(@PathVariable("id") Integer roomId) {
+    public ClassRoomDTOResponse showCourse(@PathVariable("id") Integer roomId) {
         logger.debug("showing classRoom with ID: {}", roomId);
-        return classRoomService.readByID(roomId);
+        ClassRoom classRoom = classRoomService.readByID(roomId);
+        return ClassRoomMapper.INSTANCE.classRoomToClassRoomDTOResponse(classRoom);
     }
 
     @PostMapping("/api/classRooms")
-    public ClassRoom saveClassRoom(@RequestParam Integer roomNumber) {
-        logger.debug("saving new classroom with roomNumber: {}", roomNumber);
-        return classRoomService.create(roomNumber);
+    public ClassRoomDTOResponse saveClassRoom(@Valid @RequestBody ClassRoomDTORequest classRoomDTORequest) {
+        logger.debug("saving new classroom: {}", classRoomDTORequest);
+        ClassRoom classRoom = classRoomService.create(classRoomDTORequest.getRoomNumber());
+        return ClassRoomMapper.INSTANCE.classRoomToClassRoomDTOResponse(classRoom);
     }
 
     @PatchMapping("/api/classRooms/{id}")
-    public ClassRoom update(@RequestParam Integer roomNumber, @PathVariable("id") Integer roomId) {
+    public ClassRoomDTOResponse update(@Valid @RequestBody ClassRoomDTORequest classRoomDTORequest,
+                            @PathVariable("id") Integer roomId) {
         logger.debug("updating classRoom with ID: {}", roomId);
-        return classRoomService.update(roomId, roomNumber);
+        ClassRoom classRoom = classRoomService.update(roomId, classRoomDTORequest.getRoomNumber());
+        return ClassRoomMapper.INSTANCE.classRoomToClassRoomDTOResponse(classRoom);
     }
 
     @DeleteMapping("/api/classRooms/{id}")

@@ -1,13 +1,18 @@
 package com.foxminded.university.controllers;
 
+import com.foxminded.university.dto.student.StudentDTORequest;
+import com.foxminded.university.dto.student.StudentDTOResponse;
 import com.foxminded.university.entities.Student;
+import com.foxminded.university.mappers.StudentMapper;
 import com.foxminded.university.service.StudentService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -16,29 +21,34 @@ public class StudentsRestController {
     private final StudentService studentService;
 
     @GetMapping("/api/students")
-    public List<Student> showStudents() {
+    public List<StudentDTOResponse> showStudents() {
         logger.debug("showing all students");
-        return studentService.readAll();
+        List<Student> students = studentService.readAll();
+        return students.stream().map(StudentMapper.INSTANCE::studentToStudentDTOResponse).collect(Collectors.toList());
     }
 
     @GetMapping("/api/students/{id}")
-    public Student showStudent(@PathVariable("id") Integer studentId) {
+    public StudentDTOResponse showStudent(@PathVariable("id") Integer studentId) {
         logger.debug("showing student with ID: {}", studentId);
-        return studentService.readByID(studentId);
+        Student student = studentService.readByID(studentId);
+        return StudentMapper.INSTANCE.studentToStudentDTOResponse(student);
     }
 
     @PostMapping("/api/students")
-    public Student saveStudent(@RequestParam String firstName, @RequestParam String lastName,
-                               @RequestParam Integer groupId) {
-        logger.debug("saving new student with firstName: {}, lastName: {}, groupID: {}", firstName, lastName, groupId);
-        return studentService.create(firstName, lastName, groupId);
+    public StudentDTOResponse saveStudent(@Valid @RequestBody StudentDTORequest studentDTORequest) {
+        logger.debug("saving new student: {}", studentDTORequest);
+        Student student = studentService.create(studentDTORequest.getFirstName(), studentDTORequest.getLastName(),
+                studentDTORequest.getGroupId());
+        return StudentMapper.INSTANCE.studentToStudentDTOResponse(student);
     }
 
     @PatchMapping("/api/students/{id}")
-    public Student update(@RequestParam String firstName, @RequestParam String lastName,
-                         @RequestParam Integer groupId, @PathVariable("id") Integer studentId) {
-        logger.debug("updating student with ID: {}", studentId);
-        return studentService.update(studentId, firstName, lastName, groupId);
+    public StudentDTOResponse update(@Valid @RequestBody StudentDTORequest studentDTORequest,
+                                     @PathVariable("id") Integer studentId) {
+        logger.debug("updating student: {}", studentDTORequest);
+        Student student = studentService.update(studentId, studentDTORequest.getFirstName(),
+                studentDTORequest.getLastName(), studentDTORequest.getGroupId());
+        return StudentMapper.INSTANCE.studentToStudentDTOResponse(student);
     }
 
     @DeleteMapping("/api/students/{id}")
