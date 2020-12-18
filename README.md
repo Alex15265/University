@@ -65,3 +65,7 @@ This app is a tutorial Foxminded project and contains the following tasks:
 
     Add validation to your models. It could be name validation, time validation, number of students 
     in groups, etc. Ask your mentor for validations that should be implemented in your code.
+    
+[Task 21] - REST
+
+    Add REST Endpoints to your project. All UI functionality should be available in the REST endpoints.

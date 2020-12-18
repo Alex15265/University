@@ -1,8 +1,9 @@
 package com.foxminded.university.entities;
 
 import lombok.Data;
+
 import javax.persistence.*;
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.List;
 
@@ -15,7 +16,7 @@ public class Course {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer courseId;
     @Column(name = "course_name")
-    @NotEmpty(message = "This field cannot be empty")
+    @NotBlank(message = "This field cannot be empty")
     private String courseName;
     @Column(name = "course_description")
     @Size(min=10, max = 400, message = "Field size must be between 10 and 400")
