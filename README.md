@@ -69,3 +69,7 @@ This app is a tutorial Foxminded project and contains the following tasks:
 [Task 21] - REST
 
     Add REST Endpoints to your project. All UI functionality should be available in the REST endpoints.
+    
+[Task 22] - Swagger
+    
+    Add Swagger documentation to your project. You can use 2 or 3 versions or ask your mentor.
