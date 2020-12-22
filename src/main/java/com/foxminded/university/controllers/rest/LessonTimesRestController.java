@@ -1,10 +1,12 @@
-package com.foxminded.university.controllers;
+package com.foxminded.university.controllers.rest;
 
 import com.foxminded.university.dto.lessonTime.LessonTimeDTORequest;
 import com.foxminded.university.dto.lessonTime.LessonTimeDTOResponse;
 import com.foxminded.university.entities.LessonTime;
 import com.foxminded.university.mappers.LessonTimeMapper;
 import com.foxminded.university.service.LessonTimeService;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,12 +20,14 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/lessontimes")
 public class LessonTimesRestController {
     private final Logger logger = LoggerFactory.getLogger(LessonTimesRestController.class);
     private final LessonTimeService lessonTimeService;
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yy HH:mm");
 
-    @GetMapping("/api/lessonTimes")
+    @GetMapping("/")
+    @ApiOperation(value = "Method used to fetch all lessontimes")
     public List<LessonTimeDTOResponse> showLessonTimes() {
         logger.debug("showing all lessonTimes");
         List<LessonTime> lessonTimes = lessonTimeService.readAll();
@@ -31,15 +35,21 @@ public class LessonTimesRestController {
                 .collect(Collectors.toList());
     }
 
-    @GetMapping("/api/lessonTimes/{id}")
-    public LessonTimeDTOResponse showLessonTime(@PathVariable("id") Integer timeId) {
+    @GetMapping("/{id}")
+    @ApiOperation(value = "Method used to fetch a lessontime by ID")
+    public LessonTimeDTOResponse showLessonTimeByID(
+            @ApiParam(value = "ID value of the lessontime you need to retrieve", required = true)
+            @PathVariable("id") Integer timeId) {
         logger.debug("showing lessonTime with ID: {}", timeId);
         LessonTime lessonTime = lessonTimeService.readByID(timeId);
         return LessonTimeMapper.INSTANCE.lessonTimeToLessonTimeDTOResponse(lessonTime);
     }
 
-    @PostMapping("/api/lessonTimes")
-    public LessonTimeDTOResponse saveLessonTime(@Valid @RequestBody LessonTimeDTORequest lessonTimeDTORequest) {
+    @PostMapping("/")
+    @ApiOperation(value = "Method used to save a new lessontime")
+    public LessonTimeDTOResponse saveLessonTime(
+            @ApiParam(value = "lessontimeDTORequest for the lessontime you need to save", required = true)
+            @Valid @RequestBody LessonTimeDTORequest lessonTimeDTORequest) {
         logger.debug("saving new lessonTime: {}", lessonTimeDTORequest);
         LessonTime lessonTime =
                 lessonTimeService.create(LocalDateTime.parse(lessonTimeDTORequest.getLessonStart(), formatter),
@@ -47,9 +57,13 @@ public class LessonTimesRestController {
         return LessonTimeMapper.INSTANCE.lessonTimeToLessonTimeDTOResponse(lessonTime);
     }
 
-    @PatchMapping("/api/lessonTimes/{id}")
-    public LessonTimeDTOResponse update(@Valid @RequestBody LessonTimeDTORequest lessonTimeDTORequest,
-                             @PathVariable("id") Integer timeId) {
+    @PatchMapping("/{id}")
+    @ApiOperation(value = "Method used to update a lessontime by ID")
+    public LessonTimeDTOResponse updateLessonTime(
+            @ApiParam(value = "lessontimeDTORequest for the lessontime you need to update", required = true)
+            @Valid @RequestBody LessonTimeDTORequest lessonTimeDTORequest,
+            @ApiParam(value = "ID value of the lessontime you need to update", required = true)
+            @PathVariable("id") Integer timeId) {
         logger.debug("updating lessonTime with ID: {}", timeId);
         LessonTime lessonTime =
                 lessonTimeService.update(timeId, LocalDateTime.parse(lessonTimeDTORequest.getLessonStart(), formatter),
@@ -57,8 +71,11 @@ public class LessonTimesRestController {
         return LessonTimeMapper.INSTANCE.lessonTimeToLessonTimeDTOResponse(lessonTime);
     }
 
-    @DeleteMapping("/api/lessonTimes/{id}")
-    public void deleteLessonTime(@PathVariable("id") Integer timeId) {
+    @DeleteMapping("/{id}")
+    @ApiOperation(value = "Method used to delete a lessontime by ID")
+    public void deleteLessonTime(
+            @ApiParam(value = "ID value of the lessontime you need to delete", required = true)
+            @PathVariable("id") Integer timeId) {
         logger.debug("deleting lessonTime with ID: {}", timeId);
         lessonTimeService.delete(timeId);
     }
