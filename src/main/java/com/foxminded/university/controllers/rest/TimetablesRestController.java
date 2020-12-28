@@ -71,7 +71,7 @@ public class TimetablesRestController {
             @ApiParam(value = "The end time of lessons you need to retrieve")
                     String endTime) {
         logger.debug("showing lessons by group with ID: {}", groupId);
-        List<Lesson> lessons = timetableService.findByProfessor(
+        List<Lesson> lessons = timetableService.findByGroup(
                 groupId,
                 LocalDateTime.parse(startTime, formatter),
                 LocalDateTime.parse(endTime, formatter))
