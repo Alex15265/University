@@ -2,19 +2,19 @@ package com.foxminded.university.controllers.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.foxminded.university.dto.classRoom.ClassRoomDTORequest;
-import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import static org.hamcrest.Matchers.is;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -38,20 +38,20 @@ public class ClassRoomsRestControllerSystemTest {
     public void showAllClassRooms_shouldRetrieveAllClassRoomsFromDB() throws Exception {
         mockMvc.perform(get("/api/classrooms/"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.size()", Matchers.is(3)))
-                .andExpect(jsonPath("$[0].roomId", Matchers.is(1)))
-                .andExpect(jsonPath("$[0].roomNumber", Matchers.is(101)))
-                .andExpect(jsonPath("$[1].roomId", Matchers.is(2)))
-                .andExpect(jsonPath("$[1].roomNumber", Matchers.is(102)))
-                .andExpect(jsonPath("$[2].roomId", Matchers.is(3)))
-                .andExpect(jsonPath("$[2].roomNumber", Matchers.is(103)));
+                .andExpect(content().contentType(APPLICATION_JSON))
+                .andExpect(jsonPath("$.size()", is(3)))
+                .andExpect(jsonPath("$[0].roomId", is(1)))
+                .andExpect(jsonPath("$[0].roomNumber", is(101)))
+                .andExpect(jsonPath("$[1].roomId", is(2)))
+                .andExpect(jsonPath("$[1].roomNumber", is(102)))
+                .andExpect(jsonPath("$[2].roomId", is(3)))
+                .andExpect(jsonPath("$[2].roomNumber", is(103)));
     }
 
     @Test
     public void showClassRooms_shouldThrowExceptionOnBadRequest() throws Exception {
         mockMvc.perform(get("/api/classroo")
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(APPLICATION_JSON))
                 .andExpect(status().is4xxClientError());
     }
 
@@ -59,15 +59,15 @@ public class ClassRoomsRestControllerSystemTest {
     public void showClassRoomByID_shouldRetrieveClassRoomFromDBByID() throws Exception {
         mockMvc.perform(get("/api/classrooms/2"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.roomId", Matchers.is(2)))
-                .andExpect(jsonPath("$.roomNumber", Matchers.is(102)));
+                .andExpect(content().contentType(APPLICATION_JSON))
+                .andExpect(jsonPath("$.roomId", is(2)))
+                .andExpect(jsonPath("$.roomNumber", is(102)));
     }
 
     @Test
     public void showClassRoomByID_shouldThrowExceptionOnBadRequest() throws Exception {
         mockMvc.perform(get("/api/classrooms/{room_id}", "bad_request")
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
 
@@ -78,11 +78,11 @@ public class ClassRoomsRestControllerSystemTest {
 
         mockMvc.perform(post("/api/classrooms/")
                 .content(objectMapper.writeValueAsString(classRoomDTORequest))
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.roomId", Matchers.is(4)))
-                .andExpect(jsonPath("$.roomNumber", Matchers.is(777)));
+                .andExpect(content().contentType(APPLICATION_JSON))
+                .andExpect(jsonPath("$.roomId", is(4)))
+                .andExpect(jsonPath("$.roomNumber", is(777)));
     }
 
     @Test
@@ -92,7 +92,7 @@ public class ClassRoomsRestControllerSystemTest {
 
         mockMvc.perform(post("/api/classrooms/")
                 .content(objectMapper.writeValueAsString(classRoomDTORequest))
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(APPLICATION_JSON))
                 .andExpect(status().is4xxClientError());
     }
 
@@ -103,11 +103,11 @@ public class ClassRoomsRestControllerSystemTest {
 
         mockMvc.perform(patch("/api/classrooms/1")
                 .content(objectMapper.writeValueAsString(classRoomDTORequest))
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.roomId", Matchers.is(1)))
-                .andExpect(jsonPath("$.roomNumber", Matchers.is(777)));
+                .andExpect(content().contentType(APPLICATION_JSON))
+                .andExpect(jsonPath("$.roomId", is(1)))
+                .andExpect(jsonPath("$.roomNumber", is(777)));
     }
 
     @Test
@@ -117,7 +117,7 @@ public class ClassRoomsRestControllerSystemTest {
 
         mockMvc.perform(patch("/api/classrooms/2")
                 .content(objectMapper.writeValueAsString(classRoomDTORequest))
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(APPLICATION_JSON))
                 .andExpect(status().is4xxClientError());
     }
 
