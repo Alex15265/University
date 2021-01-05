@@ -6,6 +6,7 @@ import com.foxminded.university.service.CourseService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
@@ -23,6 +24,7 @@ public class CoursesController {
     private final CourseService courseService;
 
     @GetMapping("/courses")
+    @PreAuthorize("hasAuthority('read')")
     public String showCourses(Model model) {
         logger.debug("showing all courses");
         model.addAttribute("courses", courseService.readAll());
@@ -30,6 +32,7 @@ public class CoursesController {
     }
 
     @GetMapping("/studentsByCourse/{id}")
+    @PreAuthorize("hasAuthority('read')")
     public String showStudentsByCourse(@PathVariable("id") Integer courseId, Model model) {
         logger.debug("showing students by course with ID: {}", courseId);
         model.addAttribute("students", courseService.findStudentsByCourse(courseId));
@@ -37,6 +40,7 @@ public class CoursesController {
     }
 
     @GetMapping("/newCourseForm")
+    @PreAuthorize("hasAuthority('write')")
     public String showNewCourseForm(Model model) {
         logger.debug("showing new Course form");
         Course course = new Course();
@@ -45,6 +49,7 @@ public class CoursesController {
     }
 
     @PostMapping("/saveCourse")
+    @PreAuthorize("hasAuthority('write')")
     public String saveCourse(@ModelAttribute("course") @Valid Course course, Errors errors) {
         logger.debug("saving new course: {}", course);
         if (errors.hasErrors()) {
@@ -56,6 +61,7 @@ public class CoursesController {
     }
 
     @GetMapping("/updateCourseForm/{id}")
+    @PreAuthorize("hasAuthority('write')")
     public String showUpdateCourseForm(@PathVariable("id") Integer courseId, Model model) {
         logger.debug("showing update course form");
         model.addAttribute("course", courseService.readByID(courseId));
@@ -63,6 +69,7 @@ public class CoursesController {
     }
 
     @PostMapping("/updateCourse/{id}")
+    @PreAuthorize("hasAuthority('write')")
     public String update(@ModelAttribute("course") Course course, @PathVariable("id") Integer courseId) {
         logger.debug("updating course with ID: {}", courseId);
         courseService.update(courseId, course.getCourseName(), course.getDescription(),
@@ -71,6 +78,7 @@ public class CoursesController {
     }
 
     @GetMapping("/deleteCourse/{id}")
+    @PreAuthorize("hasAuthority('write')")
     public String deleteCourse(@PathVariable("id") Integer courseId) {
         logger.debug("deleting course with ID: {}", courseId);
         courseService.delete(courseId);
@@ -78,6 +86,7 @@ public class CoursesController {
     }
 
     @GetMapping("/editStudentForm/{id}")
+    @PreAuthorize("hasAuthority('write')")
     public String showEditStudentForm(@PathVariable("id") Integer courseId, Model model) {
         logger.debug("showing edit student form");
         model.addAttribute("course", courseService.readByID(courseId));
@@ -87,6 +96,7 @@ public class CoursesController {
     }
 
     @PostMapping("/addStudent/{id}")
+    @PreAuthorize("hasAuthority('write')")
     public String addStudent(@ModelAttribute("studentId") Integer studentId, @PathVariable("id") Integer courseId,
                            Model model) {
         logger.debug("adding student with ID: {} to course with ID: {}", studentId, courseId);
@@ -95,6 +105,7 @@ public class CoursesController {
     }
 
     @PostMapping("/deleteStudent/{id}")
+    @PreAuthorize("hasAuthority('write')")
     public String deleteStudent(@ModelAttribute("studentId") Integer studentId, @PathVariable("id") Integer courseId,
                               Model model) {
         logger.debug("deleting student with ID: {} from course with ID: {}", studentId, courseId);

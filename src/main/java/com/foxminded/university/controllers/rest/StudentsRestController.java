@@ -10,6 +10,7 @@ import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -24,6 +25,7 @@ public class StudentsRestController {
     private final StudentService studentService;
 
     @GetMapping("/")
+    @PreAuthorize("hasAuthority('read')")
     @ApiOperation(value = "Method used to fetch all students")
     public List<StudentDTOResponse> showAllStudents() {
         logger.debug("showing all students");
@@ -32,6 +34,7 @@ public class StudentsRestController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('read')")
     @ApiOperation(value = "Method used to fetch a student by ID")
     public StudentDTOResponse showStudentByID(
             @ApiParam(value = "ID value of the student you need to retrieve", required = true)
@@ -42,6 +45,7 @@ public class StudentsRestController {
     }
 
     @PostMapping("/")
+    @PreAuthorize("hasAuthority('write')")
     @ApiOperation(value = "Method used to save a new student")
     public StudentDTOResponse saveStudent(
             @ApiParam(value = "studentDTORequest for the student you need to save", required = true)
@@ -53,6 +57,7 @@ public class StudentsRestController {
     }
 
     @PatchMapping("/{id}")
+    @PreAuthorize("hasAuthority('write')")
     @ApiOperation(value = "Method used to update a student by ID")
     public StudentDTOResponse updateStudent(
             @ApiParam(value = "studentDTORequest for the student you need to update", required = true)
@@ -66,6 +71,7 @@ public class StudentsRestController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('write')")
     @ApiOperation(value = "Method used to delete a student by ID")
     public void deleteStudent(
             @ApiParam(value = "ID value of the student you need to delete", required = true)

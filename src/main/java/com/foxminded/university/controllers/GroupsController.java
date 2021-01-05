@@ -5,6 +5,7 @@ import com.foxminded.university.service.GroupService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
@@ -22,6 +23,7 @@ public class GroupsController {
     private final GroupService groupService;
 
     @GetMapping("/groups")
+    @PreAuthorize("hasAuthority('read')")
     public String showGroups(Model model) {
         logger.debug("showing all groups");
         model.addAttribute("groups", groupService.readAll());
@@ -29,6 +31,7 @@ public class GroupsController {
     }
 
     @GetMapping("/studentsByGroup/{id}")
+    @PreAuthorize("hasAuthority('read')")
     public String showStudentsByGroup(@PathVariable("id") Integer groupId, Model model) {
         logger.debug("showing students by group with ID: {}", groupId);
         model.addAttribute("students", groupService.findStudentsByGroup(groupId));
@@ -36,6 +39,7 @@ public class GroupsController {
     }
 
     @GetMapping("/newGroupForm")
+    @PreAuthorize("hasAuthority('write')")
     public String showNewGroupForm(Model model) {
         logger.debug("showing new group form");
         Group group = new Group();
@@ -44,6 +48,7 @@ public class GroupsController {
     }
 
     @PostMapping("/saveGroup")
+    @PreAuthorize("hasAuthority('write')")
     public String saveGroup(@ModelAttribute("group") @Valid Group group, Errors errors) {
         logger.debug("saving new group: {}", group);
         if (errors.hasErrors()) {
@@ -54,6 +59,7 @@ public class GroupsController {
     }
 
     @GetMapping("/updateGroupForm/{id}")
+    @PreAuthorize("hasAuthority('write')")
     public String showUpdateGroupForm(@PathVariable("id") Integer groupId, Model model) {
         logger.debug("showing update group form");
         model.addAttribute("group", groupService.readById(groupId));
@@ -61,6 +67,7 @@ public class GroupsController {
     }
 
     @PostMapping("/updateGroup/{id}")
+    @PreAuthorize("hasAuthority('write')")
     public String update(@ModelAttribute("group") Group group, @PathVariable("id") Integer groupId) {
         logger.debug("updating group with ID: {}", groupId);
         groupService.update(groupId, group.getGroupName());
@@ -68,6 +75,7 @@ public class GroupsController {
     }
 
     @GetMapping("/deleteGroup/{id}")
+    @PreAuthorize("hasAuthority('write')")
     public String deleteGroup(@PathVariable("id") Integer groupId) {
         logger.debug("deleting group with ID: {}", groupId);
         groupService.delete(groupId);

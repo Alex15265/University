@@ -10,6 +10,7 @@ import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -24,6 +25,7 @@ public class LessonsRestController {
     private final LessonService lessonService;
 
     @GetMapping("/")
+    @PreAuthorize("hasAuthority('read')")
     @ApiOperation(value = "Method used to fetch all lessons")
     public List<LessonDTOResponse> showAllLessons() {
         logger.debug("showing all lessons");
@@ -32,6 +34,7 @@ public class LessonsRestController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('read')")
     @ApiOperation(value = "Method used to fetch a lesson by ID")
     public LessonDTOResponse showLessonByID(
             @ApiParam(value = "ID value of the lesson you need to retrieve", required = true)
@@ -42,6 +45,7 @@ public class LessonsRestController {
     }
 
     @PostMapping("/")
+    @PreAuthorize("hasAuthority('write')")
     @ApiOperation(value = "Method used to save a new lesson")
     public LessonDTOResponse saveLesson(
             @ApiParam(value = "lessonDTORequest for the lesson you need to save", required = true)
@@ -53,6 +57,7 @@ public class LessonsRestController {
     }
 
     @PatchMapping("/{id}")
+    @PreAuthorize("hasAuthority('write')")
     @ApiOperation(value = "Method used to update a lesson by ID")
     public LessonDTOResponse updateLesson(
             @ApiParam(value = "lessonDTORequest for the lesson you need to update", required = true)
@@ -66,6 +71,7 @@ public class LessonsRestController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('write')")
     @ApiOperation(value = "Method used to delete a lesson by ID")
     public void deleteLesson(
             @ApiParam(value = "ID value of the lesson you need to delete", required = true)
@@ -75,6 +81,7 @@ public class LessonsRestController {
     }
 
     @PostMapping("/{id}/groups")
+    @PreAuthorize("hasAuthority('write')")
     @ApiOperation(value = "Method used to add a group to a lesson")
     public void addGroupToLesson(
             @ApiParam(value = "ID value of the group you need to add", required = true)
@@ -86,6 +93,7 @@ public class LessonsRestController {
     }
 
     @DeleteMapping("/{id}/groups")
+    @PreAuthorize("hasAuthority('write')")
     @ApiOperation(value = "Method used to delete a group from a lesson")
     public void deleteGroupFromLesson(
             @ApiParam(value = "ID value of the group you need to delete", required = true)

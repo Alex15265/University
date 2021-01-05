@@ -1,18 +1,16 @@
 package com.foxminded.university.controllers.rest;
 
 import com.foxminded.university.dto.lesson.LessonDTOResponse;
-import com.foxminded.university.dto.timetable.TimetableDTORequest;
 import com.foxminded.university.entities.Lesson;
 import com.foxminded.university.mappers.LessonMapper;
 import com.foxminded.university.service.TimetableService;
-import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
@@ -31,6 +29,7 @@ public class TimetablesRestController {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yy HH:mm");
 
     @GetMapping("/api/professorTimetable")
+    @PreAuthorize("hasAuthority('read')")
     @ApiOperation(value = "Method used to fetch a professor's timetable")
     public List<LessonDTOResponse> findTimetableForProfessor(
                 @Valid
@@ -56,6 +55,7 @@ public class TimetablesRestController {
     }
 
     @GetMapping("/api/groupTimetable")
+    @PreAuthorize("hasAuthority('read')")
     @ApiOperation(value = "Method used to fetch a group's timetable")
     public List<LessonDTOResponse> findTimetableForGroup(
             @Valid
