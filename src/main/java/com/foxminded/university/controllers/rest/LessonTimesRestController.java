@@ -10,6 +10,7 @@ import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -27,6 +28,7 @@ public class LessonTimesRestController {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yy HH:mm");
 
     @GetMapping("/")
+    @PreAuthorize("hasAuthority('read')")
     @ApiOperation(value = "Method used to fetch all lessontimes")
     public List<LessonTimeDTOResponse> showLessonTimes() {
         logger.debug("showing all lessonTimes");
@@ -36,6 +38,7 @@ public class LessonTimesRestController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('read')")
     @ApiOperation(value = "Method used to fetch a lessontime by ID")
     public LessonTimeDTOResponse showLessonTimeByID(
             @ApiParam(value = "ID value of the lessontime you need to retrieve", required = true)
@@ -46,6 +49,7 @@ public class LessonTimesRestController {
     }
 
     @PostMapping("/")
+    @PreAuthorize("hasAuthority('write')")
     @ApiOperation(value = "Method used to save a new lessontime")
     public LessonTimeDTOResponse saveLessonTime(
             @ApiParam(value = "lessontimeDTORequest for the lessontime you need to save", required = true)
@@ -58,6 +62,7 @@ public class LessonTimesRestController {
     }
 
     @PatchMapping("/{id}")
+    @PreAuthorize("hasAuthority('write')")
     @ApiOperation(value = "Method used to update a lessontime by ID")
     public LessonTimeDTOResponse updateLessonTime(
             @ApiParam(value = "lessontimeDTORequest for the lessontime you need to update", required = true)
@@ -72,6 +77,7 @@ public class LessonTimesRestController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('write')")
     @ApiOperation(value = "Method used to delete a lessontime by ID")
     public void deleteLessonTime(
             @ApiParam(value = "ID value of the lessontime you need to delete", required = true)

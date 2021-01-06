@@ -13,6 +13,7 @@ import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -27,6 +28,7 @@ public class ProfessorsRestController {
     private final ProfessorService professorService;
 
     @GetMapping("/")
+    @PreAuthorize("hasAuthority('read')")
     @ApiOperation(value = "Method used to fetch all professors")
     public List<ProfessorDTOResponse> showAllProfessors() {
         logger.debug("showing all professors");
@@ -36,6 +38,7 @@ public class ProfessorsRestController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('read')")
     @ApiOperation(value = "Method used to fetch a professor by ID")
     public ProfessorDTOResponse showProfessorByID(
             @ApiParam(value = "ID value of the professor you need to retrieve", required = true)
@@ -46,6 +49,7 @@ public class ProfessorsRestController {
     }
 
     @GetMapping("/{id}/courses")
+    @PreAuthorize("hasAuthority('read')")
     @ApiOperation(value = "Method used to show professor's courses")
     public List<CourseDTOResponse> showCoursesByProfessor(
             @ApiParam(value = "ID value of the professor whose courses you want to retrieve", required = true)
@@ -57,6 +61,7 @@ public class ProfessorsRestController {
     }
 
     @PostMapping("/")
+    @PreAuthorize("hasAuthority('write')")
     @ApiOperation(value = "Method used to save new professor")
     public ProfessorDTOResponse saveProfessor(
             @ApiParam(value = "professorDTORequest for the professor you need to save", required = true)
@@ -68,6 +73,7 @@ public class ProfessorsRestController {
     }
 
     @PatchMapping("/{id}")
+    @PreAuthorize("hasAuthority('write')")
     @ApiOperation(value = "Method used to update a professor by ID")
     public ProfessorDTOResponse updateProfessor(
             @ApiParam(value = "professorDTORequest for the professor you need to update", required = true)
@@ -81,6 +87,7 @@ public class ProfessorsRestController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('write')")
     @ApiOperation(value = "Method used to delete a professor by ID")
     public void deleteProfessor(
             @ApiParam(value = "ID value of the professor you need to delete", required = true)

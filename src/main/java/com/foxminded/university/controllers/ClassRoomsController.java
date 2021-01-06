@@ -5,6 +5,7 @@ import com.foxminded.university.service.ClassRoomService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
@@ -22,6 +23,7 @@ public class ClassRoomsController {
     private final ClassRoomService classRoomService;
 
     @GetMapping("/classRooms")
+    @PreAuthorize("hasAuthority('read')")
     public String showClassRooms(Model model) {
         logger.debug("showing all classrooms");
         model.addAttribute("classrooms", classRoomService.readAll());
@@ -29,6 +31,7 @@ public class ClassRoomsController {
     }
 
     @GetMapping("/newClassRoomForm")
+    @PreAuthorize("hasAuthority('write')")
     public String showNewClassRoomForm(Model model) {
         logger.debug("showing new ClassRoom form");
         ClassRoom classRoom = new ClassRoom();
@@ -37,6 +40,7 @@ public class ClassRoomsController {
     }
 
     @PostMapping("/saveClassRoom")
+    @PreAuthorize("hasAuthority('write')")
     public String saveClassRoom(@ModelAttribute("classroom") @Valid ClassRoom classRoom, Errors errors) {
         logger.debug("saving new classroom: {}", classRoom);
         if (errors.hasErrors()) {
@@ -47,6 +51,7 @@ public class ClassRoomsController {
     }
 
     @GetMapping("/updateClassRoomForm/{id}")
+    @PreAuthorize("hasAuthority('write')")
     public String showUpdateClassRoomForm(@PathVariable("id") Integer roomId, Model model) {
         logger.debug("showing update classRoom form");
         model.addAttribute("classroom", classRoomService.readByID(roomId));
@@ -54,6 +59,7 @@ public class ClassRoomsController {
     }
 
     @PostMapping("/updateClassRoom/{id}")
+    @PreAuthorize("hasAuthority('write')")
     public String update(@ModelAttribute("classroom") ClassRoom classRoom, @PathVariable("id") Integer roomId) {
         logger.debug("updating classRoom with ID: {}", roomId);
         classRoomService.update(roomId, classRoom.getRoomNumber());
@@ -61,6 +67,7 @@ public class ClassRoomsController {
     }
 
     @GetMapping("/deleteClassRoom/{id}")
+    @PreAuthorize("hasAuthority('write')")
     public String deleteClassRoom(@PathVariable("id") Integer roomId) {
         logger.debug("deleting classRoom with ID: {}", roomId);
         classRoomService.delete(roomId);

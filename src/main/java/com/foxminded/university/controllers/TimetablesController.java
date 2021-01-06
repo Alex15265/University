@@ -7,6 +7,7 @@ import com.foxminded.university.service.TimetableService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +20,7 @@ public class TimetablesController {
     private final TimetableService timetableService;
 
     @GetMapping("/timetableForm")
+    @PreAuthorize("hasAuthority('read')")
     public String showTimetableForm(Model model) {
         logger.debug("showing timetable form");
         Group group = new Group();
@@ -31,6 +33,7 @@ public class TimetablesController {
     }
 
     @GetMapping("/findByProfessor")
+    @PreAuthorize("hasAuthority('read')")
     public String findByProfessor(@ModelAttribute("professor") Professor professor,
                                   @ModelAttribute("time") LessonTime lessonTime, Model model) {
         logger.debug("showing lessons by professor with ID: {}", professor.getProfessorId());
@@ -40,6 +43,7 @@ public class TimetablesController {
     }
 
     @GetMapping("/findByGroup")
+    @PreAuthorize("hasAuthority('read')")
     public String findByGroup(@ModelAttribute("group") Group group,
                                   @ModelAttribute("time") LessonTime lessonTime, Model model) {
         logger.debug("showing lessons by group with ID: {}", group.getGroupId());

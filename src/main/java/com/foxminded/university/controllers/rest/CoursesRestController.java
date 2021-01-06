@@ -13,7 +13,7 @@ import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.ui.Model;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -28,6 +28,7 @@ public class CoursesRestController {
     private final CourseService courseService;
 
     @GetMapping("/")
+    @PreAuthorize("hasAuthority('read')")
     @ApiOperation(value = "Method used to fetch all courses")
     public List<CourseDTOResponse> showAllCourses() {
         logger.debug("showing all courses");
@@ -36,6 +37,7 @@ public class CoursesRestController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('read')")
     @ApiOperation(value = "Method used to fetch a course by ID")
     public CourseDTOResponse showCourseByID(
             @ApiParam(value = "ID value of the course you need to retrieve", required = true)
@@ -46,6 +48,7 @@ public class CoursesRestController {
     }
 
     @GetMapping("/{id}/students")
+    @PreAuthorize("hasAuthority('read')")
     @ApiOperation(value = "Method used to show students in a course")
     public List<StudentDTOResponse> showStudentsByCourse(
             @ApiParam(value = "ID value of the course whose students you want to retrieve", required = true)
@@ -56,6 +59,7 @@ public class CoursesRestController {
     }
 
     @PostMapping("")
+    @PreAuthorize("hasAuthority('write')")
     @ApiOperation(value = "Method used to save a new course")
     public CourseDTOResponse saveCourse(
             @ApiParam(value = "courseDTORequest for the course you need to save", required = true)
@@ -67,6 +71,7 @@ public class CoursesRestController {
     }
 
     @PatchMapping("/{id}")
+    @PreAuthorize("hasAuthority('write')")
     @ApiOperation(value = "Method used to update a course by ID")
     public CourseDTOResponse updateCourse(
             @ApiParam(value = "courseDTORequest for the course you need to update", required = true)
@@ -80,6 +85,7 @@ public class CoursesRestController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('write')")
     @ApiOperation(value = "Method used to delete a course by ID")
     public void deleteCourse(
             @ApiParam(value = "ID value of the course you need to delete", required = true)
@@ -89,6 +95,7 @@ public class CoursesRestController {
     }
 
     @PostMapping("/{id}/students")
+    @PreAuthorize("hasAuthority('write')")
     @ApiOperation(value = "Method used to add a student to a course")
     public void addStudentToCourse(
             @ApiParam(value = "ID value of the student you need to add", required = true)
@@ -100,6 +107,7 @@ public class CoursesRestController {
     }
 
     @DeleteMapping("/{id}/students")
+    @PreAuthorize("hasAuthority('write')")
     @ApiOperation(value = "Method used to delete a student from a course")
     public void deleteStudentFromCourse(
             @ApiParam(value = "ID value of the student you need to delete", required = true)

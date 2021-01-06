@@ -73,3 +73,7 @@ This app is a tutorial Foxminded project and contains the following tasks:
 [Task 22] - Swagger
     
     Add Swagger documentation to your project. You can use 2 or 3 versions or ask your mentor.
+    
+[Task 23] - Spring Boot Tests
+    
+    Write Integration(or/and System) tests using Spring Boot Test, H2 DB (it is possible to use Database Rider)

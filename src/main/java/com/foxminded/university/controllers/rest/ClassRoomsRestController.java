@@ -10,6 +10,7 @@ import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -24,6 +25,7 @@ public class ClassRoomsRestController {
     private final ClassRoomService classRoomService;
 
     @GetMapping("/")
+    @PreAuthorize("hasAuthority('read')")
     @ApiOperation(value = "Method used to fetch all classrooms")
     public List<ClassRoomDTOResponse> showAllClassRooms() {
         logger.debug("showing all classrooms");
@@ -33,6 +35,7 @@ public class ClassRoomsRestController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('read')")
     @ApiOperation(value = "Method used to fetch a classroom by ID")
     public ClassRoomDTOResponse showClassRoomByID(
             @ApiParam(value = "ID value of the classroom you need to retrieve", required = true)
@@ -43,6 +46,7 @@ public class ClassRoomsRestController {
     }
 
     @PostMapping("/")
+    @PreAuthorize("hasAuthority('write')")
     @ApiOperation(value = "Method used to save a new classroom")
     public ClassRoomDTOResponse saveClassRoom(
             @ApiParam(value = "classroomDTORequest for the classroom you need to save", required = true)
@@ -53,6 +57,7 @@ public class ClassRoomsRestController {
     }
 
     @PatchMapping("/{id}")
+    @PreAuthorize("hasAuthority('write')")
     @ApiOperation(value = "Method used to update a classroom by ID")
     public ClassRoomDTOResponse updateClassRoom(
             @ApiParam(value = "classroomDTORequest for the classroom you need to update", required = true)
@@ -65,6 +70,7 @@ public class ClassRoomsRestController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('write')")
     @ApiOperation(value = "Method used to delete a classroom by ID")
     public void deleteClassRoom(
             @ApiParam(value = "ID value of the classroom you need to delete", required = true)
