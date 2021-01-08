@@ -1,4 +1,4 @@
-package com.foxminded.university.entities.security;
+package com.foxminded.university.security;
 
 import lombok.RequiredArgsConstructor;
 

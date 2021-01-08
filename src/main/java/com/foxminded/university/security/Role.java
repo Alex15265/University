@@ -1,4 +1,4 @@
-package com.foxminded.university.entities.security;
+package com.foxminded.university.security;
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
