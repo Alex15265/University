@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>ClassRooms</title>
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+          integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+          crossorigin="anonymous">
+</head>
+<body>
+
+<div class="container my-4">
+    <h1>ClassRooms</h1>
+    <a th:href = "@{/newClassRoomForm}" class="btn btn-outline-success btn-sm mb-3"> Add ClassRoom </a>
+    <a th:href = "@{/}" class="btn btn-link btn-sm mb-3"> Home Page </a>
+    <table border="1" class="table table-striped table-responsive-md w-50">
+        <thead>
+        <tr class="d-flex">
+            <th class="col-3"> <em>ClassRoom ID</em> </th>
+            <th class="col"> <em>ClassRoom Number</em> </th>
+            <th class="col-4"> <em>Actions</em> </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="d-flex" th:each="classroom: ${classrooms}">
+            <th class="col-3" th:text="${classroom.roomId}"></th>
+            <td class="col" th:text="${classroom.roomNumber}"></td>
+            <td class="col-4"> <a th:href="@{/updateClassRoomForm/{id}(id=${classroom.roomId})}" class="btn btn-outline-primary">Update</a>
+                <a th:href="@{/deleteClassRoom/{id}(id=${classroom.roomId})}" class="btn btn-outline-danger">Delete</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

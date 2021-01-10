@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="ISO-8859-1">
+    <title>Add/Remove Group</title>
+
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-4">
+    <h1 class="mt-3">Add/Remove Group</h1>
+    <hr>
+    <form action="#" th:action="@{/addGroup/{id}(id=${lesson.getLessonId()})}"
+          method="POST">
+
+        <input type="number" th:field="${group.groupId}"
+               placeholder="Enter Group ID" class="form-control mb-4 col-4">
+        <button type="submit" class="btn btn-outline-info col-2"> Add Group</button>
+    </form>
+    <form class="mt-5" action="#" th:action="@{/deleteGroup/{id}(id=${lesson.getLessonId()})}"
+          method="POST">
+
+        <input type="number" th:field="${group.groupId}"
+               placeholder="Enter Group ID" class="form-control mb-4 col-4">
+        <button type="submit" class="btn btn-outline-danger col-2"> Remove Group</button>
+    </form>
+    <hr>
+    <a th:href = "@{/lessons}"> Back to Lessons</a>
+</div>
+</body>
+</html>

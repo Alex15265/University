@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Your Lessons</title>
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+          integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+          crossorigin="anonymous">
+</head>
+<body>
+<div class="container my-4">
+    <h1>Your Lessons</h1>
+    <a th:href = "@{/}" class="btn btn-link btn-sm mb-3"> Home Page </a>
+    <table border="1" class = "table table-striped table-responsive-md">
+        <thead>
+        <tr class="d-flex">
+            <th class="col-1"> <em>Lesson ID</em> </th>
+            <th class="col"> <em>Course</em> </th>
+            <th class="col"> <em>Professor</em> </th>
+            <th class="col"> <em>Groups</em> </th>
+            <th class="col"> <em>ClassRoom</em> </th>
+            <th class="col"> <em>LessonTime</em> </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="d-flex" th:each="lesson: ${lessons}">
+            <th class="col-1" th:text="${lesson.lessonId}"></th>
+            <td class="col" th:text="${lesson.course.courseName}"></td>
+            <td class="col" th:text="|${lesson.professor.firstName} ${lesson.professor.lastName}|"></td>
+            <td class="col" th:text="${lesson.groups}"></td>
+            <td class="col" th:text="${lesson.classRoom.roomNumber}"></td>
+            <td class="col" th:text="${lesson.time.lessonStart}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

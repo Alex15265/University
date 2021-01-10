@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>LessonTimes</title>
+
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+          integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+          crossorigin="anonymous">
+</head>
+<body>
+
+<div class="container my-4">
+    <h1>LessonTimes</h1>
+    <a th:href = "@{/newLessonTimeForm}" class="btn btn-outline-success btn-sm mb-3"> Add LessonTime </a>
+    <a th:href = "@{/}" class="btn btn-link btn-sm mb-3"> Home Page </a>
+    <table border="1" class="table table-striped table-responsive-md w-75">
+        <thead>
+        <tr class="d-flex">
+            <th class="col-1"> <em>Time ID</em> </th>
+            <th class="col"> <em>Lesson Start</em> </th>
+            <th class="col"> <em>Lesson End</em> </th>
+            <th class="col-3"> <em>Actions</em> </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="d-flex" th:each="lessonTime: ${lessonTimes}">
+            <th class="col-1" th:text="${lessonTime.timeId}"></th>
+            <td class="col" th:text="${lessonTime.lessonStart}"></td>
+            <td class="col" th:text="${lessonTime.lessonEnd}"></td>
+            <td class="col-3"> <a th:href="@{/updateLessonTimeForm/{id}(id=${lessonTime.timeId})}" class="btn btn-outline-primary">Update</a>
+                <a th:href="@{/deleteLessonTime/{id}(id=${lessonTime.timeId})}" class="btn btn-outline-danger">Delete</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

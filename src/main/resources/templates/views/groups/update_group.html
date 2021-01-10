@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="ISO-8859-1">
+    <title>Update Group</title>
+
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-4">
+    <h1>Update Group</h1>
+    <hr>
+    <form action="#" th:action="@{/updateGroup/{id}(id=${group.getGroupId()})}" th:object="${group}"
+          method="POST">
+        <input type="hidden" th:field="*{groupId}" />
+        <input type="text" th:field="*{groupName}" class="form-control mb-4 col-4">
+        <button type="submit" class="btn btn-outline-info col-2"> Update Group</button>
+    </form>
+    <hr>
+    <a th:href = "@{/groups}"> Back to Groups</a>
+</div>
+</body>
+</html>
